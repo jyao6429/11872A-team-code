@@ -34,8 +34,6 @@
 
 PID motorPositionPID;
 PID keepStraightPID;
-float kP = 0.005;
-float kD = 0.0;
 
 void pre_auton()
 {
