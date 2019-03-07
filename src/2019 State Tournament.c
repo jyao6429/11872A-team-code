@@ -40,6 +40,8 @@ float kP = 0.07;
 float kD = 0.01;
 Gyro gyro;
 PID gyroPID;
+
+// Will possibly use
 PID flipPID;
 
 // Auton variables
@@ -65,6 +67,7 @@ void pre_auton()
     // manage all user created tasks if set to false.
     bStopTasksBetweenModes = true;
 
+    // Reset just in case
     resetMotorEncoder(right1);
     resetMotorEncoder(left1);
 
@@ -82,7 +85,6 @@ void pre_auton()
 
     // Initialize flipPID
     pidInit(flipPID, 0.1, 1, 0.01);
-
     keepHolding = false;
 
     // Choose auton program
@@ -119,8 +121,6 @@ void pre_auton()
     }
 }
 
-// Can change this in other functions
-
 void
 holdFlipAngle(float fTarget)
 {
@@ -141,6 +141,8 @@ holdFlipAngle(float fTarget)
 * gyro turn to target angle
 *
 * @param fTarget target value of gyro turn (in degrees)
+* @param fGyroAngle initial angle of gyro (in degrees)
+* @param maxSpeed maximum motor power to use (up to 127)
 */
 float
 gyroTurn(float fTarget, float fGyroAngle, int maxSpeed)
@@ -156,6 +158,7 @@ gyroTurn(float fTarget, float fGyroAngle, int maxSpeed)
         // Reset loop timer
         liTimer = nPgmTime;
 
+        // Add on to current robot angle
         fGyroAngle += gyro_get_rate(gyro) * fDeltaTime;
 
         // Get variables for datalog
@@ -164,7 +167,6 @@ gyroTurn(float fTarget, float fGyroAngle, int maxSpeed)
         float derivative = 0;
 
         long dTime = (nPgmTime - gyroPID.lastTime) * 0.001;
-
         if (dTime != 0)
             derivative = (fGyroAngle - gyroPID.lastValue) / dTime;
 
@@ -182,8 +184,8 @@ gyroTurn(float fTarget, float fGyroAngle, int maxSpeed)
         motor[right1] = driveOut;
         motor[left1] = -driveOut;
 
-        // Stop the turn function when the angle has been within 3 degrees of the desired angle for 350ms
-        if(abs(fTarget - fGyroAngle) > 3)
+        // Stop the turn function when the angle has been within 2 degrees of the desired angle for 350ms
+        if(abs(fTarget - fGyroAngle) > 2)
             liAtTargetTime = nPgmTime;
         if (nPgmTime - liAtTargetTime > 350)
         {
@@ -196,13 +198,37 @@ gyroTurn(float fTarget, float fGyroAngle, int maxSpeed)
     pidInit(gyroPID, kP, 0, kD);
     return fGyroAngle;
 }
+
+/**
+* Overloaded gyro turn for simpler use
+* @param fTarget target angle to turn to (in degrees)
+*/
 float
 gyroTurn(float fTarget)
 {
     return gyroTurn(fTarget, 0, 60);
 }
+/**
+* Drive straight a certain distance
+* @param distance the specific encoder tick to travel to
+* @param reset if motor encoder needs to be reset to 0 before the move
+*/
+void
+driveStraight(long distance, bool reset)
+{
+    if (reset)
+    {
+        resetMotorEncoder(right1);
+        resetMotorEncoder(left1);
+    }
 
-// Own useful functions
+    setMotorTarget(right1, distance, 90, false);
+    setMotorTarget(left1, distance, 90, false);
+
+    waitUntil(getMotorTargetCompleted(right1) && getMotorTargetCompleted(left1));
+}
+
+// Functions for the flipper
 task raise()
 {
 
@@ -254,20 +280,6 @@ task flipAndReturn()
     startTask(returnDown);
 }
 
-void
-driveStraight(long distance, bool reset)
-{
-    if (reset)
-    {
-        resetMotorEncoder(right1);
-        resetMotorEncoder(left1);
-    }
-
-    setMotorTarget(right1, distance, 90, false);
-    setMotorTarget(left1, distance, 90, false);
-
-    waitUntil(getMotorTargetCompleted(right1) && getMotorTargetCompleted(left1));
-}
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /*                              Autonomous Task                              */
