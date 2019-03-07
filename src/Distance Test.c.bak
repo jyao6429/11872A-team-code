@@ -91,7 +91,7 @@ goToPosition(long targetPosition, int maxSpeed)
 
         // Calculate the output of the PID controller and output to drive motors
         float driveOutR = pidCalculate(motorPositionPID, targetPosition, currentPositionR) * maxSpeed;
-        float driveOutL = driveOutR + pidCalculate(keepStraightPID, currentPositionR, currentPositionL) * 30;
+        float driveOutL = driveOutR + pidCalculate(keepStraightPID, currentPositionR, currentPositionL) * 45;
 
         // Log on dataLog
         datalogDataGroupStart();
