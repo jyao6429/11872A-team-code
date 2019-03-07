@@ -34,8 +34,6 @@
 
 PID motorPositionPID;
 PID keepStraightPID;
-float kP = 0.005;
-float kD = 0.0;
 
 void pre_auton()
 {
@@ -55,7 +53,7 @@ void pre_auton()
 
     slaveMotor(flipL, flipR);
 
-    pidInit(motorPositionPID, kP, 0, kD);
+    pidInit(motorPositionPID, 0.005, 0, 0);
     pidInit(keepStraightPID, 0.005, 0.01, 0.0004);
 }
 void

@@ -55,7 +55,7 @@ void pre_auton()
 
     slaveMotor(flipL, flipR);
 
-    pidInit(motorPositionPID, kP, 0, kD);
+    pidInit(motorPositionPID, 0.005, 0, 0);
     pidInit(keepStraightPID, 0.005, 0.01, 0.0004);
 }
 void
@@ -91,7 +91,7 @@ goToPosition(long targetPosition, int maxSpeed)
 
         // Calculate the output of the PID controller and output to drive motors
         float driveOutR = pidCalculate(motorPositionPID, targetPosition, currentPositionR) * maxSpeed;
-        float driveOutL = driveOutR + pidCalculate(keepStraightPID, currentPositionR, currentPositionL) * 45;
+        float driveOutL = driveOutR + pidCalculate(keepStraightPID, currentPositionR, currentPositionL) * 30;
 
         // Log on dataLog
         datalogDataGroupStart();
