@@ -54,7 +54,13 @@ void pre_auton()
     slaveMotor(flipL, flipR);
 
     pidInit(motorPositionPID, 0.005, 0, 0);
-    pidInit(keepStraightPID, 0.005, 0.01, 0.0004);
+    pidInit(keepStraightPID, 0.01, 0, 0);
+}
+void
+powerMotors(int leftPower, int rightPower)
+{
+    motor[left1] = leftPower;
+    motor[right1] = rightPower;
 }
 void
 goToPosition(long targetPosition, int maxSpeed)
@@ -64,8 +70,8 @@ goToPosition(long targetPosition, int maxSpeed)
 
     while (!bAtTarget)
     {
-        long currentPositionR = getMotorEncoder(right1);
-        long currentPositionL = getMotorEncoder(left1);
+        float currentPositionR = getMotorEncoder(right1);
+        float currentPositionL = getMotorEncoder(left1) + targetPosition / 70;
 
         /*
         float error = targetPosition - currentPositionR;
@@ -89,7 +95,7 @@ goToPosition(long targetPosition, int maxSpeed)
 
         // Calculate the output of the PID controller and output to drive motors
         float driveOutR = pidCalculate(motorPositionPID, targetPosition, currentPositionR) * maxSpeed;
-        float driveOutL = driveOutR + pidCalculate(keepStraightPID, currentPositionR, currentPositionL) * 30;
+        float driveOutL = driveOutR + pidCalculate(keepStraightPID, currentPositionR, currentPositionL) * 100;
 
         // Log on dataLog
         datalogDataGroupStart();
@@ -100,8 +106,7 @@ goToPosition(long targetPosition, int maxSpeed)
 		datalogAddValue(5, driveOutL);
         datalogDataGroupEnd();
 
-        motor[right1] = driveOutR;
-        motor[left1] = driveOutL;
+        powerMotors(driveOutL, driveOutR);
 
         // Stop the turn function when the position has been within 12 ticks of the desired encoder tick for 350ms
         if(abs(targetPosition - currentPositionR) > 12 || abs(targetPosition - currentPositionL) > 12)
@@ -109,8 +114,7 @@ goToPosition(long targetPosition, int maxSpeed)
         if (nPgmTime - liAtTargetTime > 350)
         {
             bAtTarget = true;
-            motor[right1] = 0;
-            motor[left1] = 0;
+            powerMotors(0);
         }
     }
 }
@@ -124,8 +128,6 @@ driveStraight(long distance, bool reset)
     }
 
     goToPosition(distance, 100);
-    //setMotorTarget(right1, distance, 90, false);
-    //setMotorTarget(left1, distance, 90, false);
 }
 task autonomous()
 {

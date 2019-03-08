@@ -34,10 +34,14 @@
 #include "./libGyro/NERD_Gyro.c"
 
 // Gyro stuff
-float kP = 0.07;
-float kD = 0.01;
+float kP = 0.08;
+float kD = 0.003;
 Gyro gyro;
 PID gyroPID;
+
+// Driving PID
+PID motorPositionPID;
+PID keepStraightPID;
 
 // Will possibly use
 PID flipPID;
@@ -80,6 +84,10 @@ void pre_auton()
     // Initialize the gyro
     gyro_init(gyro, gyroSense, false);
     pidInit(gyroPID, kP, 0, kD);
+
+    // Initialize driving straight PID
+    pidInit(motorPositionPID, 0.005, 0, 0);
+    pidInit(keepStraightPID, 0.01, 0, 0);
 
     // Initialize flipPID
     pidInit(flipPID, 0.1, 1, 0.01);
@@ -134,7 +142,90 @@ holdFlipAngle(float fTarget)
         wait1Msec(25);
     }
 }
+void
+powerMotors(int leftPower, int rightPower)
+{
+    motor[left1] = leftPower;
+    motor[right1] = rightPower;
+}
+void
+powerMotors(int power)
+{
+    powerMotors(power, power);
+}
+void
+goToPosition(long targetPosition, int maxSpeed)
+{
+    bool bAtTarget = false;
+    long liAtTargetTime = nPgmTime;
 
+    while (!bAtTarget)
+    {
+        float currentPositionR = getMotorEncoder(right1);
+        float currentPositionL = getMotorEncoder(left1) + targetPosition / 70;
+
+        /*
+        float error = targetPosition - currentPositionR;
+        float integral = motorPositionPID.sigma;
+        float derivative = 0;
+
+        long dTime = (nPgmTime - motorPositionPID.lastTime) * 0.001;
+
+        if (dTime != 0)
+            derivative = (currentPositionR - motorPositionPID.lastValue) / dTime;
+            */
+/*
+        float error = currentPositionR - currentPositionL;
+        float integral = keepStraightPID.sigma;
+        float derivative = 0;
+
+        long dTime = (nPgmTime - keepStraightPID.lastTime) * 0.001;
+
+        if (dTime != 0)
+            derivative = (currentPositionL - keepStraightPID.lastValue) / dTime;
+*/
+        // Calculate the output of the PID controller and output to drive motors
+        float driveOutR = pidCalculate(motorPositionPID, targetPosition, currentPositionR) * maxSpeed;
+        float driveOutL = driveOutR + pidCalculate(keepStraightPID, currentPositionR, currentPositionL) * 100;
+
+        /*
+        // Log on dataLog
+        datalogDataGroupStart();
+        datalogAddValue(0, error);
+		datalogAddValue(1, integral);
+		datalogAddValue(2, derivative);
+		datalogAddValue(4, driveOutR);
+		datalogAddValue(5, driveOutL);
+        datalogDataGroupEnd();
+*/
+        powerMotors(driveOutR, driveOutR);
+
+        // Stop the turn function when the position has been within 12 ticks of the desired encoder tick for 350ms
+        if(abs(targetPosition - currentPositionR) > 12 || abs(targetPosition - currentPositionL) > 12)
+            liAtTargetTime = nPgmTime;
+        if (nPgmTime - liAtTargetTime > 350)
+        {
+            bAtTarget = true;
+            powerMotors(0);
+        }
+    }
+}
+/**
+* Drive straight a certain distance
+* @param distance the specific encoder tick to travel to
+* @param reset if motor encoder needs to be reset to 0 before the move
+*/
+void
+driveStraight(long distance, bool reset)
+{
+    if (reset)
+    {
+        resetMotorEncoder(right1);
+        resetMotorEncoder(left1);
+    }
+
+    goToPosition(distance, 100);
+}
 /**
 * gyro turn to target angle
 *
@@ -160,27 +251,26 @@ gyroTurn(float fTarget, float fGyroAngle, int maxSpeed)
         fGyroAngle += gyro_get_rate(gyro) * fDeltaTime;
 
         // Get variables for datalog
-        float error = fTarget - fGyroAngle;
-        float integral = gyroPID.sigma;
-        float derivative = 0;
+        //float error = fTarget - fGyroAngle;
+        //float integral = gyroPID.sigma;
+        //float derivative = 0;
 
-        long dTime = (nPgmTime - gyroPID.lastTime) * 0.001;
-        if (dTime != 0)
-            derivative = (fGyroAngle - gyroPID.lastValue) / dTime;
+        //long dTime = (nPgmTime - gyroPID.lastTime) * 0.001;
+        //if (dTime != 0)
+          //  derivative = (fGyroAngle - gyroPID.lastValue) / dTime;
 
         // Calculate the output of the PID controller and output to drive motors
         float driveOut = pidCalculate(gyroPID, fTarget, fGyroAngle) * maxSpeed;
 
         // Log on dataLog
-        datalogDataGroupStart();
-        datalogAddValue(0, error);
-		datalogAddValue(1, integral);
-		datalogAddValue(2, derivative);
-		datalogAddValue(4, driveOut);
-        datalogDataGroupEnd();
+        //datalogDataGroupStart();
+        //datalogAddValue(0, error);
+		//datalogAddValue(1, integral);
+		//datalogAddValue(2, derivative);
+		//datalogAddValue(4, driveOut);
+        //datalogDataGroupEnd();
 
-        motor[right1] = driveOut;
-        motor[left1] = -driveOut;
+        powerMotors(-driveOut, driveOut);
 
         // Stop the turn function when the angle has been within 2 degrees of the desired angle for 350ms
         if(abs(fTarget - fGyroAngle) > 2)
@@ -188,8 +278,7 @@ gyroTurn(float fTarget, float fGyroAngle, int maxSpeed)
         if (nPgmTime - liAtTargetTime > 350)
         {
             bAtGyro = true;
-            motor[right1] = 0;
-            motor[left1] = 0;
+            powerMotors(0);
         }
     }
     // Reinitialize the PID constants to their original values in case they were changed
@@ -204,28 +293,8 @@ gyroTurn(float fTarget, float fGyroAngle, int maxSpeed)
 float
 gyroTurn(float fTarget)
 {
-    return gyroTurn(fTarget, 0, 60);
+    return gyroTurn(fTarget, 0, 65);
 }
-/**
-* Drive straight a certain distance
-* @param distance the specific encoder tick to travel to
-* @param reset if motor encoder needs to be reset to 0 before the move
-*/
-void
-driveStraight(long distance, bool reset)
-{
-    if (reset)
-    {
-        resetMotorEncoder(right1);
-        resetMotorEncoder(left1);
-    }
-
-    setMotorTarget(right1, distance, 90, false);
-    setMotorTarget(left1, distance, 90, false);
-
-    waitUntil(getMotorTargetCompleted(right1) && getMotorTargetCompleted(left1));
-}
-
 // Functions for the flipper
 task raise()
 {
@@ -473,12 +542,12 @@ task autonomous()
 /*---------------------------------------------------------------------------*/
 void test()
 {
-    gyroTurn(89);
+    driveStraight(3000, true);
 }
 task usercontrol()
 {
-    //test();
-    autonNearFlagPlat();
+    test();
+    //autonNearFlagPlat();
 
     // Remove PID Control for better driving
     nMotorPIDSpeedCtrl[right1] = RegIdle;
