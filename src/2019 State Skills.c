@@ -45,9 +45,6 @@ PID motorPositionPID;
 PID flipPID;
 
 // Auton variables
-bool isNearFlag;
-bool isPlatform;
-int turnDirection;
 bool keepHolding;
 
 /*---------------------------------------------------------------------------*/
@@ -88,39 +85,6 @@ void pre_auton()
     // Initialize flipPID
     pidInit(flipPID, 0.1, 1, 0.01);
     keepHolding = false;
-
-    // Choose auton program
-    // Choose blue or red alliance
-    if (SensorValue[blueRedJumper] == 1)
-    {
-        turnDirection = 1;
-        SensorValue[blueALED] = 1;
-    }
-    else
-    {
-        turnDirection = -1;
-        SensorValue[redALED] = 1;
-    }
-
-    // Choose if is near flag
-    if (SensorValue[nearFarJumper] == 1)
-        isNearFlag = true;
-    else
-    {
-        isNearFlag = false;
-        SensorValue[farFlagLED] = 1;
-    }
-
-    // Choose if doing platform
-    if (SensorValue[platJumper] == 1)
-    {
-        isPlatform = true;
-    }
-    else
-    {
-        isPlatform = false;
-        SensorValue[noPlatLED] = 1;
-    }
 }
 
 void
@@ -168,9 +132,9 @@ goToPosition(long targetPosition, int maxSpeed)
         long dTime = (nPgmTime - motorPositionPID.lastTime) * 0.001;
 
         if (dTime != 0)
-            derivative = (currentPositionR - motorPositionPID.lastValue) / dTime;
-            */
-/*
+        derivative = (currentPositionR - motorPositionPID.lastValue) / dTime;
+        */
+        /*
         float error = currentPositionR - currentPositionL;
         float integral = keepStraightPID.sigma;
         float derivative = 0;
@@ -178,8 +142,8 @@ goToPosition(long targetPosition, int maxSpeed)
         long dTime = (nPgmTime - keepStraightPID.lastTime) * 0.001;
 
         if (dTime != 0)
-            derivative = (currentPositionL - keepStraightPID.lastValue) / dTime;
-*/
+        derivative = (currentPositionL - keepStraightPID.lastValue) / dTime;
+        */
         // Calculate the output of the PID controller and output to drive motors
         float driveOutR = pidCalculate(motorPositionPID, targetPosition, currentPositionR) * maxSpeed;
         //float driveOutL = driveOutR + pidCalculate(keepStraightPID, currentPositionR, currentPositionL) * 100;
@@ -188,12 +152,12 @@ goToPosition(long targetPosition, int maxSpeed)
         // Log on dataLog
         datalogDataGroupStart();
         datalogAddValue(0, error);
-		datalogAddValue(1, integral);
-		datalogAddValue(2, derivative);
-		datalogAddValue(4, driveOutR);
-		datalogAddValue(5, driveOutL);
+        datalogAddValue(1, integral);
+        datalogAddValue(2, derivative);
+        datalogAddValue(4, driveOutR);
+        datalogAddValue(5, driveOutL);
         datalogDataGroupEnd();
-*/
+        */
         powerMotors(driveOutR, driveOutR);
 
         // Stop the turn function when the position has been within 12 ticks of the desired encoder tick for 350ms
@@ -253,7 +217,7 @@ gyroTurn(float fTarget, float fGyroAngle, int maxSpeed)
 
         //long dTime = (nPgmTime - gyroPID.lastTime) * 0.001;
         //if (dTime != 0)
-          //  derivative = (fGyroAngle - gyroPID.lastValue) / dTime;
+        //  derivative = (fGyroAngle - gyroPID.lastValue) / dTime;
 
         // Calculate the output of the PID controller and output to drive motors
         float driveOut = pidCalculate(gyroPID, fTarget, fGyroAngle) * maxSpeed;
@@ -261,9 +225,9 @@ gyroTurn(float fTarget, float fGyroAngle, int maxSpeed)
         // Log on dataLog
         //datalogDataGroupStart();
         //datalogAddValue(0, error);
-		//datalogAddValue(1, integral);
-		//datalogAddValue(2, derivative);
-		//datalogAddValue(4, driveOut);
+        //datalogAddValue(1, integral);
+        //datalogAddValue(2, derivative);
+        //datalogAddValue(4, driveOut);
         //datalogDataGroupEnd();
 
         powerMotors(-driveOut, driveOut);
@@ -351,7 +315,7 @@ task flipAndReturn()
 /*  a VEX Competition.                                                       */
 /*---------------------------------------------------------------------------*/
 void
-autonNearFlagNoPlat()
+autonSkills()
 {
     // Go backwards to hit 1st flag
     driveStraight(-2200, true);
@@ -360,7 +324,7 @@ autonNearFlagNoPlat()
     driveStraight(-1100, false);
 
     // Turn 90 deg (face 1st cap)
-    gyroTurn(-90 * turnDirection);
+    gyroTurn(90);
 
     // Square up against wall
     motor[right1] = -60;
@@ -388,7 +352,7 @@ autonNearFlagNoPlat()
     driveStraight(1800, false);
 
     // Turn 90 deg (to line up backwards with 2nd flag)
-    gyroTurn(90 * turnDirection);
+    gyroTurn(90);
 
     // Back up to square with wall and hit 2nd flag
     driveStraight(-1100, true);
@@ -403,48 +367,41 @@ autonNearFlagNoPlat()
     driveStraight(1800, true);
 
     // Sweep the floor to right to knock 2nd cap off ball
-    float tempAngle = gyroTurn(-60 * turnDirection, 0, 80);
+    float tempAngle = gyroTurn(60, 0, 80);
     // Then return to center
     gyroTurn(0, tempAngle, 55);
-}
-void autonNearFlagPlat()
-{
-    // Go backwards to hit 1st flag
-    driveStraight(-2200, true);
 
-    // Go forwards to line up with alliance platform
-    driveStraight(1100, false);
+    // Raise flipper to get out of the way
+    startTask(raise);
 
-    // Turn 90 deg (face alliance platform)
-    gyroTurn(-90 * turnDirection);
+    // Go forwards and center in tile to line up with starting alliance tile
+    driveStraight(300, true);
 
-    // Square against alliance platform
-    motor[right1] = 40;
-    motor[left1] = 40;
-    wait1Msec(1500);
+    // Turn 90 deg to face alliance tile backwards
+    gyroTurn(90);
 
-    // Climb platform
-    motor[right1] = 127;
-    motor[left1] = 127;
-    wait1Msec(2000);
+    // Back up to square with wall
+    driveStraight(-1900, true);
+    motor[right1] = -60;
+    motor[left1] = -60;
+    wait1Msec(500);
 
-    // Stop everything
-    motor[right1] = 0;
-    motor[left1] = 0;
-}
-void
-autonFarFlagPlat()
-{
+    // Move up slightly to rotate
+    driveStraight(200, true);
+
+    // Turn 90 deg (on way to line up with alliance platform)
+    gyroTurn(-90);
+
     // Move in line with alliance platform
-    driveStraight(1100, true);
+    driveStraight(1000, true);
 
     // Turn 90 deg (face alliance platform)
-    gyroTurn(90 * turnDirection);
+    gyroTurn(90);
 
     // Square against alliance platform
     motor[right1] = 40;
     motor[left1] = 40;
-    wait1Msec(1500);
+    wait1Msec(1000);
 
     // Climb platform
     motor[right1] = 127;
@@ -454,28 +411,6 @@ autonFarFlagPlat()
     // Stop everything
     motor[right1] = 0;
     motor[left1] = 0;
-}
-void
-autonFarFlagNoPlat()
-{
-    // Lower flipper
-    startTask(returnDown);
-
-    // Knock first cap
-    driveStraight(2200, true);
-
-    // Turn 90 deg to face second cap
-    gyroTurn(90 * turnDirection);
-
-    // Go forwards and flip cap
-    resetMotorEncoder(right1);
-    powerMotors(80);
-    waitUntil(getMotorEncoder(right1) > 500);
-    startTask(flipAndReturn);
-    wait1Msec(400);
-
-    driveStraight(-400, true);
-
 }
 task autonomous()
 {
@@ -483,20 +418,7 @@ task autonomous()
     nMotorPIDSpeedCtrl[right1] = RegSpeed;
     nMotorPIDSpeedCtrl[left1] = RegSpeed;
 
-    if (isNearFlag)
-    {
-        if (isPlatform)
-            autonNearFlagPlat();
-        else
-            autonNearFlagNoPlat();
-    }
-    else
-    {
-        if (isPlatform)
-            autonFarFlagPlat();
-        else
-            autonFarFlagNoPlat();
-    }
+    autonSkills();
 }
 
 /*---------------------------------------------------------------------------*/
@@ -513,7 +435,7 @@ void test()
 task usercontrol()
 {
     //test();
-    autonNearFlagNoPlat();
+    //autonNearFlagPlat();
 
     // Remove PID Control for better driving
     nMotorPIDSpeedCtrl[right1] = RegIdle;
@@ -547,5 +469,7 @@ task usercontrol()
         // Raise flipper
         if (vexRT[Btn8D] == 1)
             startTask(raise);
+        if (vexRT[Btn7R] == 1)
+            startTask(autonomous);
     }
 }
