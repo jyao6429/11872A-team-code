@@ -538,9 +538,10 @@ task usercontrol()
         // Raise flipper
         if (vexRT[Btn8D] == 1)
             startTask(raise);
-        if (vexRT[Btn5U] == 1)
-            motor[flipR] = 40;
-        else if (vexRT[Btn5D == 1)
-            motor[flipR] = -30;
+        // Manual flip control
+        //if (vexRT[Btn5U] == 1)
+          //  motor[flipR] = 40;
+        //if (vexRT[Btn5D] == 1)
+          //  motor[flipR] = -30;
     }
 }

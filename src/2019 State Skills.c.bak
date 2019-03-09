@@ -329,8 +329,7 @@ autonSkills()
     gyroTurn(90);
 
     // Square up against wall
-    motor[right1] = -60;
-    motor[left1] = -60;
+    powerMotors(-60);
 
     // Lower flipper
     startTask(returnDown);
@@ -340,19 +339,19 @@ autonSkills()
     resetMotorEncoder(left1);
 
     // Go forward to 1st cap
-    motor[right1] = 85;
-    motor[left1] = 85;
+    powerMotors(85);
 
     waitUntil(getMotorEncoder(right1) > 1600);
 
     // Flip 1st cap while still moving forward
-    startTask(flip);
+    startTask(flipAndReturn);
     wait1Msec(500);
     startTask(raise);
 
     // Travel to end to 2nd cap
     driveStraight(2200, false);
 
+    // Line up with first cap
     driveStraight(1100, false);
 
     // turn to face cap
@@ -373,55 +372,54 @@ autonSkills()
 
     gyroTurn(-90);
 
-    driveStraight(1100, true);
-
-    // Turn back against 2nd flag
-    gyroTurn(-90);
-
-    // Back up to square with wall and hit 2nd flag
-    driveStraight(-2200, true);
-    motor[right1] = -60;
-    motor[left1] = -60;
-    wait1Msec(750);
-
-    // Drive away from 2nd flag
-    driveStraight(1100, true);
-
-    gyroTurn(90);
-
     resetMotorEncoder(right1);
     resetMotorEncoder(left1);
 
-    // Go forward to 1st cap
-    motor[right1] = 85;
-    motor[left1] = 85;
+    // Go forward to 3rd cap
+    powerMotors(85);
 
-    waitUntil(getMotorEncoder(right1) > 1500);
+    waitUntil(getMotorEncoder(right1) > 2500);
 
     // Flip 3rd cap while still moving forward
     startTask(flip);
     wait1Msec(500);
     startTask(raise);
 
-    // Travel to end to 2nd cap
-    driveStraight(2200, false);
+    // Travel to end to 3rd cap
+    driveStraight(3300, false);
 
     gyroTurn(-90);
 
-    // Back up to square with wall and hit 3rd flag
-    driveStraight(-1100, true);
-    motor[right1] = -60;
-    motor[left1] = -60;
-    wait1Msec(750);
+    startTask(returnDown);
+    wait1Msec(400);
 
-    driveStraight(2200, true);
+    // Line up with last cap
+    driveStraight(1100, true);
 
     gyroTurn(-90);
 
-    // Back up to square with wall and hit wall
-    driveStraight(-1800, true);
-    motor[right1] = -60;
-    motor[left1] = -60;
+    resetMotorEncoder(right1);
+    resetMotorEncoder(left1);
+
+    powerMotors(85);
+
+    waitUntil(getMotorEncoder(right1) > 600);
+
+    // Flip 3rd cap while still moving forward
+    startTask(flip);
+    wait1Msec(500);
+    startTask(raise);
+
+    driveStraight(1100, false);
+
+    resetMotorEncoder(right1);
+    resetMotorEncoder(left1);
+
+    powerMotors(-85);
+    waitUntil(getMotorEncoder(right1) < 1600);
+
+    // Square up against wall
+    powerMotors(-60);
     wait1Msec(750);
 
     driveStraight(300, true);
@@ -432,29 +430,22 @@ autonSkills()
 
     gyroTurn(-90);
 
-    // Square against alliance platform
-    motor[right1] = 40;
-    motor[left1] = 40;
+    powerMotors(60);
     wait1Msec(1500);
 
-    // Climb platform
-    motor[right1] = 127;
-    motor[left1] = 127;
-    wait1Msec(1700);
+    powerMotors(127);
+    wait1Msec(1400);
 
-    // Square against alliance platform
-    motor[right1] = 40;
-    motor[left1] = 40;
-    wait1Msec(1500);
+    powerMotors(60);
+    wait1Msec(700);
 
-    // Climb platform
-    motor[right1] = 127;
-    motor[left1] = 127;
-    wait1Msec(1700);
+    powerMotors(127);
+    wait1Msec(1400);
 
-    // Stop everything
-    motor[right1] = 0;
-    motor[left1] = 0;
+    powerMotors(-5);
+    wait1Msec(250);
+
+    powerMotors(0);
 }
 void
 autonEasy()
@@ -466,7 +457,7 @@ autonEasy()
     wait1Msec(1000);
 
     powerMotors(60);
-    wait1Msec(1500);
+    wait1Msec(1800);
 
     powerMotors(127);
     wait1Msec(1400);
