@@ -363,8 +363,7 @@ autonNearFlagNoPlat()
     gyroTurn(-90 * turnDirection);
 
     // Square up against wall
-    motor[right1] = -60;
-    motor[left1] = -60;
+    powerMotors(-60);
 
     // Lower flipper
     startTask(returnDown);
@@ -374,10 +373,9 @@ autonNearFlagNoPlat()
     resetMotorEncoder(left1);
 
     // Go forward to 1st cap
-    motor[right1] = 85;
-    motor[left1] = 85;
+    powerMotors(85);
 
-    waitUntil(getMotorEncoder(right1) > 800);
+    waitUntil(getMotorEncoder(right1) > 500);
 
     // Flip 1st cap while still moving forward
     startTask(flip);
@@ -385,27 +383,24 @@ autonNearFlagNoPlat()
     startTask(raise);
 
     // Travel to end to line up with 2nd flag
-    driveStraight(1800, false);
+    driveStraight(1100, false);
 
-    // Turn 90 deg (to line up backwards with 2nd flag)
+    // Turn 90 deg (to line up with second cap)
     gyroTurn(90 * turnDirection);
 
-    // Back up to square with wall and hit 2nd flag
-    driveStraight(-1100, true);
-    motor[right1] = -60;
-    motor[left1] = -60;
-    wait1Msec(750);
+    // Drive up to line up
+    driveStraight(1100, true);
+
+    // Turn towards 2nd cap
+    gyroTurn(-90 * turnDirection);
 
     // Lower flipper
     startTask(returnDown);
+    wait1Msec(400);
 
-    // Go forward to 2nd tilted cap
-    driveStraight(1800, true);
+    driveStraight(1100, true);
 
-    // Sweep the floor to right to knock 2nd cap off ball
-    float tempAngle = gyroTurn(-60 * turnDirection, 0, 80);
-    // Then return to center
-    gyroTurn(0, tempAngle, 55);
+    powerMotors(0);
 }
 void autonNearFlagPlat()
 {
@@ -419,41 +414,35 @@ void autonNearFlagPlat()
     gyroTurn(-90 * turnDirection);
 
     // Square against alliance platform
-    motor[right1] = 40;
-    motor[left1] = 40;
+    powerMotors(60);
     wait1Msec(1500);
 
     // Climb platform
-    motor[right1] = 127;
-    motor[left1] = 127;
-    wait1Msec(2000);
+    powerMotors(127);
+    wait1Msec(1400);
 
     // Stop everything
-    motor[right1] = 0;
-    motor[left1] = 0;
+    powerMotors(0);
 }
 void
 autonFarFlagPlat()
 {
     // Move in line with alliance platform
-    driveStraight(1100, true);
+    driveStraight(1150, true);
 
     // Turn 90 deg (face alliance platform)
     gyroTurn(90 * turnDirection);
 
     // Square against alliance platform
-    motor[right1] = 40;
-    motor[left1] = 40;
+    powerMotors(60);
     wait1Msec(1500);
 
     // Climb platform
-    motor[right1] = 127;
-    motor[left1] = 127;
-    wait1Msec(2000);
+    powerMotors(127);
+    wait1Msec(1400);
 
     // Stop everything
-    motor[right1] = 0;
-    motor[left1] = 0;
+    powerMotors(0);
 }
 void
 autonFarFlagNoPlat()
@@ -475,6 +464,8 @@ autonFarFlagNoPlat()
     wait1Msec(400);
 
     driveStraight(-400, true);
+
+    powerMotors(0);
 
 }
 task autonomous()
@@ -513,7 +504,7 @@ void test()
 task usercontrol()
 {
     //test();
-    startTask(autonomous);
+    //autonNearFlagNoPlat();
 
     // Remove PID Control for better driving
     nMotorPIDSpeedCtrl[right1] = RegIdle;
@@ -547,5 +538,7 @@ task usercontrol()
         // Raise flipper
         if (vexRT[Btn8D] == 1)
             startTask(raise);
+        if (vexRT[Btn5U] == 1)
+            motor[flipR] = 40;
     }
 }
