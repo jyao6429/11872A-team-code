@@ -41,7 +41,7 @@ PID gyroPID;
 
 // Driving PID
 PID motorPositionPID;
-//PID keepStraightPID;
+PID keepStraightPID;
 
 // Will possibly use
 PID flipPID;
@@ -82,7 +82,7 @@ void pre_auton()
 
     // Initialize driving straight PID
     pidInit(motorPositionPID, 0.005, 0, 0);
-    //pidInit(keepStraightPID, 0.01, 0, 0);
+    pidInit(keepStraightPID, 0.01, 0.01, 0);
 
     // Initialize flipPID
     pidInit(flipPID, 0.1, 1, 0.01);
@@ -124,7 +124,7 @@ goToPosition(long targetPosition, int maxSpeed)
     while (!bAtTarget)
     {
         float currentPositionR = getMotorEncoder(right1);
-        //float currentPositionL = getMotorEncoder(left1) + targetPosition / 70;
+        float currentPositionL = getMotorEncoder(left1);
 
         /*
         float error = targetPosition - currentPositionR;
@@ -148,7 +148,7 @@ goToPosition(long targetPosition, int maxSpeed)
         */
         // Calculate the output of the PID controller and output to drive motors
         float driveOutR = pidCalculate(motorPositionPID, targetPosition, currentPositionR) * maxSpeed;
-        //float driveOutL = driveOutR + pidCalculate(keepStraightPID, currentPositionR, currentPositionL) * 100;
+        float driveOutL = driveOutR + pidCalculate(keepStraightPID, currentPositionR, currentPositionL) * 100 + 5;
 
         /*
         // Log on dataLog
@@ -365,7 +365,9 @@ autonSkills()
 
     powerMotors(80);
     wait1Msec(800);
-    startTask(flipAndReturn);
+    startTask(flip);
+    wait1Msec(400);
+    startTask(raise);
 
     driveStraight(1100, false);
 
@@ -376,7 +378,11 @@ autonSkills()
     resetMotorEncoder(left1);
 
     // Go forward to 3rd cap
-    powerMotors(85);
+    startTask(returnDown);
+
+    driveStraight(2000, true);
+
+    powerMotors(60);
 
     waitUntil(getMotorEncoder(right1) > 2500);
 
@@ -480,8 +486,8 @@ task autonomous()
     nMotorPIDSpeedCtrl[right1] = RegSpeed;
     nMotorPIDSpeedCtrl[left1] = RegSpeed;
 
-    //autonSkills();
-    autonEasy();
+    autonSkills();
+    //autonEasy();
 }
 
 /*---------------------------------------------------------------------------*/
@@ -497,9 +503,9 @@ void test()
 }
 task usercontrol()
 {
-    //test();
+    test();
     //autonSkills();
-    autonEasy();
+    //autonEasy();
 
     // Remove PID Control for better driving
     nMotorPIDSpeedCtrl[right1] = RegIdle;
