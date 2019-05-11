@@ -49,7 +49,7 @@
 // points or time in mSec that the gyro calibrates for
 #define GYRO_CALIBRATION_POINTS 1500
 
-float calibration_buffer[GYRO_CALIBRATION_POINTS];
+double calibration_buffer[GYRO_CALIBRATION_POINTS];
 
 /**
  * generate calibration data for the gyro by collecting
@@ -59,13 +59,13 @@ float calibration_buffer[GYRO_CALIBRATION_POINTS];
  */
 void gyro_calibrate (Gyro gyro)
 {
-	float raw_average{0.0};
-	float std_deviation{0.0};
+	double raw_average{0.0};
+	double std_deviation{0.0};
 
 	// calculate average gyro reading with no motion
 	for (int i = 0; i < GYRO_CALIBRATION_POINTS; ++i)
   {
-		float raw = gyro.analog_in.get_value();
+		double raw = gyro.analog_in.get_value();
 		raw_average += raw;
 		calibration_buffer[i] = raw;
 		pros::delay(1);
@@ -79,7 +79,7 @@ void gyro_calibrate (Gyro gyro)
   {
 		std_deviation += fabs (raw_average - calibration_buffer[i]);
   }
-	std_deviation /= (float) GYRO_CALIBRATION_POINTS;
+	std_deviation /= (double) GYRO_CALIBRATION_POINTS;
 
 	gyro.config.std_deviation = std_deviation;
 
@@ -116,9 +116,9 @@ void gyro_init (Gyro gyro, int port_number, char gyro_flipped)
  *
  * @return gyro rate, in degrees per second
  */
-float gyro_get_rate (Gyro gyro)
+double gyro_get_rate (Gyro gyro)
 {
-	float gyro_read{0.0};
+	double gyro_read{0.0};
 
 	#ifdef GYRO_OVERSAMPLE
 		if (GYRO_OVERSAMPLE > 0)
@@ -130,7 +130,7 @@ float gyro_get_rate (Gyro gyro)
       {
 				sample_sum += gyro.analog_in.get_value();
       }
-			gyro_read = (float) sample_sum / (float) n_samples;
+			gyro_read = (double) sample_sum / (double) n_samples;
 		}
 		else
     {
@@ -141,10 +141,10 @@ float gyro_get_rate (Gyro gyro)
 	#endif
 
 	//Difference from zero-rate value or the average calibration read
-	float difference = gyro_read - gyro.config.avg;
+	double difference = gyro_read - gyro.config.avg;
 
 	//Difference fro zero-rate value, in volts
-	float gyro_voltage = difference * 5.0 / 4095.0;
+	double gyro_voltage = difference * 5.0 / 4095.0;
 
 	if (fabs (difference) > GYRO_STD_DEVS * gyro.config.std_deviation)
   {

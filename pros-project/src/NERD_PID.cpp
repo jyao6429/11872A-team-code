@@ -52,7 +52,7 @@
  * innerIntegralBand  inner bound of PID I summing cutoff
  * outerIntegralBand  outer bound of PID I summing cutoff
  */
-void pidInit (PID pid, float Kp, float Ki, float Kd)
+void pidInit (PID pid, double Kp, double Ki, double Kd)
 {
 	pid.Kp = Kp;
 	pid.Ki = Ki;
@@ -63,7 +63,7 @@ void pidInit (PID pid, float Kp, float Ki, float Kd)
 	pid.lastTime = pros::millis();
 }
 
-void pidInit (PID pid, float Kp, float Ki, float Kd, float Kf)
+void pidInit (PID pid, double Kp, double Ki, double Kd, double Kf)
 {
 	pid.Kp = Kp;
 	pid.Ki = Ki;
@@ -100,12 +100,12 @@ void pidInitCopy (PID pid, PID toCopy)
  *
  * @return  output value of the control loop
  */
-float pidCalculate (PID pid, float setPoint, float processVariable)
+double pidCalculate (PID pid, double setPoint, double processVariable)
 {
-	float deltaTime = (pros::millis() - pid.lastTime) * 0.001;
+	double deltaTime = (pros::millis() - pid.lastTime) * 0.001;
 	pid.lastTime = pros::millis();
 
-	float deltaPV{0};
+	double deltaPV{0};
 
   if (deltaTime > 0)
   {
@@ -114,9 +114,9 @@ float pidCalculate (PID pid, float setPoint, float processVariable)
 
   pid.lastValue = processVariable;
 
-	float error = setPoint - processVariable;
+	double error = setPoint - processVariable;
 
-  float output = error * pid.Kp + pid.sigma * pid.Ki - deltaPV * pid.Kd + setPoint * pid.Kf;
+  double output = error * pid.Kp + pid.sigma * pid.Ki - deltaPV * pid.Kd + setPoint * pid.Kf;
 
 	if (!(fabs(output) >= 1.0 && ((error >= 0 && pid.sigma >= 0) || (error < 0 && pid.sigma < 0))))
   {

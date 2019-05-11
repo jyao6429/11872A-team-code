@@ -5,9 +5,9 @@
 
 struct gyro_config
 {
-	float std_deviation;
-	float avg;
-	float volts_per_degree_per_second;
+	double std_deviation;
+	double avg;
+	double volts_per_degree_per_second;
 	char gyro_flipped;
 };
 
@@ -20,6 +20,6 @@ typedef struct
 
 void gyro_calibrate (Gyro gyro);
 void gyro_init (Gyro gyro, int port_number, char gyro_flipped);
-float gyro_get_rate (Gyro gyro);
+double gyro_get_rate (Gyro gyro);
 
 #endif

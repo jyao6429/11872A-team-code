@@ -6,19 +6,19 @@
  */
 typedef struct
 {
-	float Kp;
-	float Ki;
-	float Kd;
-	float Kf;
-	float sigma;
-	float lastValue;
+	double Kp;
+	double Ki;
+	double Kd;
+	double Kf;
+	double sigma;
+	double lastValue;
 	unsigned long lastTime;
-	float lastSetPoint;
+	double lastSetPoint;
 } PID;
 
-void pidInit (PID pid, float Kp, float Ki, float Kd);
-void pidInit (PID pid, float Kp, float Ki, float Kd, float Kf);
+void pidInit (PID pid, double Kp, double Ki, double Kd);
+void pidInit (PID pid, double Kp, double Ki, double Kd, double Kf);
 void pidInitCopy (PID pid, PID toCopy);
-float pidCalculate (PID pid, float setPoint, float processVariable);
+double pidCalculate (PID pid, double setPoint, double processVariable);
 
 #endif
