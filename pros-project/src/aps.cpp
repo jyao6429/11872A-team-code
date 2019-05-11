@@ -82,6 +82,14 @@ void startTracking()
     prevPos[0] = currentPos[0];
     prevPos[1] = currentPos[1];
 
+    // Update previous angle
+    if (newAngle > 2 * M_PI)
+      newAngle -= 2 * M_PI;
+    if (newAngle < 0)
+      newAngle += 2 * M_PI;
+
+    prevAngle = newAngle;
+
     pros::delay(5);
   }
 
