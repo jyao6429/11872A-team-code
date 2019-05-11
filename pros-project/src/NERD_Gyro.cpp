@@ -51,8 +51,6 @@
 
 float calibration_buffer[GYRO_CALIBRATION_POINTS];
 
-float gyro_get_rate (Gyro gyro);
-
 /**
  * generate calibration data for the gyro by collecting
  * zero movement data for reference when reading data later
@@ -67,7 +65,7 @@ void gyro_calibrate (Gyro gyro)
 	// calculate average gyro reading with no motion
 	for (int i = 0; i < GYRO_CALIBRATION_POINTS; ++i)
   {
-		float raw = SensorValue (gyro.port_number);
+		float raw = gyro.analog_in.get_value();
 		raw_average += raw;
 		calibration_buffer[i] = raw;
 		pros::delay(1);
@@ -78,7 +76,9 @@ void gyro_calibrate (Gyro gyro)
 	//calcuate the standard devation, or the average distance
 	//from the average on the data read
 	for (int i = 0; i < GYRO_CALIBRATION_POINTS; ++i)
+  {
 		std_deviation += fabs (raw_average - calibration_buffer[i]);
+  }
 	std_deviation /= (float) GYRO_CALIBRATION_POINTS;
 
 	gyro.config.std_deviation = std_deviation;
@@ -103,6 +103,7 @@ void gyro_init (Gyro gyro, int port_number, char gyro_flipped)
 {
 	gyro.port_number = port_number;
 	gyro.config.gyro_flipped = gyro_flipped;
+  gyro.analog_in = pros::ADIAnalogIn (port_number);
 	gyro_calibrate (gyro);
 }
 
@@ -126,15 +127,17 @@ float gyro_get_rate (Gyro gyro)
 			int n_samples = pow(4, GYRO_OVERSAMPLE);
 
 			for (int i = 0; i < n_samples; ++i)
-				sample_sum += SensorValue(gyro.port_number);
+      {
+				sample_sum += gyro.analog_in.get_value();
+      }
 			gyro_read = (float) sample_sum / (float) n_samples;
 		}
 		else
     {
-			gyro_read = SensorValue (gyro.port_number);
+			gyro_read = gyro.analog_in.get_value();
     }
 	#else
-		gyro_read = SensorValue (gyro.port_number);
+		gyro_read = gyro.analog_in.get_value();
 	#endif
 
 	//Difference from zero-rate value or the average calibration read

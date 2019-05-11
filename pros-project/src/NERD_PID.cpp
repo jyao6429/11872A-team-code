@@ -105,7 +105,7 @@ float pidCalculate (PID pid, float setPoint, float processVariable)
 	float deltaTime = (pros::millis() - pid.lastTime) * 0.001;
 	pid.lastTime = pros::millis();
 
-	float deltaPV = 0;
+	float deltaPV{0};
 
   if (deltaTime > 0)
   {
