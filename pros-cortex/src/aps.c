@@ -138,7 +138,6 @@ double nearestEquivalentAngle(double ref, double target)
 */
 void convertPolar(double *source, double *target)
 {
-  double polar[2] = {0.0, 0.0};
   target[0] = sqrt(pow(source[0], 2) + pow(source[1], 2));
   double tempAngle = atan(source[1] / source[0]);
 
