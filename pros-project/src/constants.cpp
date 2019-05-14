@@ -17,6 +17,3 @@ namespace Ports
   extern const int liftPot{3};
 
 }
-
-// Gyro for use with tracking and autonomous
-Gyro gyro();
