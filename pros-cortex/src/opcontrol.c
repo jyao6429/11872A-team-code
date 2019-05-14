@@ -8,6 +8,7 @@
  */
 
 #include "main.h"
+#include "chassis.h"
 
 /*
  * Runs the user operator control code. This function will be started in its own task with the
@@ -26,9 +27,17 @@
  *
  * This task should never exit; it should end with some kind of infinite loop, even if empty.
  */
-void operatorControl() {
-	while (1) {
-		printf("Hello PROS User!\n");
+void operatorControl()
+{
+	printf("Hello PROS User!\n");
+
+	while (1)
+	{
+		int leftPower = joystickGetAnalog(1, 2);
+		int rightPower = joystickGetAnalog(2, 2);
+
+		powerMotors(leftPower, rightPower);
+
 		delay(20);
 	}
 }
