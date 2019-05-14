@@ -35,9 +35,12 @@ void operatorControl()
 	while (1)
 	{
 		int leftPower = joystickGetAnalog(1, 2);
-		int rightPower = joystickGetAnalog(2, 2);
+		int rightPower = joystickGetAnalog(1, 4);
 
 		powerMotors(leftPower, rightPower);
+
+		// Debug APS
+		printf("X: %f.3\tY: %f.3\tANGLE: %f.3\n", prevPos[0], prevPos[1], radToDeg(prevAngle));
 
 		delay(20);
 	}

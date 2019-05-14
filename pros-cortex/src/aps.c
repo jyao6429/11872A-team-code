@@ -25,11 +25,19 @@ int prevBack = 0;
 // Not sure if using v5 or cortex, just rewrite these functions to make code work
 int getLeftEncoder()
 {
-  return encoderGet(leftEncoder);
+  // For testing
+  int left;
+  imeGet(PORT_leftEncoder, &left);
+  return left;
+  //return encoderGet(leftEncoder);
 }
 int getRightEncoder()
 {
-  return encoderGet(rightEncoder);
+  // For testing
+  int right;
+  imeGet(PORT_rightEncoder, &right);
+  return right;
+  //return encoderGet(rightEncoder);
 }
 int getBackEncoder()
 {
@@ -153,4 +161,8 @@ double encoderToRad(int count, int ticksPerRotation)
 double degToRad(double degrees)
 {
   return M_PI * (degrees / 180);
+}
+double radToDeg(double rads)
+{
+  return 180 * (rads / (2 * M_PI));
 }

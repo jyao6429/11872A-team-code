@@ -38,8 +38,12 @@ void initializeIO()
  */
 void initialize()
 {
-  leftEncoder = encoderInit(PORT_leftEncoder, PORT_leftEncoder + 1, false);
-  rightEncoder = encoderInit(PORT_rightEncoder, PORT_rightEncoder + 1, true);
+  // Temporary while testing with current robot
+  int IMECount = imeInitializeAll();
+  if (IMECount != 2)
+    printf("IMEs are not all detected!\n");
+  //leftEncoder = encoderInit(PORT_leftEncoder, PORT_leftEncoder + 1, false);
+  //rightEncoder = encoderInit(PORT_rightEncoder, PORT_rightEncoder + 1, true);
   backEncoder = encoderInit(PORT_backEncoder, PORT_backEncoder + 1, false);
 
   TaskHandle aps = taskCreate(startTracking, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT);
