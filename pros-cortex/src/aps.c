@@ -44,7 +44,7 @@ int getBackEncoder()
   return encoderGet(backEncoder);
 }
 
-void startTracking()
+void startTracking(void *ignore)
 {
   while (true)
   {

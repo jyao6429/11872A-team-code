@@ -46,5 +46,5 @@ void initialize()
   //rightEncoder = encoderInit(PORT_rightEncoder, PORT_rightEncoder + 1, true);
   backEncoder = encoderInit(PORT_backEncoder, PORT_backEncoder + 1, false);
 
-  TaskHandle aps = taskCreate(startTracking, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT);
+  taskCreate(startTracking, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT + 1);
 }

@@ -9,7 +9,7 @@ int getLeftEncoder();
 int getRightEncoder();
 int getBackEncoder();
 
-void startTracking();
+void startTracking(void *ignore);
 
 double nearestEquivalentAngle(double ref, double target);
 void convertPolar(double *source, double *target);
