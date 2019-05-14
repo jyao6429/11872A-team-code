@@ -10,6 +10,7 @@ const double sR = 5.0;                // distance from center to right tracking 
 const double sB = 5.0;                // distance from center to back tracking wheel
 const double sideWheelRadius = 2.0;   // radius of side wheels
 const double backWheelRadius = 2.0;   // radius of back wheel
+// Encoder counts
 const int sideTicksPerRotation = 360; // side encoder ticks per 360 degrees of motion
 const int backTicksPerRotation = 360; // back encoder ticks per 360 degrees of motion
 

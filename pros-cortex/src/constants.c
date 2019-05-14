@@ -8,7 +8,11 @@ const int rightFrontMotor = 4;
 
 // Other motor ports
 
+// Encoder ports
+const int leftTrackingEncoder = 1;
+const int rightTrackingEncoder = 2;
+const int backTrackingEncoder = 3;
+
 // Sensor ports
 const int gyro = 1;
-const int backTrackingEncoder = 2;
-const int liftPot = 3;
+const int liftPot = 2;
