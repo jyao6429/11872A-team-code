@@ -5,11 +5,13 @@
 #include "chassis.h"
 
 // Physical parameters in inches
-const double sL = 5.0;               // distance from center to left tracking wheel
-const double sR = 5.0;               // distance from center to right tracking wheel
-const double sB = 5.0;               // distance from center to back tracking wheel
-const double wheelRadius = 2.0;      // radius of wheels
-const int ticksPerRotation = 360;    // encoder ticks per 360 degrees of motion
+const double sL = 5.0;                // distance from center to left tracking wheel
+const double sR = 5.0;                // distance from center to right tracking wheel
+const double sB = 5.0;                // distance from center to back tracking wheel
+const double sideWheelRadius = 2.0;   // radius of side wheels
+const double backWheelRadius = 2.0;   // radius of back wheel
+const int sideTicksPerRotation = 360; // side encoder ticks per 360 degrees of motion
+const int backTicksPerRotation = 360; // back encoder ticks per 360 degrees of motion
 
 // Previous positions
 double prevPos[] = {0.0, 0.0};
@@ -34,9 +36,9 @@ void startTracking()
     int currentBack = getBackEncoder();
 
     // Calculate traveled distance in inches
-    double deltaLeft = wheelRadius * encoderToRad(currentLeft - prevLeft);
-    double deltaRight = wheelRadius * encoderToRad(currentRight - prevRight);
-    double deltaBack = wheelRadius * encoderToRad(currentBack - prevBack);
+    double deltaLeft = sideWheelRadius * encoderToRad(currentLeft - prevLeft, sideTicksPerRotation);
+    double deltaRight = sideWheelRadius * encoderToRad(currentRight - prevRight, sideTicksPerRotation);
+    double deltaBack = backWheelRadius * encoderToRad(currentBack - prevBack, backTicksPerRotation);
 
     // Update prev values;
     int prevLeft = currentLeft;
@@ -44,8 +46,8 @@ void startTracking()
     int prevBack = currentBack;
 
     // Calculate total change since last reset
-    double totalLeft = wheelRadius * encoderToRad(currentLeft);
-    double totalRight = wheelRadius * encoderToRad(currentRight);
+    double totalLeft = sideWheelRadius * encoderToRad(currentLeft, sideTicksPerRotation);
+    double totalRight = sideWheelRadius * encoderToRad(currentRight, sideTicksPerRotation);
 
     // Calculate new absolute orientation
     double newAngle = resetAngle + (totalLeft - totalRight) / (sL + sR);
@@ -134,7 +136,7 @@ void convertCart(double *source, double *target)
   target[0] = source[0] * cos(source[1]);
   target[1] = source[0] * sin(source[1]);
 }
-double encoderToRad(int count)
+double encoderToRad(int count, int ticksPerRotation)
 {
   return ((double) count / (double) ticksPerRotation) * 2 * M_PI;
 }
