@@ -1,11 +1,11 @@
 #include "main.h"
-#include "constants.h"
+#include "global.h"
 #include "chassis.h"
 
 void powerMotors(int leftPower, int rightPower)
 {
-  motorSet(leftBackMotor, leftPower);
-  motorSet(leftFrontMotor, leftPower);
-  motorSet(rightBackMotor, rightPower);
-  motorSet(rightFrontMotor, rightPower);
+  motorSet(PORT_leftBackMotor, leftPower);
+  motorSet(PORT_leftFrontMotor, leftPower);
+  motorSet(PORT_rightBackMotor, rightPower);
+  motorSet(PORT_rightFrontMotor, rightPower);
 }

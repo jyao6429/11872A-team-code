@@ -8,6 +8,8 @@
  */
 
 #include "main.h"
+#include "aps.h"
+#include "global.h"
 
 /*
  * Runs pre-initialization code. This function will be started in kernel mode one time while the
@@ -17,7 +19,8 @@
  * states (digitalWrite()) of limit switches, push buttons, and solenoids. It can also safely
  * configure a UART port (usartOpen()) but cannot set up an LCD (lcdInit()).
  */
-void initializeIO() {
+void initializeIO()
+{
 }
 
 /*
@@ -33,5 +36,11 @@ void initializeIO() {
  * will not start. An autonomous mode selection menu like the pre_auton() in other environments
  * can be implemented in this task if desired.
  */
-void initialize() {
+void initialize()
+{
+  leftEncoder = encoderInit(PORT_leftEncoder, PORT_leftEncoder + 1, false);
+  rightEncoder = encoderInit(PORT_rightEncoder, PORT_rightEncoder + 1, true);
+  backEncoder = encoderInit(PORT_backEncoder, PORT_backEncoder + 1, false);
+
+  TaskHandle aps = taskCreate(startTracking, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT);
 }

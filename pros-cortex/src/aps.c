@@ -1,7 +1,7 @@
 #include "main.h"
 #include "math.h"
 #include "aps.h"
-#include "constants.h"
+#include "global.h"
 #include "chassis.h"
 
 // Physical parameters in inches
@@ -23,9 +23,18 @@ int prevRight = 0;
 int prevBack = 0;
 
 // Not sure if using v5 or cortex, just rewrite these functions to make code work
-int getLeftEncoder() {return 0;}
-int getRightEncoder() {return 0;}
-int getBackEncoder() {return 0;}
+int getLeftEncoder()
+{
+  return encoderGet(leftEncoder);
+}
+int getRightEncoder()
+{
+  return encoderGet(rightEncoder);
+}
+int getBackEncoder()
+{
+  return encoderGet(backEncoder);
+}
 
 void startTracking()
 {
