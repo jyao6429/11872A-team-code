@@ -1,6 +1,8 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
+#include "NERD_Gyro.h"
+
 namespace Ports
 {
   // Drive motor ports
@@ -15,7 +17,6 @@ namespace Ports
   extern const int gyro;
   extern const int backTrackingEncoder;
   extern const int liftPot;
-
 }
 
 #endif

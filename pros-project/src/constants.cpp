@@ -1,4 +1,5 @@
 #include "constants.h"
+#include "NERD_Gyro.h"
 
 namespace Ports
 {
@@ -16,3 +17,6 @@ namespace Ports
   extern const int liftPot{3};
 
 }
+
+// Gyro for use with tracking and autonomous
+Gyro gyro();

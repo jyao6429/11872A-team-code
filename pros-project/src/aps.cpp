@@ -71,10 +71,15 @@ void startTracking()
 
     // Calculate global offset
     double localPolar[]{0.0, 0.0};
-    convertPolar(localOffset, localPolar);
-    localPolar[1] += -avgAngle;
 
+    // Convert localOffset to polar
+    convertPolar(localOffset, localPolar);
+
+    // Shift angle
+    localPolar[1] += -avgAngle;
     double globalOffset[]{0.0, 0.0};
+
+    // Converting back to cartesian gives the globalOffset
     convertCart(localPolar, globalOffset);
 
     // Calculate new absolute position
@@ -83,17 +88,33 @@ void startTracking()
     prevPos[1] = currentPos[1];
 
     // Update previous angle
+
+/* No need for this since we have nearestEquivalentAngle
     if (newAngle > 2 * M_PI)
       newAngle -= 2 * M_PI;
     if (newAngle < 0)
       newAngle += 2 * M_PI;
-
+*/
     prevAngle = newAngle;
 
     pros::delay(5);
   }
-
 }
+
+/**
+* Calculates nearest equivalent angle in radians
+*
+* @param ref the current orientation in radians
+* @param target the target orientation in radians
+* @return the target orientation + 2 * pi * k added
+*/
+double nearestEquivalentAngle(double ref, double target)
+{
+  return round((ref - target) / (2 * M_PI)) * 2 * M_PI + target;
+}
+/**
+* Converts cartesian coordinates into polar
+*/
 void convertPolar(double *source, double *target)
 {
   double polar[2] = {0.0, 0.0};
