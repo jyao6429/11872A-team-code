@@ -4,6 +4,17 @@
 #include "global.h"
 #include "chassis.h"
 
+// Enums for Cartesian and Polar coordinates
+enum Cartesian
+{
+  X_COMP,
+  Y_COMP
+};
+enum Polar
+{
+  MAGNITUDE,
+  ANGLE
+};
 // Physical parameters in inches
 const double sL = 5.0;                // distance from center to left tracking wheel
 const double sR = 5.0;                // distance from center to right tracking wheel
@@ -78,13 +89,13 @@ void startTracking(void *ignore)
     // If drove straight (about < 2 deg diff)
     if (fabs(deltaAngle) < 0.03)
     {
-      localOffset[0] = deltaBack;
-      localOffset[1] = deltaRight;
+      localOffset[X_COMP] = deltaBack;
+      localOffset[Y_COMP] = deltaRight;
     }
     else
     {
-      localOffset[0] = 2 * sin(deltaAngle / 2) * ((deltaBack / deltaAngle) + sB);
-      localOffset[1] = 2 * sin(deltaAngle / 2) * ((deltaRight / deltaAngle) + sR);
+      localOffset[X_COMP] = 2 * sin(deltaAngle / 2) * ((deltaBack / deltaAngle) + sB);
+      localOffset[Y_COMP] = 2 * sin(deltaAngle / 2) * ((deltaRight / deltaAngle) + sR);
     }
 
     // Calculate average angle
@@ -104,7 +115,7 @@ void startTracking(void *ignore)
     convertCart(localPolar, globalOffset);
 
     // Calculate new absolute position
-    double currentPos[] = {prevPos[0] + globalOffset[0], prevPos[1] + globalOffset[1]};
+    double currentPos[] = {prevPos[X_COMP] + globalOffset[X_COMP], prevPos[Y_COMP] + globalOffset[Y_COMP]};
     prevPos[0] = currentPos[0];
     prevPos[1] = currentPos[1];
 
@@ -138,20 +149,20 @@ double nearestEquivalentAngle(double ref, double target)
 */
 void convertPolar(double *source, double *target)
 {
-  target[0] = sqrt(pow(source[0], 2) + pow(source[1], 2));
-  double tempAngle = atan(source[1] / source[0]);
+  target[MAGNITUDE] = sqrt(pow(source[X_COMP], 2) + pow(source[Y_COMP], 2));
+  double tempAngle = atan(source[Y_COMP] / source[X_COMP]);
 
-  if (source[0] < 0.0)
+  if (source[X_COMP] < 0.0)
   {
     tempAngle += M_PI;
   }
 
-  target[1] = tempAngle;
+  target[ANGLE] = tempAngle;
 }
 void convertCart(double *source, double *target)
 {
-  target[0] = source[0] * cos(source[1]);
-  target[1] = source[0] * sin(source[1]);
+  target[X_COMP] = source[MAGNITUDE] * cos(source[ANGLE]);
+  target[Y_COMP] = source[MAGNITUDE] * sin(source[ANGLE]);
 }
 double encoderToRad(int count, int ticksPerRotation)
 {
@@ -159,9 +170,9 @@ double encoderToRad(int count, int ticksPerRotation)
 }
 double degToRad(double degrees)
 {
-  return M_PI * (degrees / 180);
+  return degrees * (M_PI / 180);
 }
 double radToDeg(double rads)
 {
-  return 180 * (rads / (2 * M_PI));
+  return rads * (180 / M_PI);
 }
