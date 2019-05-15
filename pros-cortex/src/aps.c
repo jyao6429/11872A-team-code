@@ -29,6 +29,7 @@ const int backTicksPerRotation = 360; // back encoder ticks per 360 degrees of m
 double prevPos[] = {0.0, 0.0};
 double prevAngle = 0.0;
 double resetAngle = 0.0;
+// Previous encoder values
 int prevLeft = 0;
 int prevRight = 0;
 int prevBack = 0;
@@ -55,6 +56,15 @@ int getBackEncoder()
   return encoderGet(backEncoder);
 }
 
+// Initialize APS by setting inital conditions and starting tracking algorithm
+void initializeAPS(double startX, double startY, double startAngle)
+{
+  prevPos[X_COMP] = startX;
+  prevPos[Y_COMP] = startY;
+  resetAngle = startAngle;
+
+  taskCreate(startTracking, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT + 1);
+}
 void startTracking(void *ignore)
 {
   while (true)
