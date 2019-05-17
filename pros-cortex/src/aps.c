@@ -137,9 +137,8 @@ void startTracking(void *ignore)
     convertCart(localPolar, globalOffset);
 
     // Calculate new absolute position
-    double currentPos[] = {prevPos[X_COMP] + globalOffset[X_COMP], prevPos[Y_COMP] + globalOffset[Y_COMP]};
-    prevPos[X_COMP] = currentPos[X_COMP];
-    prevPos[Y_COMP] = currentPos[Y_COMP];
+    prevPos[X_COMP] += globalOffset[X_COMP];
+    prevPos[Y_COMP] += globalOffset[Y_COMP];
 
     // Update previous angle
     prevAngle = newAngle;
