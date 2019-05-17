@@ -44,6 +44,18 @@ int getRightEncoder();
  * @return the number of ticks
  */
 int getBackEncoder();
+/**
+ * Resets the left encoder
+ */
+void resetLeftEncoder();
+/**
+ * Resets the right encoder
+ */
+void resetRightEncoder();
+/**
+ * Resets the back encoder
+ */
+void resetBackEncoder();
 
 /**
  * Initializes the Absolute Positioning system
@@ -65,7 +77,7 @@ void startTracking(void *ignore);
  * @param ref - the current orientation in radians
  * @param target - the target orientation in radians
  *
- * @return the target orientation + 2 * pi * k added
+ * @return the target orientation + 2 x pi x k added
  */
 double nearestEquivalentAngle(double ref, double target);
 /**

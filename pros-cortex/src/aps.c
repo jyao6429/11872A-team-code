@@ -44,9 +44,32 @@ int getBackEncoder()
 {
   return encoderGet(backEncoder);
 }
+void resetLeftEncoder()
+{
+  // For testing
+  imeReset(PORT_leftEncoder);
+  //encoderReset(leftEncoder);
+  prevLeft = 0;
+}
+void resetRightEncoder()
+{
+  // For testing
+  imeReset(PORT_rightEncoder);
+  //encoderReset(rightEncoder);
+  prevRight = 0;
+}
+void resetBackEncoder()
+{
+  encoderReset(backEncoder);
+  prevBack = 0;
+}
 
 void initializeAPS(double startX, double startY, double startAngle)
 {
+  resetLeftEncoder();
+  resetRightEncoder();
+  resetBackEncoder();
+
   prevPos[X_COMP] = startX;
   prevPos[Y_COMP] = startY;
   resetAngle = degToRad(startAngle);
@@ -84,6 +107,7 @@ void startTracking(void *ignore)
 
     // Calculate local offset
     double localOffset[] = {0.0, 0.0};
+
     // If drove straight (about < 2 deg diff)
     if (fabs(deltaAngle) < 0.03)
     {
