@@ -23,5 +23,6 @@
  * The autonomous task may exit, unlike operatorControl() which should never exit. If it does
  * so, the robot will await a switch to another mode or disable/enable cycle.
  */
-void autonomous() {
+void autonomous()
+{
 }

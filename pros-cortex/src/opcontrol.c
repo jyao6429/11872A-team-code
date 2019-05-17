@@ -40,7 +40,7 @@ void operatorControl()
 		powerMotors(leftPower, rightPower);
 
 		// Debug APS
-		printf("X: %f.3\tY: %f.3\tANGLE: %f.3\n", prevPos[0], prevPos[1], radToDeg(prevAngle));
+		printf("X: %f.2\tY: %f.2\tANGLE: %f.2\n", prevPos[X_COMP], prevPos[Y_COMP], radToDeg(prevAngle));
 
 		delay(20);
 	}

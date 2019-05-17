@@ -4,17 +4,6 @@
 #include "global.h"
 #include "chassis.h"
 
-// Enums for Cartesian and Polar coordinates
-enum Cartesian
-{
-  X_COMP,
-  Y_COMP
-};
-enum Polar
-{
-  MAGNITUDE,
-  ANGLE
-};
 // Physical parameters in inches
 const double sL = 5.0;                // distance from center to left tracking wheel
 const double sR = 5.0;                // distance from center to right tracking wheel
@@ -56,12 +45,11 @@ int getBackEncoder()
   return encoderGet(backEncoder);
 }
 
-// Initialize APS by setting inital conditions and starting tracking algorithm
 void initializeAPS(double startX, double startY, double startAngle)
 {
   prevPos[X_COMP] = startX;
   prevPos[Y_COMP] = startY;
-  resetAngle = startAngle;
+  resetAngle = degToRad(startAngle);
 
   taskCreate(startTracking, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT + 1);
 }
@@ -118,7 +106,7 @@ void startTracking(void *ignore)
     convertPolar(localOffset, localPolar);
 
     // Shift angle
-    localPolar[1] += -avgAngle;
+    localPolar[ANGLE] -= avgAngle;
     double globalOffset[] = {0.0, 0.0};
 
     // Converting back to cartesian gives the globalOffset
@@ -126,37 +114,19 @@ void startTracking(void *ignore)
 
     // Calculate new absolute position
     double currentPos[] = {prevPos[X_COMP] + globalOffset[X_COMP], prevPos[Y_COMP] + globalOffset[Y_COMP]};
-    prevPos[0] = currentPos[0];
-    prevPos[1] = currentPos[1];
+    prevPos[X_COMP] = currentPos[X_COMP];
+    prevPos[Y_COMP] = currentPos[Y_COMP];
 
     // Update previous angle
-
-/* No need for this since we have nearestEquivalentAngle
-    if (newAngle > 2 * M_PI)
-      newAngle -= 2 * M_PI;
-    if (newAngle < 0)
-      newAngle += 2 * M_PI;
-*/
     prevAngle = newAngle;
 
     delay(5);
   }
 }
-
-/**
-* Calculates nearest equivalent angle in radians
-*
-* @param ref the current orientation in radians
-* @param target the target orientation in radians
-* @return the target orientation + 2 * pi * k added
-*/
 double nearestEquivalentAngle(double ref, double target)
 {
   return round((ref - target) / (2 * M_PI)) * 2 * M_PI + target;
 }
-/**
-* Converts cartesian coordinates into polar
-*/
 void convertPolar(double *source, double *target)
 {
   target[MAGNITUDE] = sqrt(pow(source[X_COMP], 2) + pow(source[Y_COMP], 2));

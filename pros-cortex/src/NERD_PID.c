@@ -43,14 +43,6 @@
 #include "math.h"
 #include "NERD_PID.h"
 
-/**
- * initialize pid structure, set parameters
- *
- * pid instance of PID structure
- * Kp  proportional gain
- * Ki  integral gain
- * Kd  derivative gain
- */
 void pidInit (PID pid, double Kp, double Ki, double Kd)
 {
 	pid.Kp = Kp;
@@ -61,13 +53,6 @@ void pidInit (PID pid, double Kp, double Ki, double Kd)
 	pid.lastValue = 0;
 	pid.lastTime = millis();
 }
-
-/**
- * initialize pid structure, set parameters based on another PID structure
- *
- * @param pid  instance of PID structure
- * @param toCopy  PID instance to copy settings from
- */
 void pidInitCopy (PID pid, PID toCopy)
 {
 	pid.Kp = toCopy.Ki;
@@ -78,16 +63,6 @@ void pidInitCopy (PID pid, PID toCopy)
 	pid.lastValue = 0;
 	pid.lastTime = millis();
 }
-
-/**
- * calculate pid output
- *
- * @param pid  instance of PID structure
- * @param setPoint  set point of PID controller
- * @param processVariable  sensor/feedback value
- *
- * @return  output value of the control loop
- */
 double pidCalculate (PID pid, double setPoint, double processVariable)
 {
 	double deltaTime = (millis() - pid.lastTime) * 0.001;
