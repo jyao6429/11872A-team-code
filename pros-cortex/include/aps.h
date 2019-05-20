@@ -12,7 +12,10 @@ enum Polar
   MAGNITUDE,
   ANGLE
 };
-
+// Previous encoder values
+int prevLeft;
+int prevRight;
+int prevBack;
 /**
  * The previous position vector calculated by the APS
  */

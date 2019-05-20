@@ -5,13 +5,13 @@
 #include "chassis.h"
 
 // Physical parameters in inches
-const double sL = 5.0;                // distance from center to left tracking wheel
-const double sR = 5.0;                // distance from center to right tracking wheel
-const double sB = 5.0;                // distance from center to back tracking wheel
+const double sL = 7.0625;                // distance from center to left tracking wheel
+const double sR = 7.0625;                // distance from center to right tracking wheel
+const double sB = 10.5;                // distance from center to back tracking wheel
 const double sideWheelRadius = 2.0;   // radius of side wheels
 const double backWheelRadius = 2.0;   // radius of back wheel
 // Encoder counts
-const int sideTicksPerRotation = 360; // side encoder ticks per 360 degrees of motion
+const int sideTicksPerRotation = 627; // side encoder ticks per 360 degrees of motion
 const int backTicksPerRotation = 360; // back encoder ticks per 360 degrees of motion
 
 // Previous positions
@@ -37,12 +37,12 @@ int getRightEncoder()
   // For testing
   int right;
   imeGet(PORT_rightEncoder, &right);
-  return right;
+  return -right;
   //return encoderGet(rightEncoder);
 }
 int getBackEncoder()
 {
-  return encoderGet(backEncoder);
+  return -encoderGet(backEncoder);
 }
 void resetLeftEncoder()
 {
@@ -90,10 +90,12 @@ void startTracking(void *ignore)
     double deltaRight = sideWheelRadius * encoderToRad(currentRight - prevRight, sideTicksPerRotation);
     double deltaBack = backWheelRadius * encoderToRad(currentBack - prevBack, backTicksPerRotation);
 
+    //printf("%f\t%f\t%f\n", deltaLeft, deltaRight, deltaBack);
+
     // Update prev values;
-    int prevLeft = currentLeft;
-    int prevRight = currentRight;
-    int prevBack = currentBack;
+    prevLeft = currentLeft;
+    prevRight = currentRight;
+    prevBack = currentBack;
 
     // Calculate total change since last reset
     double totalLeft = sideWheelRadius * encoderToRad(currentLeft, sideTicksPerRotation);

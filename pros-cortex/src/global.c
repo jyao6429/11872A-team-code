@@ -12,7 +12,7 @@ const int PORT_rightFrontMotor = 4;
 // Encoder ports
 const int PORT_leftEncoder = 1;
 const int PORT_rightEncoder = 0;
-const int PORT_backEncoder = 3;
+const int PORT_backEncoder = 1;
 
 // Encoders themselves
 Encoder leftEncoder;
