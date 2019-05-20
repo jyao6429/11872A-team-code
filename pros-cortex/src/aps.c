@@ -123,10 +123,8 @@ void startTracking(void *ignore)
     // Calculate average angle
     double avgAngle = prevAngle + (deltaAngle / 2);
 
-    // Calculate global offset
-    double localPolar[] = {0.0, 0.0};
-
     // Convert localOffset to polar
+    double localPolar[] = {0.0, 0.0};
     convertPolar(localOffset, localPolar);
 
     // Shift angle
