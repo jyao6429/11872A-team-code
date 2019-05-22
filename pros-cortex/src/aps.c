@@ -110,8 +110,8 @@ void startTracking(void *ignore)
     // Calculate local offset
     double localOffset[] = {0.0, 0.0};
 
-    // If drove straight (about < 2 deg diff)
-    if (fabs(deltaAngle) < 0.03)
+    // If drove straight (about < 1 deg diff)
+    if (fabs(deltaAngle) < 0.01)
     {
       localOffset[X_COMP] = deltaBack;
       localOffset[Y_COMP] = deltaRight;

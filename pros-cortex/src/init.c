@@ -10,6 +10,7 @@
 #include "main.h"
 #include "aps.h"
 #include "global.h"
+#include "NERD_Gyro.h"
 
 /*
  * Runs pre-initialization code. This function will be started in kernel mode one time while the
@@ -45,6 +46,9 @@ void initialize()
   //leftEncoder = encoderInit(PORT_leftEncoder, PORT_leftEncoder + 1, false);
   //rightEncoder = encoderInit(PORT_rightEncoder, PORT_rightEncoder + 1, true);
   backEncoder = encoderInit(PORT_backEncoder, PORT_backEncoder + 1, false);
+
+  // Initialize Gyro
+  gyro_init(gyro, PORT_gyro, false);
 
   initializeAPS(0.0, 0.0, 0.0);
 }

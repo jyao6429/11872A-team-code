@@ -2,6 +2,7 @@
 #define GLOBAL_H
 
 #include "main.h"
+#include "NERD_Gyro.h"
 
 // Left-back motor port
 extern const int PORT_leftBackMotor;
@@ -32,5 +33,8 @@ extern Encoder backEncoder;
 extern const int PORT_gyro;
 // Potentiometer port
 extern const int PORT_liftPot;
+
+// Gyro itself
+NERD_Gyro gyro;
 
 #endif

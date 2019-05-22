@@ -1,5 +1,6 @@
 #include "global.h"
 #include "main.h"
+#include "NERD_Gyro.h"
 
 // Drive motor ports
 const int PORT_leftBackMotor = 1;
@@ -22,3 +23,6 @@ Encoder backEncoder;
 // Sensor ports
 const int PORT_gyro = 1;
 const int PORT_liftPot = 2;
+
+// Gyro itself
+NERD_Gyro gyro;
