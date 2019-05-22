@@ -57,12 +57,6 @@ int getGyroAnalog(NERD_Gyro gyro)
 {
 	return analogRead(gyro.port_number);
 }
-/**
- * generate calibration data for the gyro by collecting
- * zero movement data for reference when reading data later
- *
- * @param gyro instance of gyro structure
- */
 void gyro_calibrate (NERD_Gyro gyro)
 {
 	double raw_average = 0.0;
@@ -99,12 +93,6 @@ void gyro_calibrate (NERD_Gyro gyro)
 	gyro.config.volts_per_degree_per_second = 0.0011 * 1.515;
 }
 
-/**
- * initialize gyro and run the calibration subroutine
- *
- * @param gyro instance of gyro structure
- * @param port_number the port number of the gyro
- */
 void gyro_init (NERD_Gyro gyro, int port_number, bool gyro_flipped)
 {
 	gyro.port_number = port_number;
@@ -112,15 +100,6 @@ void gyro_init (NERD_Gyro gyro, int port_number, bool gyro_flipped)
 	gyro_calibrate (gyro);
 }
 
-/**
- * calculate filtered gyro rate data, ignoring anything within
- * GYRO_STD_DEVS standard deviations of the average gyro
- * rate value at zero motion
- *`
- * @param gyro instance of gyro structure
- *
- * @return gyro rate, in degrees per second
- */
 double gyro_get_rate (NERD_Gyro gyro)
 {
 	double gyro_read = 0.0;

@@ -19,7 +19,7 @@ int prevBack;
 /**
  * The previous position vector calculated by the APS
  */
-double prevPos;
+double prevPos[2];
 /**
  * The previous angle calculated by the APS
  */
