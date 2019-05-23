@@ -61,13 +61,26 @@ void resetRightEncoder();
 void resetBackEncoder();
 
 /**
- * Initializes the Absolute Positioning system
+ * Initializes the Absolute Positioning System
  *
  * @param startX - the starting x coordinate in inches
  * @param startY - the starting y coordinate in inches
  * @param startAngle - the starting angle in degrees
  */
 void initializeAPS(double startX, double startY, double startAngle);
+/**
+ * Resets the Absolute Positioning System
+ *
+ * @param resetX - the reset x coordinate in inches
+ * @param resetY - the reset y coordinate in inches
+ * @param resetAngle - the reset angle in degrees
+ */
+void resetPosition(double resetX, double resetY, double resetAngle);
+/**
+ * Starts integrating the gyro rate to keep track of orientation
+ * This should be started as a task
+ */
+void startGyroIntegral(void *ignore);
 /**
  * Starts tracking the robot position
  * This shoud be started as a task

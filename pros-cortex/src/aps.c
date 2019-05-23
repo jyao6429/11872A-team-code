@@ -14,6 +14,9 @@ const double backWheelRadius = 2.0;   // radius of back wheel
 const int sideTicksPerRotation = 360; // side encoder ticks per 360 degrees of motion
 const int backTicksPerRotation = 360; // back encoder ticks per 360 degrees of motion
 
+// Current angle calculated by gyro
+double gyroAngle = 0.0;
+
 // Previous positions
 double prevPos[2] = {0.0, 0.0};
 double prevAngle = 0.0;
@@ -52,23 +55,50 @@ void resetBackEncoder()
   encoderReset(backEncoder);
   prevBack = 0;
 }
-
 void initializeAPS(double startX, double startY, double startAngle)
 {
+  // Reset to starting positions
+  resetPosition(startX, startY, startAngle);
+
+  // Create new tasks to track position
+  taskCreate(startGyroIntegral, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT + 2);
+  taskCreate(startTracking, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT + 1);
+}
+void resetPosition(double resetX, double resetY, double resetAngle)
+{
+  // Reset all the encoders
   resetLeftEncoder();
   resetRightEncoder();
   resetBackEncoder();
 
-  prevPos[X_COMP] = startX;
-  prevPos[Y_COMP] = startY;
-  resetAngle = degToRad(startAngle);
+  // Set reset positions
+  prevPos[X_COMP] = resetX;
+  prevPos[Y_COMP] = resetY;
+  // Set reset orientation
+  resetAngle = degToRad(resetAngle);
+  gyroAngle = resetAngle;
+  prevAngle = resetAngle;
+}
+void startGyroIntegral(void *ignore)
+{
+  unsigned long gyroTimer = millis();
 
-  taskCreate(startTracking, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT + 1);
+  while (true)
+  {
+    // Calculate delta time from last iteration
+    double deltaTime = ((double) (millis() - gyroTimer)) / 1000;
+
+    // Reset loop timer
+    gyroTimer = millis();
+
+    // Add to angle with rate from gyro
+    gyroAngle += degToRad(gyro_get_rate(gyro) * deltaTime);
+
+    delay(1);
+  }
 }
 void startTracking(void *ignore)
 {
-  long gyroTimer = millis();
-
   while (true)
   {
     // Get current encoder values
@@ -81,7 +111,7 @@ void startTracking(void *ignore)
     double deltaRight = sideWheelRadius * encoderToRad(currentRight - prevRight, sideTicksPerRotation);
     double deltaBack = backWheelRadius * encoderToRad(currentBack - prevBack, backTicksPerRotation);
 
-    //printf("%f\t%f\t%f\n", deltaLeft, deltaRight, deltaBack);
+//printf("%f\t%f\t%f\n", deltaLeft, deltaRight, deltaBack);
 
     // Update prev values;
     //prevLeft = currentLeft;
@@ -90,15 +120,14 @@ void startTracking(void *ignore)
 
     // Calculate total change since last reset
     //double totalLeft = sideWheelRadius * encoderToRad(currentLeft, sideTicksPerRotation);
-    double totalRight = sideWheelRadius * encoderToRad(currentRight, sideTicksPerRotation);
+    //double totalRight = sideWheelRadius * encoderToRad(currentRight, sideTicksPerRotation);
 
     // Calculate new absolute orientation
-    // Calculate delta time from last iteration
-    double deltaTime = (double) (millis() - gyroTimer) / 1000;
-    // Reset loop timer
-    gyroTimer = millis();
+    //double newAngle = resetAngle + (totalLeft - totalRight) / (sL + sR);
+
     // Calculate change in angle
-    double deltaAngle = degToRad(gyro_get_rate(gyro) * deltaTime);
+    //double deltaAngle = newAngle - prevAngle;
+    double deltaAngle = gyroAngle - prevAngle;
 
     // Calculate local offset
     double localOffset[] = {0.0, 0.0};
@@ -134,6 +163,7 @@ void startTracking(void *ignore)
     prevPos[Y_COMP] += globalOffset[Y_COMP];
 
     // Update previous angle
+    //prevAngle = newAngle;
     prevAngle += deltaAngle;
 
     delay(2);
@@ -145,9 +175,12 @@ double nearestEquivalentAngle(double ref, double target)
 }
 void convertPolar(double *source, double *target)
 {
+  // Handles magnitude of vector with distance formula
   target[MAGNITUDE] = sqrt(pow(source[X_COMP], 2) + pow(source[Y_COMP], 2));
+  // Calculates angle with arctan
   double tempAngle = atan(source[Y_COMP] / source[X_COMP]);
 
+  // Since range of arctan is -PI / 2 to PI / 2, need to add PI for angles in 2nd and 3rd quadrent
   if (source[X_COMP] < 0.0)
   {
     tempAngle += M_PI;
