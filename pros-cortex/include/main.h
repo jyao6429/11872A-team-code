@@ -27,6 +27,16 @@
 
 #include <API.h>
 
+// User includes
+#include "aps.h"
+#include "chassis.h"
+#include "global.h"
+#include "NERD_Gyro.h"
+#include "NERD_PID.h"
+
+// Other includes
+#include "math.h"
+
 // Allow usage of this file in C++ programs
 #ifdef __cplusplus
 extern "C" {

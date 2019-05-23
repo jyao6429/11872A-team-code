@@ -1,6 +1,4 @@
-#include "global.h"
 #include "main.h"
-#include "NERD_Gyro.h"
 
 // Drive motor ports
 const int PORT_leftBackMotor = 1;

@@ -40,8 +40,6 @@
 -------------------------------------------------------------------------------- */
 
 #include "main.h"
-#include "math.h"
-#include "NERD_PID.h"
 
 void pidInit (PID pid, double Kp, double Ki, double Kd)
 {

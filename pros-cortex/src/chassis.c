@@ -1,6 +1,4 @@
 #include "main.h"
-#include "global.h"
-#include "chassis.h"
 
 void powerMotors(int leftPower, int rightPower)
 {

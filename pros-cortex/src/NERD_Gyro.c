@@ -38,9 +38,6 @@
 	or on the VEX Forum as jmmckinney.
 -------------------------------------------------------------------------------- */
 
-#include "NERD_Gyro.h"
-#include "global.h"
-#include "math.h"
 #include "main.h"
 
 // ignore data within n standard deviations of no motion average

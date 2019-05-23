@@ -8,9 +8,6 @@
  */
 
 #include "main.h"
-#include "aps.h"
-#include "global.h"
-#include "NERD_Gyro.h"
 
 /*
  * Runs pre-initialization code. This function will be started in kernel mode one time while the

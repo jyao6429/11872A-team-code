@@ -1,8 +1,4 @@
 #include "main.h"
-#include "math.h"
-#include "aps.h"
-#include "global.h"
-#include "chassis.h"
 
 // Physical parameters in inches
 const double sL = 7.0625;                // distance from center to left tracking wheel

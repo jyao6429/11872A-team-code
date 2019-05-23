@@ -8,8 +8,6 @@
  */
 
 #include "main.h"
-#include "chassis.h"
-#include "aps.h"
 
 /*
  * Runs the user operator control code. This function will be started in its own task with the
