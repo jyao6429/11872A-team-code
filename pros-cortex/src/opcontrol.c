@@ -38,7 +38,7 @@ void operatorControl()
 		powerMotors(leftPower, rightPower);
 
 		// Debug APS
-		printf("X: %f\tY: %f\tANGLE: %f\n", prevPos[X_COMP], prevPos[Y_COMP], radToDeg(prevAngle));
+		printf("X: %f\tY: %f\tANGLE: %f\n", robotPose[POSE_X], robotPose[POSE_Y], radToDeg(robotPose[POSE_ANGLE]));
 
 		delay(20);
 	}

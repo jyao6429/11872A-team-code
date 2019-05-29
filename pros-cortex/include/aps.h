@@ -1,7 +1,13 @@
 #ifndef APS_H
 #define APS_H
 
-// Enums for Cartesian and Polar coordinates
+// Enums for Pose, Cartesian and Polar
+enum Pose
+{
+  POSE_X,
+  POSE_Y,
+  POSE_ANGLE
+};
 enum Cartesian
 {
   X_COMP,
@@ -13,17 +19,13 @@ enum Polar
   ANGLE
 };
 // Previous encoder values
-int prevLeft;
-int prevRight;
-int prevBack;
+int prevLeftEncoder;
+int prevRightEncoder;
+int prevBackEncoder;
 /**
- * The previous position vector calculated by the APS
+ * The previous position vector and orientation calculated by the APS
  */
-double prevPos[2];
-/**
- * The previous angle calculated by the APS
- */
-double prevAngle;
+double robotPose[3];
 /**
  * The angle at last reset
  */
@@ -90,26 +92,26 @@ void startTracking(void *ignore);
 /**
  * Calculates nearest equivalent angle in radians
  *
- * @param ref - the current orientation in radians
+ * @param reference - the current orientation in radians
  * @param target - the target orientation in radians
  *
  * @return the target orientation + 2 x pi x k added
  */
-double nearestEquivalentAngle(double ref, double target);
+double nearestEquivalentAngle(double reference, double target);
 /**
  * Converts cartesian coordinates into polar
  *
- * @param *source - the cartesian array to convert from
- * @param *target - the polar array to convert to
+ * @param *cartVector - the cartesian array to convert from
+ * @param *polarVector - the polar array to convert to
  */
-void convertPolar(double *source, double *target);
+void cartToPolar(double *cartVector, double *polarVector);
 /**
  * Converts polar coordinates into cartesian
  *
- * @param *source - the polar array to convert from
- * @param *target - the cartesian array to convert to
+ * @param *polarVector - the polar array to convert from
+ * @param *cartVector - the cartesian array to convert to
  */
-void convertCart(double *source, double *target);
+void polarToCart(double *polarVector, double *cartVector);
 /**
  * Converts encoder counts into linear distance traveled in the units of the diameter of the tracking wheel
  *
@@ -130,9 +132,9 @@ double degToRad(double degrees);
 /**
  * Converts radians to degrees
  *
- * @param rads - the angle to convert in radians
+ * @param radians - the angle to convert in radians
  * @return the converted angle in degrees
  */
-double radToDeg(double rads);
+ double radToDeg(double radians);
 
 #endif
