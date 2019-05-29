@@ -38,8 +38,6 @@ void operatorControl()
 		powerMotors(leftPower, rightPower);
 
 		// Debug APS
-		printf("L: %d\tR: %d\tB: %d\n", getLeftEncoder(), getRightEncoder(), getBackEncoder());
-		printf("LIN: %f\tRIN: %f\tBIN: %f\n", encoderToRad(getLeftEncoder(), 627) * 2, encoderToRad(getRightEncoder(), 627) * 2, encoderToRad(getBackEncoder(), 360) * 2);
 		printf("X: %f\tY: %f\tANGLE: %f\n", prevPos[X_COMP], prevPos[Y_COMP], radToDeg(prevAngle));
 
 		delay(20);

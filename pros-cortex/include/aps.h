@@ -111,14 +111,15 @@ void convertPolar(double *source, double *target);
  */
 void convertCart(double *source, double *target);
 /**
- * Converts encoder ticks into radians turned
+ * Converts encoder counts into linear distance traveled in the units of the diameter of the tracking wheel
  *
- * @param count - the number of encoder ticks
- * @param ticksPerRotation - the number of encoder ticks per 360 degrees
+ * @param encoderCount - the number of encoder ticks
+ * @param wheelDiameter - the diameter of the tracking wheel
+ * @param encoderResolution - the number of encoder ticks per 360 degrees
  *
- * @return the number of radians turned
+ * @return the distance traveled by that wheel
  */
-double encoderToRad(int count, int ticksPerRotation);
+double calculateTravelDistance(int encoderCount, double wheelDiameter, int encoderResolution);
 /**
  * Converts degrees to radians
  *
