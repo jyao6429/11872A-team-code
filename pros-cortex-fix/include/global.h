@@ -37,4 +37,13 @@ extern const int PORT_liftPot;
 // Gyro itself
 struct NERD_Gyro mainGyro;
 
+// Enum for different mutexes
+enum MutexTypes
+{
+  MUTEX_GYRO,
+  MUTEX_POSE
+};
+// Mutexes
+Mutex mutexes[2];
+
 #endif

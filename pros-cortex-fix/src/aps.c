@@ -67,13 +67,19 @@ void resetPosition(double resetX, double resetY, double resetAngle)
   resetBackEncoder();
 
   // Set reset pose
+  mutexTake(mutexes[MUTEX_POSE], -1);
   robotPose[POSE_X] = resetX;
   robotPose[POSE_Y] = resetY;
   robotPose[POSE_ANGLE] = resetAngle;
+  mutexGive(mutexes[MUTEX_POSE]);
 
   // Set reset orientation
   resetAngle = degToRad(resetAngle);
+
+  mutexTake(mutexes[MUTEX_GYRO], -1);
   gyroAngle = resetAngle;
+  mutexGive(mutexes[MUTEX_GYRO]);
+
 }
 void startGyroIntegral(void *ignore)
 {
@@ -90,13 +96,15 @@ void startGyroIntegral(void *ignore)
 
     double gyroRate = gyro_get_rate(&mainGyro);
     double deltaAngle = gyroRate * deltaTime;
+    mutexTake(mutexes[MUTEX_GYRO], 5);
 
-    //printf("RATE: %f\tTIME: %f\t ANGLE: %f\n", gyroRate, deltaTime, deltaAngle);
+    printf("RATE: %f\tTIME: %f\t D_ANGLE: %f\tANGLE: %f\n", gyroRate, deltaTime, deltaAngle, radToDeg(gyroAngle));
 
     // Add to angle with rate from gyro
     gyroAngle += degToRad(gyro_get_rate(&mainGyro) * deltaTime);
+    mutexGive(mutexes[MUTEX_GYRO]);
 
-    delay(1);
+    delay(20);
   }
 }
 void startTracking(void *ignore)
@@ -129,7 +137,9 @@ void startTracking(void *ignore)
 
     // Calculate change in angle
     //double deltaAngle = newAngle - prevAngle;
+    mutexTake(mutexes[MUTEX_GYRO], -1);
     double deltaAngle = gyroAngle - robotPose[POSE_ANGLE];
+    mutexGive(mutexes[MUTEX_GYRO]);
 
     // Calculate local offset vector
     double localOffset[] = {0.0, 0.0};
@@ -147,7 +157,9 @@ void startTracking(void *ignore)
     }
 
     // Calculate average angle
+    mutexTake(mutexes[MUTEX_POSE], -1);
     double avgAngle = robotPose[POSE_ANGLE] + (deltaAngle / 2);
+    mutexGive(mutexes[MUTEX_POSE]);
 
     // Convert localOffset to a polar vector
     double localPolar[] = {0.0, 0.0};
@@ -161,11 +173,13 @@ void startTracking(void *ignore)
     polarToCart(localPolar, globalOffset);
 
     // Calculate new absolute position and orientation
+    mutexTake(mutexes[MUTEX_POSE], -1);
     robotPose[POSE_X] += globalOffset[X_COMP];
     robotPose[POSE_Y] += globalOffset[Y_COMP];
-    robotPose[POSE_ANGLE] = gyroAngle;
+    robotPose[POSE_ANGLE] += deltaAngle;
+    mutexGive(mutexes[MUTEX_POSE]);
 
-    delay(2);
+    delay(5);
   }
 }
 double nearestEquivalentAngle(double reference, double target)

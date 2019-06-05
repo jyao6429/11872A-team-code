@@ -36,6 +36,9 @@ void initializeIO()
  */
 void initialize()
 {
+  mutexes[MUTEX_GYRO] = mutexCreate();
+  mutexes[MUTEX_POSE] = mutexCreate();
+
   //leftEncoder = encoderInit(PORT_leftEncoder, PORT_leftEncoder + 1, false);
   rightEncoder = encoderInit(PORT_rightEncoder, PORT_rightEncoder + 1, false);
   backEncoder = encoderInit(PORT_backEncoder, PORT_backEncoder + 1, true);
@@ -45,5 +48,7 @@ void initialize()
 
   printf("AVG: %f\t STD: %f\tVPDS: %f\n", mainGyro.config.avg, mainGyro.config.std_deviation, mainGyro.config.volts_per_degree_per_second);
 
-  initializeAPS(0.0, 0.0, 0.0);
+  taskCreate(startGyroIntegral, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT + 2);
+
+  //initializeAPS(0.0, 0.0, 0.0);
 }

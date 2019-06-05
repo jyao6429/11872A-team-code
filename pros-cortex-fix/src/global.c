@@ -24,3 +24,6 @@ const int PORT_liftPot = 2;
 
 // Gyro itself
 struct NERD_Gyro mainGyro;
+
+// Mutexes
+Mutex mutexes[2];

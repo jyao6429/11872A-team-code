@@ -29,6 +29,7 @@
 void operatorControl()
 {
 	printf("Hello PROS User!\n");
+	//gyro_calibrate(&mainGyro);
 
 	while (1)
 	{
@@ -38,7 +39,13 @@ void operatorControl()
 		powerMotors(leftPower, rightPower);
 
 		// Debug APS
-		printf("X: %f\tY: %f\tANGLE: %f\n", robotPose[POSE_X], robotPose[POSE_Y], radToDeg(gyroAngle));
+		mutexTake(mutexes[MUTEX_POSE], 10);
+		//mutexTake(mutexes[MUTEX_GYRO], 10);
+
+		//printf("X: %f\tY: %f\tANGLE: %f\n", robotPose[POSE_X], robotPose[POSE_Y], radToDeg(robotPose[POSE_ANGLE]));
+
+		//mutexGive(mutexes[MUTEX_GYRO]);
+		mutexGive(mutexes[MUTEX_POSE]);
 
 		delay(20);
 	}

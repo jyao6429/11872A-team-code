@@ -91,12 +91,12 @@ void startGyroIntegral(void *ignore)
     double gyroRate = gyro_get_rate(&mainGyro);
     double deltaAngle = gyroRate * deltaTime;
 
-    //printf("RATE: %f\tTIME: %f\t ANGLE: %f\n", gyroRate, deltaTime, deltaAngle);
+    //printf("RATE: %f\tTIME: %f\t DANGLE: %f\tANGLE: %f\n", gyroRate, deltaTime, deltaAngle, gyroAngle);
 
     // Add to angle with rate from gyro
     gyroAngle += degToRad(gyro_get_rate(&mainGyro) * deltaTime);
 
-    delay(1);
+    delay(20);
   }
 }
 void startTracking(void *ignore)
@@ -165,7 +165,7 @@ void startTracking(void *ignore)
     robotPose[POSE_Y] += globalOffset[Y_COMP];
     robotPose[POSE_ANGLE] = gyroAngle;
 
-    delay(2);
+    delay(10);
   }
 }
 double nearestEquivalentAngle(double reference, double target)

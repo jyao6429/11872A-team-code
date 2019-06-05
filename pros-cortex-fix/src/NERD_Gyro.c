@@ -128,6 +128,8 @@ double gyro_get_rate (struct NERD_Gyro *gyro)
 	//Difference from zero-rate value or the average calibration read
 	double difference = gyro_read - gyro->config.avg;
 
+	//printf("DIFF: %f\n", difference);
+
 	//Difference from zero-rate value, in volts
 	double gyro_voltage = difference * 5.0 / 4095.0;
 
