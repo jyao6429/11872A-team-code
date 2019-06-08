@@ -1,9 +1,9 @@
 #include "main.h"
 
 // Physical parameters in inches
-const double sL = 4.5;               // distance from center to left tracking wheel
-const double sR = 4.5;               // distance from center to right tracking wheel
-const double sB = 2.0;                 // distance from center to back tracking wheel
+const double sL = 4.61;               // distance from center to left tracking wheel
+const double sR = 4.61;               // distance from center to right tracking wheel
+const double sB = 7.0;                 // distance from center to back tracking wheel
 const double sideWheelDiameter = 2.75;   // diameter of side wheels
 const double backWheelDiameter = 2.75;   // diameter of back wheel
 // Encoder counts
@@ -150,7 +150,7 @@ void startTracking(void *ignore)
     double localOffset[] = {0.0, 0.0};
 
     // If drove straight (about < 1 deg diff)
-    if (fabs(deltaAngle) < 0.01)
+    if (deltaAngle == 0.0)
     {
       localOffset[X_COMP] = deltaBackDistance;
       localOffset[Y_COMP] = deltaRightDistance;
