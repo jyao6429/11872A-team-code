@@ -25,7 +25,6 @@ int prevBackEncoder = 0;
 int getLeftEncoder()
 {
   return encoderGet(leftEncoder);
-  //return 0;
 }
 int getRightEncoder()
 {
@@ -34,7 +33,6 @@ int getRightEncoder()
 int getBackEncoder()
 {
   return encoderGet(backEncoder);
-  //return 0;
 }
 void resetLeftEncoder()
 {
@@ -122,8 +120,6 @@ void startTracking(void *ignore)
     double deltaRightDistance = calculateTravelDistance(currentRightEncoder - prevRightEncoder, sideWheelDiameter, sideEncoderResolution);
     double deltaBackDistance = calculateTravelDistance(currentBackEncoder - prevBackEncoder, backWheelDiameter, backEncoderResolution);
 
-//printf("L: %f\tR: %f\tB: %f\n", deltaLeftDistance, deltaRightDistance, deltaBackDistance);
-
     // Update prev values;
     prevLeftEncoder = currentLeftEncoder;
     prevRightEncoder = currentRightEncoder;
@@ -133,23 +129,18 @@ void startTracking(void *ignore)
     double totalLeftDistance = calculateTravelDistance(currentLeftEncoder, sideWheelDiameter, sideEncoderResolution);
     double totalRightDistance = calculateTravelDistance(currentRightEncoder, sideWheelDiameter, sideEncoderResolution);
 
-    //printf("L: %d\tR: %d\t B: %d\n", currentLeftEncoder, currentRightEncoder, currentBackEncoder);
-
     // Calculate new absolute orientation
     double newAngle = resetAngle + (totalLeftDistance - totalRightDistance) / (sL + sR);
 
     // Calculate change in angle
     mutexTake(mutexes[MUTEX_POSE], -1);
     double deltaAngle = newAngle - robotPose[POSE_ANGLE];
-    mutexTake(mutexes[MUTEX_GYRO], -1);
-    //double deltaAngle = gyroAngle - robotPose[POSE_ANGLE];
-    mutexGive(mutexes[MUTEX_GYRO]);
     mutexGive(mutexes[MUTEX_POSE]);
 
     // Calculate local offset vector
     double localOffset[] = {0.0, 0.0};
 
-    // If drove straight (about < 1 deg diff)
+    // If drove straight
     if (deltaAngle == 0.0)
     {
       localOffset[X_COMP] = deltaBackDistance;
