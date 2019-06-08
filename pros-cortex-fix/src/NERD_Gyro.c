@@ -130,6 +130,17 @@ double gyro_get_rate (struct NERD_Gyro *gyro)
 
 	//printf("DIFF: %f\n", difference);
 
+	// Added by jyao6429, attempting to combat drift
+	// If turning clockwise with respect to gyro orientation
+	if (difference < 0)
+	{
+		difference *= 1;
+	}
+	else
+	{
+		difference *= 1;
+	}
+
 	//Difference from zero-rate value, in volts
 	double gyro_voltage = difference * 5.0 / 4095.0;
 

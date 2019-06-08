@@ -1,17 +1,17 @@
 #include "main.h"
 
 // Drive motor ports
-const int PORT_leftBackMotor = 1;
-const int PORT_leftFrontMotor = 2;
-const int PORT_rightBackMotor = 3;
-const int PORT_rightFrontMotor = 4;
+const int PORT_leftBackMotor = 9;
+const int PORT_leftFrontMotor = 8;
+const int PORT_rightBackMotor = 2;
+const int PORT_rightFrontMotor = 3;
 
 // Other motor ports
 
 // Encoder ports
-const int PORT_leftEncoder = 1;
-const int PORT_rightEncoder = 3;
-const int PORT_backEncoder = 1;
+const int PORT_leftEncoder = 5;
+const int PORT_rightEncoder = 1;
+const int PORT_backEncoder = 3;
 
 // Encoders themselves
 Encoder leftEncoder;

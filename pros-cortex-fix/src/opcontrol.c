@@ -33,18 +33,18 @@ void operatorControl()
 
 	while (1)
 	{
-		int leftPower = joystickGetAnalog(1, 2);
-		int rightPower = joystickGetAnalog(1, 4);
+		int leftPower = joystickGetAnalog(1, 3);
+		int rightPower = joystickGetAnalog(1, 2);
 
 		powerMotors(leftPower, rightPower);
 
 		// Debug APS
 		mutexTake(mutexes[MUTEX_POSE], 10);
-		//mutexTake(mutexes[MUTEX_GYRO], 10);
+		mutexTake(mutexes[MUTEX_GYRO], 10);
 
-		//printf("X: %f\tY: %f\tANGLE: %f\n", robotPose[POSE_X], robotPose[POSE_Y], radToDeg(robotPose[POSE_ANGLE]));
+		printf("X: %f\tY: %f\tANGLE: %f\tGYRO: %f\n", robotPose[POSE_X], robotPose[POSE_Y], radToDeg(robotPose[POSE_ANGLE]), radToDeg(gyroAngle));
 
-		//mutexGive(mutexes[MUTEX_GYRO]);
+		mutexGive(mutexes[MUTEX_GYRO]);
 		mutexGive(mutexes[MUTEX_POSE]);
 
 		delay(20);

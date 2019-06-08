@@ -24,37 +24,6 @@
             "-fdiagnostics-color",
             "-std=gnu99",
             "-o",
-            "bin/chassis.c.o",
-            "src\\chassis.c"
-        ],
-        "directory": "C:\\Users\\Lijing\\Documents\\Github\\11872A-team-code\\pros-cortex-fix",
-        "file": "src\\chassis.c"
-    },
-    {
-        "arguments": [
-            "clang++",
-            "-c",
-            "-target",
-            "armv7ar-none-none-eabi",
-            "-fno-ms-extensions",
-            "-fno-ms-compatibility",
-            "-fno-delayed-template-parsing",
-            "-isystemc:\\program files\\pros\\toolchain\\usr\\bin\\../lib/gcc/arm-none-eabi/7.2.1/include",
-            "-isystemc:\\program files\\pros\\toolchain\\usr\\bin\\../lib/gcc/arm-none-eabi/7.2.1/include-fixed",
-            "-isystemc:\\program files\\pros\\toolchain\\usr\\bin\\../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/include",
-            "-isystem./include",
-            "-iquote./include/./",
-            "-mthumb",
-            "-mcpu=cortex-m3",
-            "-mlittle-endian",
-            "-Os",
-            "-ffunction-sections",
-            "-fsigned-char",
-            "-fomit-frame-pointer",
-            "-fsingle-precision-constant",
-            "-fdiagnostics-color",
-            "-std=gnu99",
-            "-o",
             "bin/auto.c.o",
             "src\\auto.c"
         ],
@@ -117,6 +86,37 @@
             "-fdiagnostics-color",
             "-std=gnu99",
             "-o",
+            "bin/NERD_Gyro.c.o",
+            "src\\NERD_Gyro.c"
+        ],
+        "directory": "C:\\Users\\Lijing\\Documents\\Github\\11872A-team-code\\pros-cortex-fix",
+        "file": "src\\NERD_Gyro.c"
+    },
+    {
+        "arguments": [
+            "clang++",
+            "-c",
+            "-target",
+            "armv7ar-none-none-eabi",
+            "-fno-ms-extensions",
+            "-fno-ms-compatibility",
+            "-fno-delayed-template-parsing",
+            "-isystemc:\\program files\\pros\\toolchain\\usr\\bin\\../lib/gcc/arm-none-eabi/7.2.1/include",
+            "-isystemc:\\program files\\pros\\toolchain\\usr\\bin\\../lib/gcc/arm-none-eabi/7.2.1/include-fixed",
+            "-isystemc:\\program files\\pros\\toolchain\\usr\\bin\\../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/include",
+            "-isystem./include",
+            "-iquote./include/./",
+            "-mthumb",
+            "-mcpu=cortex-m3",
+            "-mlittle-endian",
+            "-Os",
+            "-ffunction-sections",
+            "-fsigned-char",
+            "-fomit-frame-pointer",
+            "-fsingle-precision-constant",
+            "-fdiagnostics-color",
+            "-std=gnu99",
+            "-o",
             "bin/global.c.o",
             "src\\global.c"
         ],
@@ -148,11 +148,11 @@
             "-fdiagnostics-color",
             "-std=gnu99",
             "-o",
-            "bin/opcontrol.c.o",
-            "src\\opcontrol.c"
+            "bin/chassis.c.o",
+            "src\\chassis.c"
         ],
         "directory": "C:\\Users\\Lijing\\Documents\\Github\\11872A-team-code\\pros-cortex-fix",
-        "file": "src\\opcontrol.c"
+        "file": "src\\chassis.c"
     },
     {
         "arguments": [
@@ -210,11 +210,11 @@
             "-fdiagnostics-color",
             "-std=gnu99",
             "-o",
-            "bin/aps.c.o",
-            "src\\aps.c"
+            "bin/opcontrol.c.o",
+            "src\\opcontrol.c"
         ],
         "directory": "C:\\Users\\Lijing\\Documents\\Github\\11872A-team-code\\pros-cortex-fix",
-        "file": "src\\aps.c"
+        "file": "src\\opcontrol.c"
     },
     {
         "arguments": [
@@ -241,10 +241,10 @@
             "-fdiagnostics-color",
             "-std=gnu99",
             "-o",
-            "bin/NERD_Gyro.c.o",
-            "src\\NERD_Gyro.c"
+            "bin/aps.c.o",
+            "src\\aps.c"
         ],
         "directory": "C:\\Users\\Lijing\\Documents\\Github\\11872A-team-code\\pros-cortex-fix",
-        "file": "src\\NERD_Gyro.c"
+        "file": "src\\aps.c"
     }
 ]

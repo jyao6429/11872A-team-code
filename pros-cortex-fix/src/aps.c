@@ -3,9 +3,9 @@
 // Physical parameters in inches
 const double sL = 4.5;               // distance from center to left tracking wheel
 const double sR = 4.5;               // distance from center to right tracking wheel
-const double sB = 7.0;                 // distance from center to back tracking wheel
-const double sideWheelDiameter = 4.0;   // diameter of side wheels
-const double backWheelDiameter = 4.0;   // diameter of back wheel
+const double sB = 2.0;                 // distance from center to back tracking wheel
+const double sideWheelDiameter = 2.75;   // diameter of side wheels
+const double backWheelDiameter = 2.75;   // diameter of back wheel
 // Encoder counts
 const int sideEncoderResolution = 360;  // side encoder ticks per 360 degrees of motion
 const int backEncoderResolution = 360;  // back encoder ticks per 360 degrees of motion
@@ -24,8 +24,8 @@ int prevBackEncoder = 0;
 // Not sure if using v5 or cortex, just rewrite these functions to make code work
 int getLeftEncoder()
 {
-  //return encoderGet(leftEncoder);
-  return 0;
+  return encoderGet(leftEncoder);
+  //return 0;
 }
 int getRightEncoder()
 {
@@ -34,10 +34,11 @@ int getRightEncoder()
 int getBackEncoder()
 {
   return encoderGet(backEncoder);
+  //return 0;
 }
 void resetLeftEncoder()
 {
-  //encoderReset(leftEncoder);
+  encoderReset(leftEncoder);
   prevLeftEncoder = 0;
 }
 void resetRightEncoder()
@@ -56,7 +57,7 @@ void initializeAPS(double startX, double startY, double startAngle)
   resetPosition(startX, startY, startAngle);
 
   // Create new tasks to track position
-  taskCreate(startGyroIntegral, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT + 2);
+  //taskCreate(startGyroIntegral, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT + 2);
   taskCreate(startTracking, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT + 1);
 }
 void resetPosition(double resetX, double resetY, double resetAngle)
@@ -70,7 +71,7 @@ void resetPosition(double resetX, double resetY, double resetAngle)
   mutexTake(mutexes[MUTEX_POSE], -1);
   robotPose[POSE_X] = resetX;
   robotPose[POSE_Y] = resetY;
-  robotPose[POSE_ANGLE] = resetAngle;
+  robotPose[POSE_ANGLE] = 0;
   mutexGive(mutexes[MUTEX_POSE]);
 
   // Set reset orientation
@@ -98,13 +99,13 @@ void startGyroIntegral(void *ignore)
     double deltaAngle = gyroRate * deltaTime;
     mutexTake(mutexes[MUTEX_GYRO], 5);
 
-    printf("RATE: %f\tTIME: %f\t D_ANGLE: %f\tANGLE: %f\n", gyroRate, deltaTime, deltaAngle, radToDeg(gyroAngle));
+    //printf("RATE: %f\tTIME: %f\t D_ANGLE: %f\tANGLE: %f\n", gyroRate, deltaTime, deltaAngle, radToDeg(gyroAngle));
 
     // Add to angle with rate from gyro
     gyroAngle += degToRad(gyro_get_rate(&mainGyro) * deltaTime);
     mutexGive(mutexes[MUTEX_GYRO]);
 
-    delay(20);
+    delay(2);
   }
 }
 void startTracking(void *ignore)
@@ -112,34 +113,38 @@ void startTracking(void *ignore)
   while (true)
   {
     // Get current encoder values
-    //int currentLeftEncoder = getLeftEncoder();
+    int currentLeftEncoder = getLeftEncoder();
     int currentRightEncoder = getRightEncoder();
     int currentBackEncoder = getBackEncoder();
 
     // Calculate traveled distance in inches
-    //double deltaLeft = calculateTravelDistance(currentLeftEncoder - prevLeftEncoder, sideWheelDiameter, sideEncoderResolution);
+    double deltaLeftDistance = calculateTravelDistance(currentLeftEncoder - prevLeftEncoder, sideWheelDiameter, sideEncoderResolution);
     double deltaRightDistance = calculateTravelDistance(currentRightEncoder - prevRightEncoder, sideWheelDiameter, sideEncoderResolution);
     double deltaBackDistance = calculateTravelDistance(currentBackEncoder - prevBackEncoder, backWheelDiameter, backEncoderResolution);
 
-//printf("%f\t%f\t%f\n", deltaLeft, deltaRight, deltaBack);
+//printf("L: %f\tR: %f\tB: %f\n", deltaLeftDistance, deltaRightDistance, deltaBackDistance);
 
     // Update prev values;
-    //prevLeftEncoder = currentLeftEncoder;
+    prevLeftEncoder = currentLeftEncoder;
     prevRightEncoder = currentRightEncoder;
     prevBackEncoder = currentBackEncoder;
 
     // Calculate total change since last reset
-    //double totalLeftDistance = calculateTravelDistance(currentLeftEncoder, sideWheelDiameter, sideEncoderResolution);
-    //double totalRightDistance = calculateTravelDistance(currentRightEncoder, sideWheelDiameter, sideEncoderResolution);
+    double totalLeftDistance = calculateTravelDistance(currentLeftEncoder, sideWheelDiameter, sideEncoderResolution);
+    double totalRightDistance = calculateTravelDistance(currentRightEncoder, sideWheelDiameter, sideEncoderResolution);
+
+    //printf("L: %d\tR: %d\t B: %d\n", currentLeftEncoder, currentRightEncoder, currentBackEncoder);
 
     // Calculate new absolute orientation
-    //double newAngle = resetAngle + (totalLeftDistance - totalRightDistance) / (sL + sR);
+    double newAngle = resetAngle + (totalLeftDistance - totalRightDistance) / (sL + sR);
 
     // Calculate change in angle
-    //double deltaAngle = newAngle - prevAngle;
+    mutexTake(mutexes[MUTEX_POSE], -1);
+    double deltaAngle = newAngle - robotPose[POSE_ANGLE];
     mutexTake(mutexes[MUTEX_GYRO], -1);
-    double deltaAngle = gyroAngle - robotPose[POSE_ANGLE];
+    //double deltaAngle = gyroAngle - robotPose[POSE_ANGLE];
     mutexGive(mutexes[MUTEX_GYRO]);
+    mutexGive(mutexes[MUTEX_POSE]);
 
     // Calculate local offset vector
     double localOffset[] = {0.0, 0.0};
@@ -176,7 +181,7 @@ void startTracking(void *ignore)
     mutexTake(mutexes[MUTEX_POSE], -1);
     robotPose[POSE_X] += globalOffset[X_COMP];
     robotPose[POSE_Y] += globalOffset[Y_COMP];
-    robotPose[POSE_ANGLE] += deltaAngle;
+    robotPose[POSE_ANGLE] = newAngle;
     mutexGive(mutexes[MUTEX_POSE]);
 
     delay(5);
