@@ -2,7 +2,6 @@
 #define GLOBAL_H
 
 #include "main.h"
-#include "NERD_Gyro.h"
 
 // Left-back motor port
 extern const int PORT_leftBackMotor;
@@ -29,21 +28,15 @@ extern Encoder rightEncoder;
 // Back encoder
 extern Encoder backEncoder;
 
-// Gyro port
-extern const int PORT_gyro;
 // Potentiometer port
 extern const int PORT_liftPot;
-
-// Gyro itself
-struct NERD_Gyro mainGyro;
 
 // Enum for different mutexes
 enum MutexTypes
 {
-  MUTEX_GYRO,
   MUTEX_POSE
 };
 // Mutexes
-Mutex mutexes[2];
+Mutex mutexes[1];
 
 #endif

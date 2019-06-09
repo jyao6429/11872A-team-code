@@ -19,11 +19,7 @@ Encoder rightEncoder;
 Encoder backEncoder;
 
 // Sensor ports
-const int PORT_gyro = 1;
 const int PORT_liftPot = 2;
 
-// Gyro itself
-struct NERD_Gyro mainGyro;
-
 // Mutexes
-Mutex mutexes[2];
+Mutex mutexes[1];

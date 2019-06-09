@@ -31,7 +31,6 @@
 #include "aps.h"
 #include "chassis.h"
 #include "global.h"
-#include "NERD_Gyro.h"
 #include "NERD_PID.h"
 
 // Other includes

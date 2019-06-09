@@ -36,19 +36,14 @@ void initializeIO()
  */
 void initialize()
 {
-  mutexes[MUTEX_GYRO] = mutexCreate();
+  // Create mutexes
   mutexes[MUTEX_POSE] = mutexCreate();
 
+  // Initialize encoders
   leftEncoder = encoderInit(PORT_leftEncoder, PORT_leftEncoder + 1, false);
   rightEncoder = encoderInit(PORT_rightEncoder, PORT_rightEncoder + 1, true);
   backEncoder = encoderInit(PORT_backEncoder, PORT_backEncoder + 1, true);
 
-  // Initialize Gyro
-  //gyro_init(&mainGyro, PORT_gyro, true);
-
-  //printf("AVG: %f\t STD: %f\tVPDS: %f\n", mainGyro.config.avg, mainGyro.config.std_deviation, mainGyro.config.volts_per_degree_per_second);
-
-  //taskCreate(startGyroIntegral, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT + 2);
-
+  // Start tracking
   initializeAPS(0.0, 0.0, 0.0);
 }

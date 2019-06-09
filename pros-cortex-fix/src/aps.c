@@ -1,17 +1,14 @@
 #include "main.h"
 
 // Physical parameters in inches
-const double sL = 4.61;               // distance from center to left tracking wheel
-const double sR = 4.61;               // distance from center to right tracking wheel
-const double sB = 7.0;                 // distance from center to back tracking wheel
+const double sL = 4.61;                  // distance from center to left tracking wheel
+const double sR = 4.61;                  // distance from center to right tracking wheel
+const double sB = 7.0;                   // distance from center to back tracking wheel
 const double sideWheelDiameter = 2.75;   // diameter of side wheels
 const double backWheelDiameter = 2.75;   // diameter of back wheel
 // Encoder counts
-const int sideEncoderResolution = 360;  // side encoder ticks per 360 degrees of motion
-const int backEncoderResolution = 360;  // back encoder ticks per 360 degrees of motion
-
-// Current angle calculated by gyro
-double gyroAngle = 0.0;
+const int sideEncoderResolution = 360;   // side encoder ticks per 360 degrees of motion
+const int backEncoderResolution = 360;   // back encoder ticks per 360 degrees of motion
 
 // Previous position and orientation
 double robotPose[3] = {0.0, 0.0, 0.0};
@@ -55,7 +52,6 @@ void initializeAPS(double startX, double startY, double startAngle)
   resetPosition(startX, startY, startAngle);
 
   // Create new tasks to track position
-  //taskCreate(startGyroIntegral, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT + 2);
   taskCreate(startTracking, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT + 1);
 }
 void resetPosition(double resetX, double resetY, double resetAngle)
@@ -74,37 +70,6 @@ void resetPosition(double resetX, double resetY, double resetAngle)
 
   // Set reset orientation
   resetAngle = degToRad(resetAngle);
-
-  mutexTake(mutexes[MUTEX_GYRO], -1);
-  gyroAngle = resetAngle;
-  mutexGive(mutexes[MUTEX_GYRO]);
-
-}
-void startGyroIntegral(void *ignore)
-{
-  unsigned long gyroTimer = millis();
-
-  while (true)
-  {
-    // Calculate delta time from last iteration
-    double deltaTime = ((double) (millis() - gyroTimer)) / 1000;
-
-    //printf("%f\n", gyroAngle);
-    // Reset loop timer
-    gyroTimer = millis();
-
-    double gyroRate = gyro_get_rate(&mainGyro);
-    double deltaAngle = gyroRate * deltaTime;
-    mutexTake(mutexes[MUTEX_GYRO], 5);
-
-    //printf("RATE: %f\tTIME: %f\t D_ANGLE: %f\tANGLE: %f\n", gyroRate, deltaTime, deltaAngle, radToDeg(gyroAngle));
-
-    // Add to angle with rate from gyro
-    gyroAngle += degToRad(gyro_get_rate(&mainGyro) * deltaTime);
-    mutexGive(mutexes[MUTEX_GYRO]);
-
-    delay(2);
-  }
 }
 void startTracking(void *ignore)
 {
@@ -153,9 +118,7 @@ void startTracking(void *ignore)
     }
 
     // Calculate average angle
-    mutexTake(mutexes[MUTEX_POSE], -1);
-    double avgAngle = robotPose[POSE_ANGLE] + (deltaAngle / 2);
-    mutexGive(mutexes[MUTEX_POSE]);
+    double avgAngle = newAngle - (deltaAngle / 2);
 
     // Convert localOffset to a polar vector
     double localPolar[] = {0.0, 0.0};
@@ -175,7 +138,7 @@ void startTracking(void *ignore)
     robotPose[POSE_ANGLE] = newAngle;
     mutexGive(mutexes[MUTEX_POSE]);
 
-    delay(5);
+    delay(2);
   }
 }
 double nearestEquivalentAngle(double reference, double target)

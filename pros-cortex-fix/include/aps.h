@@ -23,10 +23,6 @@ int prevLeftEncoder;
 int prevRightEncoder;
 int prevBackEncoder;
 /**
- * Angle calculated by gyro
- */
-double gyroAngle;
-/**
  * The previous position vector and orientation calculated by the APS
  */
 double robotPose[3];
@@ -82,11 +78,6 @@ void initializeAPS(double startX, double startY, double startAngle);
  * @param resetAngle - the reset angle in degrees
  */
 void resetPosition(double resetX, double resetY, double resetAngle);
-/**
- * Starts integrating the gyro rate to keep track of orientation
- * This should be started as a task
- */
-void startGyroIntegral(void *ignore);
 /**
  * Starts tracking the robot position
  * This shoud be started as a task
