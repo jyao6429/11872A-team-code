@@ -40,11 +40,7 @@ void operatorControl()
 
 		// Debug APS
 		mutexTake(mutexes[MUTEX_POSE], 10);
-		mutexTake(mutexes[MUTEX_GYRO], 10);
-
-		printf("X: %f\tY: %f\tANGLE: %f\tGYRO: %f\n", robotPose[POSE_X], robotPose[POSE_Y], radToDeg(robotPose[POSE_ANGLE]), radToDeg(gyroAngle));
-
-		mutexGive(mutexes[MUTEX_GYRO]);
+		printf("X: %f\tY: %f\tANGLE: %f\n", robotPose[POSE_X], robotPose[POSE_Y], radToDeg(robotPose[POSE_ANGLE]));
 		mutexGive(mutexes[MUTEX_POSE]);
 
 		delay(20);

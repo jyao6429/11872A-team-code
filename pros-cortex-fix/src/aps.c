@@ -1,8 +1,8 @@
 #include "main.h"
 
 // Physical parameters in inches
-const double sL = 4.61;                  // distance from center to left tracking wheel
-const double sR = 4.61;                  // distance from center to right tracking wheel
+const double sL = 4.605;                  // distance from center to left tracking wheel
+const double sR = 4.605;                  // distance from center to right tracking wheel
 const double sB = 7.0;                   // distance from center to back tracking wheel
 const double sideWheelDiameter = 2.75;   // diameter of side wheels
 const double backWheelDiameter = 2.75;   // diameter of back wheel
@@ -98,9 +98,7 @@ void startTracking(void *ignore)
     double newAngle = resetAngle + (totalLeftDistance - totalRightDistance) / (sL + sR);
 
     // Calculate change in angle
-    mutexTake(mutexes[MUTEX_POSE], -1);
-    double deltaAngle = newAngle - robotPose[POSE_ANGLE];
-    mutexGive(mutexes[MUTEX_POSE]);
+    double deltaAngle = (deltaLeftDistance - deltaRightDistance) / (sL + sR);
 
     // Calculate local offset vector
     double localOffset[] = {0.0, 0.0};
