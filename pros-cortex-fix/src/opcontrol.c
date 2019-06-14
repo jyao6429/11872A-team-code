@@ -31,7 +31,7 @@ void operatorControl()
 	printf("Hello PROS User!\n");
 
 	// Test turning PID
-	turnToAngle(90, 80, true);
+	turnToAngle(90, 70, true);
 
 	while (1)
 	{

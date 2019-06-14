@@ -28,7 +28,7 @@ void turnToAngle(double targetAngle, int maxSpeed, bool isAccurate)
   targetAngle = nearestEquivalentAngle(degToRad(targetAngle));
 
   // Initialize turning PID
-  pidInit(&controllers[PID_ROTATE], 0.5, 0.0, 0.0);
+  pidInit(&controllers[PID_ROTATE], 1.8, 2.0, 0.15);
 
   // Variables to keep track of current state
   bool isAtTarget = false;
@@ -45,6 +45,9 @@ void turnToAngle(double targetAngle, int maxSpeed, bool isAccurate)
 
     // Drive the wheels
     powerMotors(driveOut, -driveOut);
+
+    // Debug
+    printf("Still turning: %f\n", radToDeg(currentAngle));
 
     // Calculate if is at target
     if (isAccurate)
