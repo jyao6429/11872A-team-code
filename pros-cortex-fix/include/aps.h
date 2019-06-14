@@ -87,12 +87,11 @@ void startTracking(void *ignore);
 /**
  * Calculates nearest equivalent angle in radians
  *
- * @param reference - the current orientation in radians
  * @param target - the target orientation in radians
  *
  * @return the target orientation + 2 x pi x k added
  */
-double nearestEquivalentAngle(double reference, double target);
+double nearestEquivalentAngle(double target);
 /**
  * Converts cartesian coordinates into polar
  *

@@ -139,9 +139,9 @@ void startTracking(void *ignore)
     delay(2);
   }
 }
-double nearestEquivalentAngle(double reference, double target)
+double nearestEquivalentAngle(double target)
 {
-  return round((reference - target) / (2 * M_PI)) * 2 * M_PI + target;
+  return round((robotPose[POSE_ANGLE] - target) / (2 * M_PI)) * 2 * M_PI + target;
 }
 void cartToPolar(double *cartVector, double *polarVector)
 {

@@ -29,7 +29,9 @@
 void operatorControl()
 {
 	printf("Hello PROS User!\n");
-	//gyro_calibrate(&mainGyro);
+
+	// Test turning PID
+	turnToAngle(90, 80, true);
 
 	while (1)
 	{
