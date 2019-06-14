@@ -45,5 +45,5 @@ void initialize()
   backEncoder = encoderInit(PORT_backEncoder, PORT_backEncoder + 1, true);
 
   // Start tracking
-  initializeAPS(0.0, 0.0, 0.0);
+  initializeAPS(0.0, 0.0, -90.0);
 }

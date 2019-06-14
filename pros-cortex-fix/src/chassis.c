@@ -4,6 +4,9 @@
 #define ACCURATE_ANGLE_ERROR 0.03
 // Accurate to about 10 degrees
 #define INACCURATE_ANGLE_ERROR 0.17
+// Accurate to inches
+#define ACCURATE_DISTANCE_ERROR 0.25
+#define INACCURATE_DISTANCE_ERROR 2
 
 void powerMotors(int leftPower, int rightPower)
 {
@@ -22,6 +25,64 @@ enum PIDControllers
 // Array of PID controllers for various motions
 PID controllers[2];
 
+void driveStraightToPoint(double targetX, double targetY, int maxSpeed, bool isAccurate)
+{
+  // Face in the direction of the point
+  turnToAngle(angleToFacePoint(targetX, targetY), maxSpeed, false);
+
+  // Initialize PIDs to go straight and keep pointed at the point
+  pidInit(&controllers[PID_STRAIGHT], 0.5, 0.0, 0.0);
+  pidInit(&controllers[PID_ROTATE], 0.5, 0.0, 0.0);
+
+  // Variables to keep track of current state
+  bool isAtTarget = false;
+  unsigned long atTargetTime = millis();
+
+  while (!isAtTarget)
+  {
+    // Calculate distance to target and differential power
+    mutexTake(mutexes[MUTEX_POSE], -1);
+    double distanceToGo = distanceToPoint(targetX, targetY);
+
+    // Calculate differences in power to keep facing point
+    int driveDiff = pidCalculate(&controllers[PID_ROTATE], angleToFacePoint(targetX, targetY), robotPose[POSE_ANGLE]) * 20;
+    mutexGive(mutexes[MUTEX_POSE]);
+
+    // Calculate the speed to approach the point
+    int driveOut = -1 * pidCalculate(&controllers[PID_STRAIGHT], 0, distanceToGo) * maxSpeed;
+
+    // Drive the wheels
+    powerMotors(driveOut - driveDiff, driveOut + driveDiff);
+
+    // Debug
+    printf("Still driving: %f\n", distanceToGo);
+
+    // Calculate if is at target
+    if (isAccurate)
+    {
+      // If not within error, reset timer
+      if (distanceToGo > ACCURATE_DISTANCE_ERROR)
+      {
+        atTargetTime = millis();
+      }
+      // If at target for more than 350 milliseconds
+      if (millis() - atTargetTime > 350)
+      {
+        isAtTarget = true;
+        powerMotors(0, 0);
+      }
+    }
+    else
+    {
+      // If within range, disengage
+      if (distanceToGo < INACCURATE_DISTANCE_ERROR)
+      {
+        isAtTarget = true;
+        powerMotors(0, 0);
+      }
+    }
+  }
+}
 void turnToAngle(double targetAngle, int maxSpeed, bool isAccurate)
 {
   // Convert targetAngle into radians and find nearest angle

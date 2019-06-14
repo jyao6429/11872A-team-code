@@ -85,6 +85,20 @@ void resetPosition(double resetX, double resetY, double resetAngle);
 void startTracking(void *ignore);
 
 /**
+ * Calculates the distance from the current position to a point
+ *
+ * @param targetX - the x component of the target point
+ * @param targetY - the y component of the target point
+ */
+double distanceToPoint(double targetX, double targetY);
+/**
+ * Calculate the orientation of the robot to face a certain point
+ *
+ * @param targetX - the x component of the target point
+ * @param targetY - the y component of the target point
+ */
+double angleToFacePoint(double targetX, double targetY);
+/**
  * Calculates nearest equivalent angle in radians
  *
  * @param target - the target orientation in radians

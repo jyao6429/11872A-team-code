@@ -139,6 +139,14 @@ void startTracking(void *ignore)
     delay(2);
   }
 }
+double distanceToPoint(double targetX, double targetY)
+{
+  return sqrt(pow(targetX - robotPose[POSE_X], 2) + pow(targetY - robotPose[POSE_Y], 2));
+}
+double angleToFacePoint(double targetX, double targetY)
+{
+  return -1 * atan2(targetY - robotPose[POSE_Y], targetX - robotPose[POSE_X]);
+}
 double nearestEquivalentAngle(double target)
 {
   return round((robotPose[POSE_ANGLE] - target) / (2 * M_PI)) * 2 * M_PI + target;
