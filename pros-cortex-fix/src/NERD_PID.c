@@ -41,53 +41,53 @@
 
 #include "main.h"
 
-void pidInit (PID pid, double Kp, double Ki, double Kd)
+void pidInit(PID *pid, double Kp, double Ki, double Kd)
 {
-	pid.Kp = Kp;
-	pid.Ki = Ki;
-	pid.Kd = Kd;
-	pid.Kf = 0.0;
-	pid.sigma = 0;
-	pid.lastValue = 0;
-	pid.lastTime = millis();
+	pid->Kp = Kp;
+	pid->Ki = Ki;
+	pid->Kd = Kd;
+	pid->Kf = 0.0;
+	pid->sigma = 0.0;
+	pid->lastValue = 0.0;
+	pid->lastTime = millis();
 }
-void pidInitCopy (PID pid, PID toCopy)
+void pidInitCopy(PID *pid, PID *toCopy)
 {
-	pid.Kp = toCopy.Ki;
-	pid.Ki = toCopy.Ki;
-	pid.Kd = toCopy.Kd;
-	pid.Kf = toCopy.Kf;
-	pid.sigma = 0;
-	pid.lastValue = 0;
-	pid.lastTime = millis();
+	pid->Kp = toCopy->Ki;
+	pid->Ki = toCopy->Ki;
+	pid->Kd = toCopy->Kd;
+	pid->Kf = toCopy->Kf;
+	pid->sigma = 0.0;
+	pid->lastValue = 0.0;
+	pid->lastTime = millis();
 }
-double pidCalculate (PID pid, double setPoint, double processVariable)
+double pidCalculate(PID *pid, double setPoint, double processVariable)
 {
-	double deltaTime = (millis() - pid.lastTime) * 0.001;
-	pid.lastTime = millis();
+	double deltaTime = (millis() - pid->lastTime) * 0.001;
+	pid->lastTime = millis();
 
-	double deltaPV = 0;
+	double deltaPV = 0.0;
 
   if (deltaTime > 0)
   {
-		deltaPV = (processVariable - pid.lastValue) / deltaTime;
+		deltaPV = (processVariable - pid->lastValue) / deltaTime;
   }
 
-  pid.lastValue = processVariable;
+  pid->lastValue = processVariable;
 
 	double error = setPoint - processVariable;
 
-  double output = error * pid.Kp + pid.sigma * pid.Ki - deltaPV * pid.Kd + setPoint * pid.Kf;
+  double output = (error * pid->Kp) + (pid->sigma * pid->Ki) - (deltaPV * pid->Kd) + (setPoint * pid->Kf);
 
-	if (!(fabs(output) >= 1.0 && ((error >= 0 && pid.sigma >= 0) || (error < 0 && pid.sigma < 0))))
+	if (!(fabs(output) >= 1.0 && ((error >= 0 && pid->sigma >= 0) || (error < 0 && pid->sigma < 0))))
   {
-    pid.sigma += error * deltaTime;
+    pid->sigma += error * deltaTime;
   }
 
-	output = error * pid.Kp
-					+ pid.sigma * pid.Ki
-					- deltaPV * pid.Kd
-					+ setPoint * pid.Kf;
+	output = error * pid->Kp
+					+ pid->sigma * pid->Ki
+					- deltaPV * pid->Kd
+					+ setPoint * pid->Kf;
 
   if (output > 1.0)
   {

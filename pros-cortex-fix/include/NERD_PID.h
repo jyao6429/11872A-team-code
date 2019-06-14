@@ -24,14 +24,14 @@ typedef struct
  * Ki - integral gain
  * Kd - derivative gain
  */
-void pidInit (PID pid, double Kp, double Ki, double Kd);
+void pidInit(PID *pid, double Kp, double Ki, double Kd);
 /**
  * initialize pid structure, set parameters based on another PID structure
  *
  * @param pid - instance of PID structure
  * @param toCopy - PID instance to copy settings from
  */
-void pidInitCopy (PID pid, PID toCopy);
+void pidInitCopy(PID *pid, PID *toCopy);
 /**
  * calculate pid output
  *
@@ -41,6 +41,6 @@ void pidInitCopy (PID pid, PID toCopy);
  *
  * @return output value of the control loop
  */
-double pidCalculate (PID pid, double setPoint, double processVariable);
+double pidCalculate(PID *pid, double setPoint, double processVariable);
 
 #endif

@@ -36,6 +36,12 @@ void operatorControl()
 		int leftPower = joystickGetAnalog(1, 3);
 		int rightPower = joystickGetAnalog(1, 2);
 
+		// Deadband for joysticks
+		if (abs(leftPower) < 15)
+			leftPower = 0;
+		if (abs(rightPower) < 15)
+			rightPower = 0;
+
 		powerMotors(leftPower, rightPower);
 
 		// Debug APS
