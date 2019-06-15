@@ -54,7 +54,7 @@ void initializeAPS(double startX, double startY, double startAngle)
   // Create new tasks to track position
   taskCreate(startTracking, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT + 1);
 }
-void resetPosition(double resetX, double resetY, double resetAngle)
+void resetPosition(double resetX, double resetY, double resetA)
 {
   // Reset all the encoders
   resetLeftEncoder();
@@ -65,11 +65,11 @@ void resetPosition(double resetX, double resetY, double resetAngle)
   mutexTake(mutexes[MUTEX_POSE], -1);
   robotPose[POSE_X] = resetX;
   robotPose[POSE_Y] = resetY;
-  robotPose[POSE_ANGLE] = 0;
+  robotPose[POSE_ANGLE] = degToRad(resetA);
   mutexGive(mutexes[MUTEX_POSE]);
 
   // Set reset orientation
-  resetAngle = degToRad(resetAngle);
+  resetAngle = degToRad(resetA);
 }
 void startTracking(void *ignore)
 {
@@ -145,7 +145,7 @@ double distanceToPoint(double targetX, double targetY)
 }
 double angleToFacePoint(double targetX, double targetY)
 {
-  return -1 * atan2(targetY - robotPose[POSE_Y], targetX - robotPose[POSE_X]);
+  return nearestEquivalentAngle(-1 * atan2(targetY - robotPose[POSE_Y], targetX - robotPose[POSE_X]));
 }
 double nearestEquivalentAngle(double target)
 {

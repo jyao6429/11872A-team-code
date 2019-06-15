@@ -2,11 +2,11 @@
 
 // Accurate to about 1.7 degrees
 #define ACCURATE_ANGLE_ERROR 0.03
-// Accurate to about 10 degrees
-#define INACCURATE_ANGLE_ERROR 0.17
+// Accurate to about 5 degrees
+#define INACCURATE_ANGLE_ERROR 0.09
 // Accurate to inches
-#define ACCURATE_DISTANCE_ERROR 0.25
-#define INACCURATE_DISTANCE_ERROR 2
+#define ACCURATE_DISTANCE_ERROR 1
+#define INACCURATE_DISTANCE_ERROR 4
 
 void powerMotors(int leftPower, int rightPower)
 {
@@ -31,8 +31,8 @@ void driveStraightToPoint(double targetX, double targetY, int maxSpeed, bool isA
   turnToAngle(angleToFacePoint(targetX, targetY), maxSpeed, false);
 
   // Initialize PIDs to go straight and keep pointed at the point
-  pidInit(&controllers[PID_STRAIGHT], 0.5, 0.0, 0.0);
-  pidInit(&controllers[PID_ROTATE], 0.5, 0.0, 0.0);
+  pidInit(&controllers[PID_STRAIGHT], 0.1, 0.0, 0.0);
+  pidInit(&controllers[PID_ROTATE], 0.1, 0.0, 0.0);
 
   // Variables to keep track of current state
   bool isAtTarget = false;
@@ -45,7 +45,7 @@ void driveStraightToPoint(double targetX, double targetY, int maxSpeed, bool isA
     double distanceToGo = distanceToPoint(targetX, targetY);
 
     // Calculate differences in power to keep facing point
-    int driveDiff = pidCalculate(&controllers[PID_ROTATE], angleToFacePoint(targetX, targetY), robotPose[POSE_ANGLE]) * 20;
+    int driveDiff = pidCalculate(&controllers[PID_ROTATE], angleToFacePoint(targetX, targetY), robotPose[POSE_ANGLE]) * 30;
     mutexGive(mutexes[MUTEX_POSE]);
 
     // Calculate the speed to approach the point
@@ -81,6 +81,7 @@ void driveStraightToPoint(double targetX, double targetY, int maxSpeed, bool isA
         powerMotors(0, 0);
       }
     }
+    delay(20);
   }
 }
 void turnToAngle(double targetAngle, int maxSpeed, bool isAccurate)
@@ -97,18 +98,10 @@ void turnToAngle(double targetAngle, int maxSpeed, bool isAccurate)
 
   while (!isAtTarget)
   {
-    // Calculate the amount to drive to each wheel
+    // Get current angle
     mutexTake(mutexes[MUTEX_POSE], -1);
     double currentAngle = robotPose[POSE_ANGLE];
     mutexGive(mutexes[MUTEX_POSE]);
-
-    int driveOut = pidCalculate(&controllers[PID_ROTATE], targetAngle, currentAngle) * maxSpeed;
-
-    // Drive the wheels
-    powerMotors(driveOut, -driveOut);
-
-    // Debug
-    printf("Still turning: %f\n", radToDeg(currentAngle));
 
     // Calculate if is at target
     if (isAccurate)
@@ -123,6 +116,7 @@ void turnToAngle(double targetAngle, int maxSpeed, bool isAccurate)
       {
         isAtTarget = true;
         powerMotors(0, 0);
+        break;
       }
     }
     else
@@ -131,8 +125,19 @@ void turnToAngle(double targetAngle, int maxSpeed, bool isAccurate)
       if (fabs(targetAngle - currentAngle) < INACCURATE_ANGLE_ERROR)
       {
         isAtTarget = true;
-        powerMotors(0, 0);
+        break;
       }
     }
+
+    // Calculate power to wheels
+    int driveOut = pidCalculate(&controllers[PID_ROTATE], targetAngle, currentAngle) * maxSpeed;
+
+    // Drive the wheels
+    powerMotors(driveOut, -driveOut);
+
+    // Debug
+    printf("(turnToAngle) X: %f\tY: %f\tANGLE: %f\n", robotPose[POSE_X], robotPose[POSE_Y], radToDeg(robotPose[POSE_ANGLE]));
+
+    delay(20);
   }
 }

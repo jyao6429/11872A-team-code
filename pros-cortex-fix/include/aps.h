@@ -77,7 +77,7 @@ void initializeAPS(double startX, double startY, double startAngle);
  * @param resetY - the reset y coordinate in inches
  * @param resetAngle - the reset angle in degrees
  */
-void resetPosition(double resetX, double resetY, double resetAngle);
+void resetPosition(double resetX, double resetY, double resetA);
 /**
  * Starts tracking the robot position
  * This shoud be started as a task
