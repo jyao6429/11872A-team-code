@@ -1,6 +1,8 @@
 #ifndef CHASSIS_H
 #define CHASSIS_H
 
+#include "main.h"
+
 /**
  * Powers the motors on the chassis
  *

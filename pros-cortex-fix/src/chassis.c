@@ -62,19 +62,28 @@ void driveStraightToPoint(double targetX, double targetY, int maxSpeed, bool isA
     if (distanceToGo > ACCURATE_DISTANCE_ERROR * 2 || !isAccurate)
     {
       // If large error in angle (45 degrees off), turn to face it
-      if (fabs(angleToFace - currentAngle) > M_PI / 4)
+      if (fabs(angleToFace - currentAngle) > M_PI / 6)
       {
         turnToAngle(angleToFace, maxSpeed, false, false);
       }
       // Otherwise, give differential power to wheels
       else
       {
+        controllers[PID_KEEP_STRAIGHT].Kd = 0.2;
         driveDiff = pidCalculate(&controllers[PID_KEEP_STRAIGHT], angleToFace, robotPose[POSE_ANGLE]) * maxSpeed * 2;
       }
     }
-    else
+    else if (distanceToGo > ACCURATE_DISTANCE_ERROR)
     {
-      driveDiff = pidCalculate(&controllers[PID_KEEP_STRAIGHT], angleToFace, robotPose[POSE_ANGLE]) * maxSpeed / 4;
+      if (fabs(angleToFace - currentAngle) > M_PI / 6)
+      {
+        turnToAngle(angleToFace, maxSpeed * 0.6, true, false);
+      }
+      else
+      {
+        controllers[PID_KEEP_STRAIGHT].Kd = 0.5;
+        driveDiff = pidCalculate(&controllers[PID_KEEP_STRAIGHT], angleToFace, robotPose[POSE_ANGLE]) * maxSpeed * 2;
+      }
     }
 
     // Calculate the speed to approach the point
@@ -121,8 +130,15 @@ void turnToAngle(double targetAngle, int maxSpeed, bool isAccurate, bool isDegre
 
   targetAngle = nearestEquivalentAngle(targetAngle);
 
-  // Initialize turning PID
-  pidInit(&controllers[PID_ROTATE], 3.5, 0.2, 0.35);
+  // Initialize turning PID, with larger constants when small angle and slow
+  if (maxSpeed < 60 && fabs(targetAngle - robotPose[POSE_ANGLE]) < M_PI / 18)
+  {
+    pidInit(&controllers[PID_ROTATE], 6.0, 1.0, 0.5);
+  }
+  else
+  {
+    pidInit(&controllers[PID_ROTATE], 3.5, 0.2, 0.35);
+  }
 
   // Variables to keep track of current state
   bool isAtTarget = false;
