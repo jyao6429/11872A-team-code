@@ -59,6 +59,7 @@ void operatorControl()
 		printf("X: %f\tY: %f\tANGLE: %f\n", robotPose[POSE_X], robotPose[POSE_Y], radToDeg(robotPose[POSE_ANGLE]));
 		mutexGive(mutexes[MUTEX_POSE]);
 
+		// Return to origin when button pressed
 		if (joystickGetDigital(1, 8, JOY_UP))
 		{
 			driveStraightToPose(0.0, 0.0, 0.0, 70, false);

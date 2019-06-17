@@ -1,8 +1,8 @@
 #include "main.h"
 
 // Physical parameters in inches
-const double sL = 4.568;                  // distance from center to left tracking wheel
-const double sR = 4.568;                  // distance from center to right tracking wheel
+const double sL = 4.568;                 // distance from center to left tracking wheel
+const double sR = 4.568;                 // distance from center to right tracking wheel
 const double sB = 4.5;                   // distance from center to back tracking wheel
 const double sideWheelDiameter = 2.75;   // diameter of side wheels
 const double backWheelDiameter = 2.75;   // diameter of back wheel

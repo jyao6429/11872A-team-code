@@ -18,6 +18,20 @@ enum Polar
   MAGNITUDE,
   ANGLE
 };
+
+// Physical parameters in inches
+
+// distance from center to left tracking wheel
+const double sL;
+// distance from center to right tracking wheel
+const double sR;
+// distance from center to back tracking wheel
+const double sB;
+// diameter of side wheels
+const double sideWheelDiameter;
+// diameter of back wheel
+const double backWheelDiameter;
+
 // Previous encoder values
 int prevLeftEncoder;
 int prevRightEncoder;

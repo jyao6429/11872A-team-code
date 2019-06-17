@@ -28,7 +28,9 @@ PID controllers[3];
 
 void driveStraightToPose(double targetX, double targetY, double targetAngle, int maxSpeed, bool isDegrees)
 {
+  // First drive to target point
   driveStraightToPoint(targetX, targetY, maxSpeed, true);
+  // Turn to the correct orientation
   turnToAngle(targetAngle, maxSpeed, true, isDegrees);
 }
 void driveStraightToPoint(double targetX, double targetY, int maxSpeed, bool isAccurate)
@@ -36,7 +38,7 @@ void driveStraightToPoint(double targetX, double targetY, int maxSpeed, bool isA
   // Initial turn
   turnToAngle(angleToFacePoint(targetX, targetY), maxSpeed, false, false);
 
-  // Initialize PIDs to go straight
+  // Initialize PIDs to go and keep straight
   pidInit(&controllers[PID_STRAIGHT], 0.15, 0.0, 0.1);
   pidInit(&controllers[PID_KEEP_STRAIGHT], 2.0, 0.0, 0.2);
 
@@ -46,16 +48,17 @@ void driveStraightToPoint(double targetX, double targetY, int maxSpeed, bool isA
 
   while (!isAtTarget)
   {
-    // Get current state and info needed to face in the direction of the point
     mutexTake(mutexes[MUTEX_POSE], -1);
+    // Get current state
     double distanceToGo = distanceToPoint(targetX, targetY);
     double currentAngle = robotPose[POSE_ANGLE];
 
+    // Get info needed to face in the direction of the point
     double angleToFace = angleToFacePoint(targetX, targetY);
     int robotDirection = 1;
     mutexGive(mutexes[MUTEX_POSE]);
 
-    // Reverses direction in case robot overshoots target
+    // Reverses direction instead of turning completely around in case robot overshoots target
     if (fabs(angleToFace - currentAngle) > M_PI / 2)
     {
       angleToFace = nearestEquivalentAngle(angleToFace - M_PI);
@@ -66,7 +69,7 @@ void driveStraightToPoint(double targetX, double targetY, int maxSpeed, bool isA
     int driveDiff = 0;
     if (distanceToGo > ACCURATE_DISTANCE_ERROR * 2 || !isAccurate)
     {
-      // If large error in angle (45 degrees off), turn to face it
+      // If large error in angle (30 degrees off), turn to face it
       if (fabs(angleToFace - currentAngle) > M_PI / 6)
       {
         turnToAngle(angleToFace, maxSpeed, false, false);
@@ -80,10 +83,12 @@ void driveStraightToPoint(double targetX, double targetY, int maxSpeed, bool isA
     }
     else if (distanceToGo > ACCURATE_DISTANCE_ERROR)
     {
+      // If large error in angle (30 degrees off), turn to face it
       if (fabs(angleToFace - currentAngle) > M_PI / 6)
       {
         turnToAngle(angleToFace, maxSpeed * 0.6, true, false);
       }
+      // Otherwise, give differential power to wheels
       else
       {
         controllers[PID_KEEP_STRAIGHT].Kd = 0.5;
@@ -164,7 +169,7 @@ void turnToAngle(double targetAngle, int maxSpeed, bool isAccurate, bool isDegre
       {
         atTargetTime = millis();
       }
-      // If at target for more than 350 milliseconds
+      // If at target for more than 350 milliseconds, disengage
       if (millis() - atTargetTime > 350)
       {
         isAtTarget = true;
