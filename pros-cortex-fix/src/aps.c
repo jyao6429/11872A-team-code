@@ -3,7 +3,7 @@
 // Physical parameters in inches
 const double sL = 4.568;                  // distance from center to left tracking wheel
 const double sR = 4.568;                  // distance from center to right tracking wheel
-const double sB = 7.0;                   // distance from center to back tracking wheel
+const double sB = 4.5;                   // distance from center to back tracking wheel
 const double sideWheelDiameter = 2.75;   // diameter of side wheels
 const double backWheelDiameter = 2.75;   // diameter of back wheel
 // Encoder counts
@@ -145,7 +145,9 @@ double distanceToPoint(double targetX, double targetY)
 }
 double angleToFacePoint(double targetX, double targetY)
 {
-  return nearestEquivalentAngle(-1 * atan2(targetY - robotPose[POSE_Y], targetX - robotPose[POSE_X]));
+  double toReturn = nearestEquivalentAngle(-1 * atan2(targetY - robotPose[POSE_Y], targetX - robotPose[POSE_X]) + M_PI / 2);
+  //printf("angleToFacePoint: %f\tX: %f\tY: %f\ttargetX: %f\ttargetY: %f\n", toReturn, robotPose[POSE_X], robotPose[POSE_Y], targetX, targetY);
+  return toReturn;
 }
 double nearestEquivalentAngle(double target)
 {

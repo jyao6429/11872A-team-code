@@ -31,10 +31,15 @@ void operatorControl()
 	printf("Hello PROS User!\n");
 
 	// Test turning PID
-	//turnToAngle(90, 70, true);
+	//turnToAngle(180, 70, true, true);
 
 	// Test driveStraightToPoint PID
-	//driveStraightToPoint(0.0, 25.0, 30, false);
+
+	driveStraightToPoint(0.0, 48.0, 70);
+	driveStraightToPoint(48.0, 48.0, 70);
+	driveStraightToPoint(48.0, 0.0, 70);
+	driveStraightToPoint(0.0, 0.0, 70);
+
 
 	while (1)
 	{
@@ -51,7 +56,7 @@ void operatorControl()
 
 		// Debug APS
 		mutexTake(mutexes[MUTEX_POSE], 10);
-		printf("X: %f\tY: %f\tANGLE: %f\n", robotPose[POSE_X], robotPose[POSE_Y], radToDeg(robotPose[POSE_ANGLE]));
+		//printf("X: %f\tY: %f\tANGLE: %f\n", robotPose[POSE_X], robotPose[POSE_Y], radToDeg(robotPose[POSE_ANGLE]));
 		mutexGive(mutexes[MUTEX_POSE]);
 
 		delay(20);

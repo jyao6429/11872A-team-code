@@ -21,18 +21,19 @@ enum PIDControllers
 {
   PID_STRAIGHT,
   PID_ROTATE,
+  PID_KEEP_STRAIGHT
 };
 // Array of PID controllers for various motions
-PID controllers[2];
+PID controllers[3];
 
 void driveStraightToPoint(double targetX, double targetY, int maxSpeed, bool isAccurate)
 {
-  // Face in the direction of the point
-  turnToAngle(angleToFacePoint(targetX, targetY), maxSpeed, false);
+  // Initial turn
+  turnToAngle(angleToFacePoint(targetX, targetY), maxSpeed, false, false);
 
-  // Initialize PIDs to go straight and keep pointed at the point
-  pidInit(&controllers[PID_STRAIGHT], 0.1, 0.0, 0.0);
-  pidInit(&controllers[PID_ROTATE], 0.1, 0.0, 0.0);
+  // Initialize PIDs to go straight
+  pidInit(&controllers[PID_STRAIGHT], 0.15, 0.0, 0.1);
+  pidInit(&controllers[PID_KEEP_STRAIGHT], 2.0, 0.0, 0.2);
 
   // Variables to keep track of current state
   bool isAtTarget = false;
@@ -40,32 +41,60 @@ void driveStraightToPoint(double targetX, double targetY, int maxSpeed, bool isA
 
   while (!isAtTarget)
   {
-    // Calculate distance to target and differential power
+    // Get current state and info needed to face in the direction of the point
     mutexTake(mutexes[MUTEX_POSE], -1);
     double distanceToGo = distanceToPoint(targetX, targetY);
+    double currentAngle = robotPose[POSE_ANGLE];
 
-    // Calculate differences in power to keep facing point
-    int driveDiff = pidCalculate(&controllers[PID_ROTATE], angleToFacePoint(targetX, targetY), robotPose[POSE_ANGLE]) * 30;
+    double angleToFace = angleToFacePoint(targetX, targetY);
+    int robotDirection = 1;
     mutexGive(mutexes[MUTEX_POSE]);
 
+    // Reverses direction in case robot overshoots target
+    if (fabs(angleToFace - currentAngle) > M_PI / 2)
+    {
+      angleToFace = nearestEquivalentAngle(angleToFace - M_PI);
+      robotDirection = -1;
+    }
+
+    // Compensate for angle error only, with greater compensation when not in margin
+    int driveDiff = 0;
+    if (distanceToGo > ACCURATE_DISTANCE_ERROR * 2 || !isAccurate)
+    {
+      // If large error in angle (45 degrees off), turn to face it
+      if (fabs(angleToFace - currentAngle) > M_PI / 4)
+      {
+        turnToAngle(angleToFace, maxSpeed, false, false);
+      }
+      // Otherwise, give differential power to wheels
+      else
+      {
+        driveDiff = pidCalculate(&controllers[PID_KEEP_STRAIGHT], angleToFace, robotPose[POSE_ANGLE]) * maxSpeed * 2;
+      }
+    }
+    else
+    {
+      driveDiff = pidCalculate(&controllers[PID_KEEP_STRAIGHT], angleToFace, robotPose[POSE_ANGLE]) * maxSpeed / 4;
+    }
+
     // Calculate the speed to approach the point
-    int driveOut = -1 * pidCalculate(&controllers[PID_STRAIGHT], 0, distanceToGo) * maxSpeed;
+    int driveOut = robotDirection * pidCalculate(&controllers[PID_STRAIGHT], distanceToGo, 0) * maxSpeed;
 
     // Drive the wheels
-    powerMotors(driveOut - driveDiff, driveOut + driveDiff);
+    powerMotors(driveOut + driveDiff, driveOut - driveDiff);
 
     // Debug
-    printf("Still driving: %f\n", distanceToGo);
+    printf("(driveStraightToPoint) X: %f\tY: %f\tANGLE: %f\n", robotPose[POSE_X], robotPose[POSE_Y], radToDeg(robotPose[POSE_ANGLE]));
 
-    // Calculate if is at target
+    // Checks if at target, depending on accuracy
     if (isAccurate)
     {
-      // If not within error, reset timer
+      // If not within range, reset timer
       if (distanceToGo > ACCURATE_DISTANCE_ERROR)
       {
         atTargetTime = millis();
       }
-      // If at target for more than 350 milliseconds
+      // If within range for at least 350ms, then target is reached
       if (millis() - atTargetTime > 350)
       {
         isAtTarget = true;
@@ -75,22 +104,25 @@ void driveStraightToPoint(double targetX, double targetY, int maxSpeed, bool isA
     else
     {
       // If within range, disengage
-      if (distanceToGo < INACCURATE_DISTANCE_ERROR)
+      if (distanceToGo < INACCURATE_ANGLE_ERROR)
       {
         isAtTarget = true;
-        powerMotors(0, 0);
       }
     }
+
     delay(20);
   }
 }
-void turnToAngle(double targetAngle, int maxSpeed, bool isAccurate)
+void turnToAngle(double targetAngle, int maxSpeed, bool isAccurate, bool isDegrees)
 {
-  // Convert targetAngle into radians and find nearest angle
-  targetAngle = nearestEquivalentAngle(degToRad(targetAngle));
+  // Convert targetAngle into radians (if needed) and find nearest angle
+  if (isDegrees)
+    targetAngle = degToRad(targetAngle);
+
+  targetAngle = nearestEquivalentAngle(targetAngle);
 
   // Initialize turning PID
-  pidInit(&controllers[PID_ROTATE], 1.8, 2.0, 0.15);
+  pidInit(&controllers[PID_ROTATE], 3.5, 0.2, 0.35);
 
   // Variables to keep track of current state
   bool isAtTarget = false;
@@ -136,7 +168,7 @@ void turnToAngle(double targetAngle, int maxSpeed, bool isAccurate)
     powerMotors(driveOut, -driveOut);
 
     // Debug
-    printf("(turnToAngle) X: %f\tY: %f\tANGLE: %f\n", robotPose[POSE_X], robotPose[POSE_Y], radToDeg(robotPose[POSE_ANGLE]));
+    printf("turnToAngle: %f\tX: %f\tY: %f\tANGLE: %f\n", radToDeg(targetAngle), robotPose[POSE_X], robotPose[POSE_Y], radToDeg(robotPose[POSE_ANGLE]));
 
     delay(20);
   }
