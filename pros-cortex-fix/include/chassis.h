@@ -1,6 +1,8 @@
 #ifndef CHASSIS_H
 #define CHASSIS_H
 
+#include "main.h"
+
 /**
  * Powers the motors on the chassis
  *
@@ -9,6 +11,16 @@
  */
 void powerMotors(int leftPower, int rightPower);
 
+/**
+ * Drives in a straight line to a point, then turns to face the correct orientation
+ *
+ * @param targetX - the x component of the target point
+ * @param targetY - the y component of the target point
+ * @param targetAngle - the target orientation
+ * @param maxSpeed - the maximum speed to take
+ * @param isDegrees - if targetAngle is given in degrees
+ */
+void driveStraightToPose(double targetX, double targetY, double targetAngle, int maxSpeed, bool isDegrees);
 /**
  * Drives in a straight line to a point
  *
@@ -21,9 +33,10 @@ void driveStraightToPoint(double targetX, double targetY, int maxSpeed, bool isA
 /**
  * Turns to a specific orientation
  *
- * @param targetAngle - the target orientation in degrees
+ * @param targetAngle - the target orientation
  * @param maxSpeed - the maximum speed to take the turn
  * @param isAccurate - if the turn needs to be accurate
+ * @param isDegrees - if targetAngle is given in degrees
  */
-void turnToAngle(double targetAngle, int maxSpeed, bool isAccurate);
+void turnToAngle(double targetAngle, int maxSpeed, bool isAccurate, bool isDegrees);
 #endif
