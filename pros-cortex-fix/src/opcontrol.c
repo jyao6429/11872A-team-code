@@ -35,7 +35,7 @@ void operatorControl()
 
 	// Test driveStraightToPose PID
 
-	//driveStraightToPose(0.0, 48.0, -90.0, 70, true);
+	driveStraightToPoint(0.0, 48.0, 70, true);
 	//driveStraightToPose(48.0, 48.0, 0.0, 70, true);
 	//driveStraightToPose(48.0, 0.0, 90.0, 70, true);
 	//driveStraightToPose(0.0, 0.0, 180.0, 70, true);
