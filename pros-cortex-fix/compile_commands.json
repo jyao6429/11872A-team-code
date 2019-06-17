@@ -179,11 +179,11 @@
             "-fdiagnostics-color",
             "-std=gnu99",
             "-o",
-            "bin/opcontrol.c.o",
-            "src\\opcontrol.c"
+            "bin/chassis.c.o",
+            "src\\chassis.c"
         ],
         "directory": "C:\\Users\\Lijing\\Documents\\Github\\11872A-team-code\\pros-cortex-fix",
-        "file": "src\\opcontrol.c"
+        "file": "src\\chassis.c"
     },
     {
         "arguments": [
@@ -210,10 +210,10 @@
             "-fdiagnostics-color",
             "-std=gnu99",
             "-o",
-            "bin/chassis.c.o",
-            "src\\chassis.c"
+            "bin/opcontrol.c.o",
+            "src\\opcontrol.c"
         ],
         "directory": "C:\\Users\\Lijing\\Documents\\Github\\11872A-team-code\\pros-cortex-fix",
-        "file": "src\\chassis.c"
+        "file": "src\\opcontrol.c"
     }
 ]

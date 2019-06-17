@@ -26,6 +26,11 @@ enum PIDControllers
 // Array of PID controllers for various motions
 PID controllers[3];
 
+void driveStraightToPose(double targetX, double targetY, double targetAngle, int maxSpeed, bool isDegrees)
+{
+  driveStraightToPoint(targetX, targetY, maxSpeed, true);
+  turnToAngle(targetAngle, maxSpeed, true, isDegrees);
+}
 void driveStraightToPoint(double targetX, double targetY, int maxSpeed, bool isAccurate)
 {
   // Initial turn

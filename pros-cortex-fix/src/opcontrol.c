@@ -33,12 +33,12 @@ void operatorControl()
 	// Test turning PID
 	//turnToAngle(90, 35, true, true);
 
-	// Test driveStraightToPoint PID
+	// Test driveStraightToPose PID
 
-	driveStraightToPoint(0.0, 48.0, 70, true);
-	driveStraightToPoint(48.0, 48.0, 70, true);
-	driveStraightToPoint(48.0, 0.0, 70, true);
-	driveStraightToPoint(0.0, 0.0, 70, true);
+	//driveStraightToPose(0.0, 48.0, -90.0, 70, true);
+	//driveStraightToPose(48.0, 48.0, 0.0, 70, true);
+	//driveStraightToPose(48.0, 0.0, 90.0, 70, true);
+	//driveStraightToPose(0.0, 0.0, 180.0, 70, true);
 
 
 	while (1)
@@ -56,8 +56,13 @@ void operatorControl()
 
 		// Debug APS
 		mutexTake(mutexes[MUTEX_POSE], 10);
-		//printf("X: %f\tY: %f\tANGLE: %f\n", robotPose[POSE_X], robotPose[POSE_Y], radToDeg(robotPose[POSE_ANGLE]));
+		printf("X: %f\tY: %f\tANGLE: %f\n", robotPose[POSE_X], robotPose[POSE_Y], radToDeg(robotPose[POSE_ANGLE]));
 		mutexGive(mutexes[MUTEX_POSE]);
+
+		if (joystickGetDigital(1, 8, JOY_UP))
+		{
+			driveStraightToPose(0.0, 0.0, 0.0, 70, false);
+		}
 
 		delay(20);
 	}
