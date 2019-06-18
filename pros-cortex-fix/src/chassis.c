@@ -21,26 +21,100 @@ enum PIDControllers
 {
   PID_STRAIGHT,
   PID_ROTATE,
-  PID_KEEP_STRAIGHT
+  PID_STAY_ON_TARGET
 };
 // Array of PID controllers for various motions
 PID controllers[3];
 
-void driveStraightToPose(double targetX, double targetY, double targetAngle, int maxSpeed, bool isDegrees)
+void driveToPose(double targetX, double targetY, double targetAngle, int maxSpeed, bool isAccurate, bool isDegrees)
+{
+  // Convert to radians if needed
+  if (isDegrees)
+    targetAngle = degToRad(targetAngle);
+
+  // Initialize PIDs to drive straight, stay on target, and rotate to the correct orientation
+  pidInit(&controllers[PID_STRAIGHT], 0.15, 0.0, 0.1);
+  pidInit(&controllers[PID_ROTATE], 0.3, 0.0, 0.0);
+  pidInit(&controllers[PID_STAY_ON_TARGET], 0.5, 0.0, 0.0);
+
+  // Variables to keep track of current state
+  bool isAtTarget = false;
+  unsigned long atTargetTime = millis();
+
+  while (!isAtTarget)
+  {
+    mutexTake(mutexes[MUTEX_POSE], -1);
+    // Get current state
+    double distanceToGo = distanceToPoint(targetX, targetY);
+    double currentAngle = robotPose[POSE_ANGLE];
+
+    // Get info needed to face in the direction of the point
+    double angleToFace = angleToFacePoint(targetX, targetY);
+    int robotDirection = 1;
+
+    // Info on targetAngle just in case an entire rotation was made at some point
+    targetAngle = nearestEquivalentAngle(targetAngle);
+    mutexGive(mutexes[MUTEX_POSE]);
+
+/* Might not need this
+    // Reverses direction instead of turning completely around in case robot overshoots target
+    if (fabs(angleToFace - currentAngle) > M_PI / 2)
+    {
+      angleToFace = nearestEquivalentAngle(angleToFace - M_PI);
+      robotDirection = -1;
+    }
+*/
+    // Calculate the velocity and angular velocity to approach the pose
+    double inputVelocity = robotDirection * pidCalculate(&controllers[PID_STRAIGHT], distanceToGo, 0) * maxSpeed * sideWheelDiameter / 2;
+    double inputOmega = (pidCalculate(&controllers[PID_STAY_ON_TARGET], angleToFace, currentAngle) + pidCalculate(&controllers[PID_ROTATE], targetAngle, angleToFace)) * maxSpeed * sideWheelDiameter / 2;
+
+    // Calculate angular velocities of each wheel
+    int leftWheelVelocity = (2 * inputVelocity + inputOmega * (sL + sR)) / sideWheelDiameter;
+    int rightWheelVelocity = (2 * inputVelocity - inputOmega * (sL + sR)) / sideWheelDiameter;
+
+    // Drive the wheels
+    powerMotors(leftWheelVelocity, rightWheelVelocity);
+
+    // Debug
+    printf("(driveToPose) leftWheelVelocity: %d\tX: %f\tY: %f\tANGLE: %f\n", leftWheelVelocity, robotPose[POSE_X], robotPose[POSE_Y], radToDeg(robotPose[POSE_ANGLE]));
+
+    if (isAccurate)
+    {
+      // If not within range, reset timer
+      if (distanceToGo > ACCURATE_DISTANCE_ERROR || fabs(currentAngle - targetAngle) > ACCURATE_ANGLE_ERROR)
+      {
+        atTargetTime = millis();
+      }
+      // If within range for at least 350ms, then target is reached
+      if (millis() - atTargetTime > 350)
+      {
+        isAtTarget = true;
+        powerMotors(0, 0);
+      }
+    }
+    else if (distanceToGo < INACCURATE_DISTANCE_ERROR && fabs(currentAngle - targetAngle) < INACCURATE_ANGLE_ERROR)
+    {
+      isAtTarget = true;
+    }
+
+    delay(20);
+  }
+}
+void driveStraightToPose(double targetX, double targetY, double targetAngle, int maxSpeed, bool isAccurate, bool isDegrees)
 {
   // First drive to target point
-  driveStraightToPoint(targetX, targetY, maxSpeed, true);
+  driveStraightToPoint(targetX, targetY, maxSpeed, isAccurate);
   // Turn to the correct orientation
-  turnToAngle(targetAngle, maxSpeed, true, isDegrees);
+  turnToAngle(targetAngle, maxSpeed, isAccurate, isDegrees);
 }
 void driveStraightToPoint(double targetX, double targetY, int maxSpeed, bool isAccurate)
 {
   // Initial turn
   turnToAngle(angleToFacePoint(targetX, targetY), maxSpeed, false, false);
 
-  // Initialize PIDs to go and keep straight
+  // Initialize PIDs to drive straight and stay on target
   pidInit(&controllers[PID_STRAIGHT], 0.15, 0.0, 0.1);
-  pidInit(&controllers[PID_KEEP_STRAIGHT], 2.0, 0.0, 0.2);
+  pidInit(&controllers[PID_STAY_ON_TARGET], 0.5, 0.0, 0.0);
 
   // Variables to keep track of current state
   bool isAtTarget = false;
@@ -65,42 +139,9 @@ void driveStraightToPoint(double targetX, double targetY, int maxSpeed, bool isA
       robotDirection = -1;
     }
 
-    /*
-    // Compensate for angle error only, with greater compensation when not in margin
-    int driveDiff = 0;
-    if (distanceToGo > ACCURATE_DISTANCE_ERROR * 2 || !isAccurate)
-    {
-      // If large error in angle (30 degrees off), turn to face it
-      if (fabs(angleToFace - currentAngle) > M_PI / 6)
-      {
-        turnToAngle(angleToFace, maxSpeed, false, false);
-      }
-      // Otherwise, give differential power to wheels
-      else
-      {
-        controllers[PID_KEEP_STRAIGHT].Kd = 0.2;
-        driveDiff = pidCalculate(&controllers[PID_KEEP_STRAIGHT], angleToFace, robotPose[POSE_ANGLE]) * maxSpeed * 2;
-      }
-    }
-    else if (distanceToGo > ACCURATE_DISTANCE_ERROR)
-    {
-      // If large error in angle (30 degrees off), turn to face it
-      if (fabs(angleToFace - currentAngle) > M_PI / 6)
-      {
-        turnToAngle(angleToFace, maxSpeed * 0.6, true, false);
-      }
-      // Otherwise, give differential power to wheels
-      else
-      {
-        controllers[PID_KEEP_STRAIGHT].Kd = 0.5;
-        driveDiff = pidCalculate(&controllers[PID_KEEP_STRAIGHT], angleToFace, robotPose[POSE_ANGLE]) * maxSpeed * 2;
-      }
-    }
-    */
-
     // Calculate the velocity and angular velocity to approach the point
-    double inputVelocity = robotDirection * pidCalculate(&controllers[PID_STRAIGHT], distanceToGo, 0) * maxSpeed;
-    double inputOmega = pidCalculate(&controllers[PID_KEEP_STRAIGHT], angleToFace, currentAngle) * maxSpeed;
+    double inputVelocity = robotDirection * pidCalculate(&controllers[PID_STRAIGHT], distanceToGo, 0) * maxSpeed * sideWheelDiameter / 2;
+    double inputOmega = pidCalculate(&controllers[PID_STAY_ON_TARGET], angleToFace, currentAngle) * maxSpeed * sideWheelDiameter / 2;
 
     // Calculate angular velocities of each wheel
     int leftWheelVelocity = (2 * inputVelocity + inputOmega * (sL + sR)) / sideWheelDiameter;
@@ -110,7 +151,7 @@ void driveStraightToPoint(double targetX, double targetY, int maxSpeed, bool isA
     powerMotors(leftWheelVelocity, rightWheelVelocity);
 
     // Debug
-    printf("(driveStraightToPoint) X: %f\tY: %f\tANGLE: %f\n", robotPose[POSE_X], robotPose[POSE_Y], radToDeg(robotPose[POSE_ANGLE]));
+    printf("(driveStraightToPoint) leftWheelVelocity: %d\tX: %f\tY: %f\tANGLE: %f\n", leftWheelVelocity, robotPose[POSE_X], robotPose[POSE_Y], radToDeg(robotPose[POSE_ANGLE]));
 
     // Checks if at target, depending on accuracy
     if (isAccurate)
