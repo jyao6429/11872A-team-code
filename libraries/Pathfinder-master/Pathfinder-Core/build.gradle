@@ -1,0 +1,50 @@
+apply plugin: 'c'
+apply plugin: 'base'
+
+model {
+    components {
+        pathfinder(NativeLibrarySpec) {
+            binaries.all {
+                cCompiler.args << '-fPIC'
+            }
+
+            sources {
+                c {
+                    source {
+                        srcDirs = ['src']
+                        includes = ['**/*.c']
+                    }
+                    exportedHeaders {
+                        srcDirs = ['include']
+                    }
+                }
+            }
+        }
+    }   
+}
+
+task zipHeaders(type: Zip) {
+    from fileTree('include')
+
+    baseName = "Pathfinder"
+    classifier = "headers"
+}
+
+publishing {
+    publications {
+        pathfinder(MavenPublication) {
+            artifactId 'Pathfinder-Core'
+
+            artifact zipHeaders {
+                classifier 'headers'
+            }
+
+            binaryArtifacts(it, 'pathfinder', false)
+        }
+
+        pathfindercorejni(MavenPublication) {
+            artifactId 'Pathfinder-CoreJNI'
+            binaryArtifacts(it, 'pathfinder', true)
+        }
+    }
+}
