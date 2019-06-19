@@ -31,6 +31,10 @@ extern Encoder backEncoder;
 // Potentiometer port
 extern const int PORT_liftPot;
 
+// Buttons for testing
+extern const int PORT_startTesting;
+extern const int PORT_stopTesting;
+
 // Enum for different mutexes
 enum MutexTypes
 {

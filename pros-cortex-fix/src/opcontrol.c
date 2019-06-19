@@ -9,6 +9,20 @@
 
 #include "main.h"
 
+
+TaskHandle test;
+void testing(void *ignore)
+{
+	// Test turning PID
+	//turnToAngle(90, 35, true, true);
+
+	// Test driveStraightToPose PID
+
+	//driveStraightToPose(0.0, 48.0, -90.0, 70, true);
+	//driveStraightToPose(48.0, 48.0, 0.0, 70, true);
+	//driveStraightToPose(48.0, 0.0, 90.0, 70, true);
+	//driveStraightToPose(0.0, 0.0, 180.0, 70, true);
+}
 /*
  * Runs the user operator control code. This function will be started in its own task with the
  * default priority and stack size whenever the robot is enabled via the Field Management System
@@ -30,19 +44,16 @@ void operatorControl()
 {
 	printf("Hello PROS User!\n");
 
-	// Test turning PID
-	//turnToAngle(90, 35, true, true);
-
-	// Test driveStraightToPose PID
-
-	//driveStraightToPose(0.0, 48.0, -90.0, 70, true);
-	//driveStraightToPose(48.0, 48.0, 0.0, 70, true);
-	//driveStraightToPose(48.0, 0.0, 90.0, 70, true);
-	//driveStraightToPose(0.0, 0.0, 180.0, 70, true);
-
-
 	while (1)
 	{
+		if (digitalRead(PORT_startTesting) == LOW)
+		{
+
+		}
+		if (digitalRead(PORT_stopTesting) == LOW)
+		{
+			
+		}
 		int leftPower = joystickGetAnalog(1, 3);
 		int rightPower = joystickGetAnalog(1, 2);
 

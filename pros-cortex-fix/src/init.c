@@ -19,6 +19,8 @@
  */
 void initializeIO()
 {
+  pinMode(PORT_startTesting, INPUT);
+  pinMode(PORT_stopTesting, INPUT);
 }
 
 /*

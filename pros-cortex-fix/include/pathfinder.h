@@ -5,6 +5,8 @@
 extern "C" {
 #endif
 
+#include "main.h"
+
 #include "pathfinder/mathutil.h"
 #include "pathfinder/structs.h"
 
@@ -18,7 +20,7 @@ extern "C" {
 #include "pathfinder/followers/encoder.h"
 #include "pathfinder/followers/distance.h"
 
-#include "pathfinder/io.h"
+//#include "pathfinder/io.h"
 
 #include "pathfinder/error.h"
 

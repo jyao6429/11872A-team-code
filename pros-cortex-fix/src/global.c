@@ -18,8 +18,12 @@ Encoder leftEncoder;
 Encoder rightEncoder;
 Encoder backEncoder;
 
-// Sensor ports
+// Analog sensor ports
 const int PORT_liftPot = 2;
+
+// Digital sensor ports
+const int PORT_startTesting = 7;
+const int PORT_stopTesting = 8;
 
 // Mutexes
 Mutex mutexes[1];
