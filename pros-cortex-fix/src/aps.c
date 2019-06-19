@@ -3,7 +3,7 @@
 // Physical parameters in inches
 const double sL = 4.568;                 // distance from center to left tracking wheel
 const double sR = 4.568;                 // distance from center to right tracking wheel
-const double sB = 4.5;                   // distance from center to back tracking wheel
+const double sB = 4.77;                   // distance from center to back tracking wheel
 const double sideWheelDiameter = 2.75;   // diameter of side wheels
 const double backWheelDiameter = 2.75;   // diameter of back wheel
 // Encoder counts
@@ -52,7 +52,7 @@ void initializeAPS(double startX, double startY, double startAngle)
   resetPosition(startX, startY, startAngle);
 
   // Create new tasks to track position
-  taskCreate(startTracking, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT + 1);
+  taskCreate(startTracking, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT + 2);
 }
 void resetPosition(double resetX, double resetY, double resetA)
 {
@@ -152,6 +152,10 @@ double angleToFacePoint(double targetX, double targetY)
 double nearestEquivalentAngle(double target)
 {
   return round((robotPose[POSE_ANGLE] - target) / (2 * M_PI)) * 2 * M_PI + target;
+}
+double normalizeAngle(double angle)
+{
+  return atan2(sin(angle), cos(angle));
 }
 void cartToPolar(double *cartVector, double *polarVector)
 {

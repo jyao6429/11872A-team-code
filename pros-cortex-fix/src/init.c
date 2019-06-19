@@ -19,6 +19,8 @@
  */
 void initializeIO()
 {
+  pinMode(PORT_startTestButton, INPUT);
+  pinMode(PORT_stopTestButton, INPUT);
 }
 
 /*

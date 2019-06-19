@@ -121,6 +121,14 @@ double angleToFacePoint(double targetX, double targetY);
  */
 double nearestEquivalentAngle(double target);
 /**
+ * Gives back the equivalent angle in the range -PI to PI
+ *
+ * @param angle - the angle to normalize
+ *
+ * @return the angle in the range -PI to PI
+ */
+double normalizeAngle(double angle);
+/**
  * Converts cartesian coordinates into polar
  *
  * @param *cartVector - the cartesian array to convert from

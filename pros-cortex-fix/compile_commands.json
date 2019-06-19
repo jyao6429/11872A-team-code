@@ -148,11 +148,11 @@
             "-fdiagnostics-color",
             "-std=gnu99",
             "-o",
-            "bin/aps.c.o",
-            "src\\aps.c"
+            "bin/chassis.c.o",
+            "src\\chassis.c"
         ],
         "directory": "C:\\Users\\Lijing\\Documents\\Github\\11872A-team-code\\pros-cortex-fix",
-        "file": "src\\aps.c"
+        "file": "src\\chassis.c"
     },
     {
         "arguments": [
@@ -210,10 +210,10 @@
             "-fdiagnostics-color",
             "-std=gnu99",
             "-o",
-            "bin/chassis.c.o",
-            "src\\chassis.c"
+            "bin/aps.c.o",
+            "src\\aps.c"
         ],
         "directory": "C:\\Users\\Lijing\\Documents\\Github\\11872A-team-code\\pros-cortex-fix",
-        "file": "src\\chassis.c"
+        "file": "src\\aps.c"
     }
 ]

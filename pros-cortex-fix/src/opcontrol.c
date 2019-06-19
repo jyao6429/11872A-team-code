@@ -26,23 +26,40 @@
  *
  * This task should never exit; it should end with some kind of infinite loop, even if empty.
  */
+TaskHandle test;
+
+void testing(void *ignore)
+{
+	resetPosition(0.0, 0.0, 0.0);
+	// Test turning PID
+	//turnToAngle(90, 70, true, true);
+
+	// Test driveStraightToPose PID
+	driveStraightToPoint(0.0, 24.0, 70, true);
+	//driveStraightToPoint(48.0, 48.0, 70, true);
+	//driveStraightToPoint(48.0, 0.0, 70, true);
+	//driveStraightToPoint(0.0, 0.0, 70, true);
+
+	// Test driveToPose PID
+	//driveToPose(0.0, 24.0, 0.0, 70, true, true);
+	//driveToPose(48.0, 48.0, 90.0, 70, true, true);
+}
+
 void operatorControl()
 {
 	printf("Hello PROS User!\n");
 
-	// Test turning PID
-	//turnToAngle(90, 35, true, true);
-
-	// Test driveStraightToPose PID
-
-	driveStraightToPoint(0.0, 48.0, 70, true);
-	driveStraightToPoint(48.0, 48.0, 70, true);
-	driveStraightToPoint(48.0, 0.0, 70, true);
-	driveStraightToPoint(0.0, 0.0, 70, true);
-
-
 	while (1)
 	{
+		if (digitalRead(PORT_startTestButton) == LOW)
+		{
+			test = taskCreate(testing, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT + 1);
+		}
+		if (digitalRead(PORT_stopTestButton) == LOW)
+		{
+			taskDelete(test);
+		}
+
 		int leftPower = joystickGetAnalog(1, 3);
 		int rightPower = joystickGetAnalog(1, 2);
 
@@ -62,7 +79,7 @@ void operatorControl()
 		// Return to origin when button pressed
 		if (joystickGetDigital(1, 8, JOY_UP))
 		{
-			driveStraightToPose(0.0, 0.0, 0.0, 70, false);
+			driveStraightToPose(0.0, 0.0, 0.0, 70, true, false);
 		}
 
 		delay(20);

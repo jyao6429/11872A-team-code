@@ -21,5 +21,9 @@ Encoder backEncoder;
 // Sensor ports
 const int PORT_liftPot = 2;
 
+// Digital sensor ports
+const int PORT_startTestButton = 7;
+const int PORT_stopTestButton = 8;
+
 // Mutexes
 Mutex mutexes[1];
