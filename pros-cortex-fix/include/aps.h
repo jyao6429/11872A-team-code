@@ -41,9 +41,25 @@ int prevBackEncoder;
  */
 double robotPose[3];
 /**
+ * The previous position vector of the left wheel
+ */
+double leftWheelPosition[2];
+/**
+ * The previous position vector of the right wheel
+ */
+double rightWheelPosition[2];
+/**
  * The angle at last reset
  */
 double resetAngle;
+/**
+ * The previous linear velocity of the left wheel in inches / second
+ */
+double leftWheelVelocity;
+/**
+ * The previous linear velocity of the right wheel in inches / second
+ */
+double rightWheelVelocity;
 
 /**
  * Gets the current count for the left tracking encoder

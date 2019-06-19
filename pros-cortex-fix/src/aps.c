@@ -12,7 +12,12 @@ const int backEncoderResolution = 360;   // back encoder ticks per 360 degrees o
 
 // Previous position and orientation
 double robotPose[3] = {0.0, 0.0, 0.0};
+double leftWheelPosition[2] = {0.0, 0.0};
+double rightWheelPosition[2] = {0.0, 0.0};
 double resetAngle = 0.0;
+// Previous velocities
+double leftWheelVelocity = 0.0;
+double rightWheelVelocity = 0.0;
 // Previous encoder values
 int prevLeftEncoder = 0;
 int prevRightEncoder = 0;
@@ -66,6 +71,12 @@ void resetPosition(double resetX, double resetY, double resetA)
   robotPose[POSE_X] = resetX;
   robotPose[POSE_Y] = resetY;
   robotPose[POSE_ANGLE] = degToRad(resetA);
+
+  leftWheelPosition[X_COMP] = robotPose[POSE_X] - sL * cos(robotPose[POSE_ANGLE]);
+  leftWheelPosition[Y_COMP] = robotPose[POSE_Y] + sL * sin(robotPose[POSE_ANGLE]);
+
+  rightWheelPosition[X_COMP] = robotPose[POSE_X] + sR * cos(robotPose[POSE_ANGLE]);
+  rightWheelPosition[Y_COMP] = robotPose[POSE_Y] - sR * sin(robotPose[POSE_ANGLE]);
   mutexGive(mutexes[MUTEX_POSE]);
 
   // Set reset orientation
@@ -73,6 +84,8 @@ void resetPosition(double resetX, double resetY, double resetA)
 }
 void startTracking(void *ignore)
 {
+  unsigned long loopTimer = millis();
+
   while (true)
   {
     // Get current encoder values
@@ -85,6 +98,15 @@ void startTracking(void *ignore)
     double deltaRightDistance = calculateTravelDistance(currentRightEncoder - prevRightEncoder, sideWheelDiameter, sideEncoderResolution);
     double deltaBackDistance = calculateTravelDistance(currentBackEncoder - prevBackEncoder, backWheelDiameter, backEncoderResolution);
 
+    // Calculate wheel velocities
+    unsigned long deltaTimeMS = millis() - loopTimer;
+
+    if (deltaTimeMS != 0)
+    {
+      leftWheelVelocity = deltaLeftDistance / ((double) deltaTimeMS * 0.001);
+      rightWheelVelocity = deltaRightDistance / ((double) deltaTimeMS * 0.001);
+    }
+    
     // Update prev values;
     prevLeftEncoder = currentLeftEncoder;
     prevRightEncoder = currentRightEncoder;
@@ -134,6 +156,12 @@ void startTracking(void *ignore)
     robotPose[POSE_X] += globalOffset[X_COMP];
     robotPose[POSE_Y] += globalOffset[Y_COMP];
     robotPose[POSE_ANGLE] = newAngle;
+
+    leftWheelPosition[X_COMP] = robotPose[POSE_X] - sL * cos(robotPose[POSE_ANGLE]);
+    leftWheelPosition[Y_COMP] = robotPose[POSE_Y] + sL * sin(robotPose[POSE_ANGLE]);
+
+    rightWheelPosition[X_COMP] = robotPose[POSE_X] + sR * cos(robotPose[POSE_ANGLE]);
+    rightWheelPosition[Y_COMP] = robotPose[POSE_Y] - sR * sin(robotPose[POSE_ANGLE]);
     mutexGive(mutexes[MUTEX_POSE]);
 
     delay(2);

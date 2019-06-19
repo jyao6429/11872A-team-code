@@ -8,20 +8,61 @@
  */
 
 #include "main.h"
+#include "math.h"
 
 
 TaskHandle test;
 void testing(void *ignore)
 {
-	// Test turning PID
-	//turnToAngle(90, 35, true, true);
+	powerMotors(127, 127);
 
-	// Test driveStraightToPose PID
+	double prevLeftV = leftWheelVelocity;
+	double prevRightV = rightWheelVelocity;
 
-	//driveStraightToPose(0.0, 48.0, -90.0, 70, true);
-	//driveStraightToPose(48.0, 48.0, 0.0, 70, true);
-	//driveStraightToPose(48.0, 0.0, 90.0, 70, true);
-	//driveStraightToPose(0.0, 0.0, 180.0, 70, true);
+	double prevLeftA = 0.0;
+	double prevRightA = 0.0;
+
+	double prevLeftJ = 0.0;
+	double prevRightJ = 0.0;
+
+	double maxV = 0.0;
+	double maxA = 0.0;
+	double maxJ = 0.0;
+
+	unsigned long timer = millis();
+
+	while (true)
+	{
+		unsigned long deltaTimeMS = millis();
+
+		double currentLeftV = leftWheelVelocity;
+		double currentRightV = rightWheelVelocity;
+
+		double currentLeftA = 0.0;
+		double currentRightA = 0.0;
+
+		double currentLeftJ = 0.0;
+		double currentRightJ = 0.0;
+
+		if (deltaTimeMS != 0)
+		{
+			double deltaTime = (double) deltaTimeMS * 0.001;
+
+			double currentLeftA = (currentLeftV - prevLeftV) / deltaTime;
+			double currentRightA = (currentRightV - prevRightV) / deltaTime;
+
+			double currentLeftJ = (currentLeftA - prevLeftA) / deltaTime;
+			double currentRightJ = (currentRightA - prevRightA) / deltaTime;
+		}
+
+		maxV = fmax(maxV, fmin(currentLeftV, currentRightV));
+		maxA = fmax(maxA, fmin(currentLeftA, currentRightA));
+		maxJ = fmax(maxJ, fmin(currentLeftJ, currentRightJ));
+
+		printf("V: %f\tA: %f\tJ: %f\n", maxV, maxA, maxJ);
+
+		delay(2);
+	}
 }
 /*
  * Runs the user operator control code. This function will be started in its own task with the
@@ -52,7 +93,7 @@ void operatorControl()
 		}
 		if (digitalRead(PORT_stopTesting) == LOW)
 		{
-			
+
 		}
 		int leftPower = joystickGetAnalog(1, 3);
 		int rightPower = joystickGetAnalog(1, 2);

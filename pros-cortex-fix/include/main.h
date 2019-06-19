@@ -32,6 +32,7 @@
 #include "chassis.h"
 #include "global.h"
 #include "NERD_PID.h"
+#include "pathfinder.h"
 
 // Other includes
 #include "math.h"
