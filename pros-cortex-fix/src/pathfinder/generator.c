@@ -7,7 +7,7 @@ TrajectoryCandidate cand_LV;
 int pathfinder_prepare(const Waypoint *path, int path_length, void (*fit)(Waypoint,Waypoint,Spline*), int sample_count, double dt,
         double max_velocity, double max_acceleration, double max_jerk, TrajectoryCandidate *cand) {
     if (path_length < 2) return -1;
-    
+
     cand->saptr = (Spline *)malloc((path_length - 1) * sizeof(Spline));
     cand->laptr = (double *)malloc((path_length - 1) * sizeof(double));
 
@@ -21,7 +21,7 @@ int pathfinder_prepare(const Waypoint *path, int path_length, void (*fit)(Waypoi
         return -1;
     }
     double totalLength = 0;
-    
+
     int i;
     for (i = 0; i < path_length-1; i++) {
         Spline s;
@@ -31,31 +31,31 @@ int pathfinder_prepare(const Waypoint *path, int path_length, void (*fit)(Waypoi
         cand->laptr[i] = dist;
         totalLength += dist;
     }
-    
+
     TrajectoryConfig config = {dt, max_velocity, max_acceleration, max_jerk, 0, path[0].angle,
         totalLength, 0, path[0].angle, sample_count};
     TrajectoryInfo info = pf_trajectory_prepare(config);
     int trajectory_length = info.length;
-    
+
     cand->totalLength = totalLength;
     cand->length = trajectory_length;
     cand->path_length = path_length;
     cand->info = info;
     cand->config = config;
-    
+
     return trajectory_length;
 }
 
 /********************************************************************************************
-*   LabVIEW memory allocation works different from C and a DLL call requires any memory 
+*   LabVIEW memory allocation works different from C and a DLL call requires any memory
 *   be allocated up front for pointers that are used as outputs (i.e. 'trajectory candidate').
 *   For the mode we could probably pass out the function pointer to LabVIEW via a function
 *   and pass it back in, but for now we can keep it static as cubic. Other option is to
 *   pass in a flag selecting which path algorithm, and make it an enum in the LabVIEW API.
-*   
+*
 *   For the 'trajectory candidate' we don't want to expose it to LabVIEW at all, since we
 *   would need to know the sizeof 'Spline' and 'double' on the target and pre-allocate it.
-*   Instead, we keep it in the DLL memory and return a length instead of a status so we 
+*   Instead, we keep it in the DLL memory and return a length instead of a status so we
 *   an allow LabVIEW to create the segments array.
 *********************************************************************************************/
 int pathfinder_prepare_LabVIEW(const Waypoint *path, int path_length, int sample_count, double dt,
@@ -73,16 +73,22 @@ int pathfinder_generate(TrajectoryCandidate *c, Segment *segments) {
     int trajectory_length = c->length;
     int path_length = c->path_length;
     double totalLength = c->totalLength;
-    
+
     Spline *splines = (c->saptr);
     double *splineLengths = (c->laptr);
-    
+
+printf("GOT TO 1.1\n");
+delay(20);
+
     int trajectory_status = pf_trajectory_create(c->info, c->config, segments);
     if (trajectory_status < 0) return trajectory_status;
-    
+
     int spline_i = 0;
     double spline_pos_initial = 0, splines_complete = 0;
-    
+
+printf("GOT TO 1.2\n");
+delay(20);
+
     int i;
     for (i = 0; i < trajectory_length; ++i) {
         double pos = segments[i].position;
@@ -112,9 +118,9 @@ int pathfinder_generate(TrajectoryCandidate *c, Segment *segments) {
             }
         }
     }
-    
+
     free(c->saptr);
     free(c->laptr);
-    
+
     return trajectory_length;
 }

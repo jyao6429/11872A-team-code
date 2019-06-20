@@ -41,6 +41,7 @@ void operatorControl()
 		if (digitalRead(PORT_startTesting) == LOW)
 		{
 			test = taskCreate(testPathFollow, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT + 3);
+			delay(1000);
 		}
 		if (digitalRead(PORT_stopTesting) == LOW)
 		{
@@ -69,7 +70,7 @@ void operatorControl()
 		// Return to origin when button pressed
 		if (joystickGetDigital(1, 8, JOY_UP))
 		{
-			driveStraightToPose(0.0, 0.0, 0.0, 70, false);
+			//driveStraightToPose(0.0, 0.0, 0.0, 70, false);
 		}
 
 		delay(20);
