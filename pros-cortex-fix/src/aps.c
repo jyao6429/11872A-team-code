@@ -100,13 +100,14 @@ void startTracking(void *ignore)
 
     // Calculate wheel velocities
     unsigned long deltaTimeMS = millis() - loopTimer;
+    loopTimer = millis();
 
     if (deltaTimeMS != 0)
     {
       leftWheelVelocity = deltaLeftDistance / ((double) deltaTimeMS * 0.001);
       rightWheelVelocity = deltaRightDistance / ((double) deltaTimeMS * 0.001);
     }
-    
+
     // Update prev values;
     prevLeftEncoder = currentLeftEncoder;
     prevRightEncoder = currentRightEncoder;

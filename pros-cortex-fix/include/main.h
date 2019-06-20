@@ -33,6 +33,7 @@
 #include "global.h"
 #include "NERD_PID.h"
 #include "pathfinder.h"
+#include "motionPlanning.h"
 
 // Other includes
 #include "math.h"
