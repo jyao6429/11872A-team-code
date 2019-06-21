@@ -32,9 +32,9 @@ void testing(void *ignore)
 {
 	resetPosition(0.0, 0.0, 0.0);
 	// Test turning PID
-	turnToAngle(90.0, 100, true, true);
-	turnToAngle(0.0, 100, true, false);
-	
+	//turnToAngle(90.0, 100, true, true);
+	//turnToAngle(0.0, 100, true, false);
+
 	// Test driveStraightToPose PID
 	//driveStraightToPoint(0.0, 24.0, 70, true);
 	//driveStraightToPoint(48.0, 48.0, 70, true);
@@ -43,7 +43,7 @@ void testing(void *ignore)
 
 	// Test driveToPose PID
 	//driveToPose(0.0, 24.0, 0.0, 70, true, true);
-	driveToPose(-48.0, 48.0, -90.0, 100, true, true);
+	driveToPose(-48.0, 48.0, -90.0, 70, true, true);
 
 	printf("Done Testing\n");
 }

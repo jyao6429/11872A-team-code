@@ -46,10 +46,10 @@ void driveToPose(double targetX, double targetY, double targetAngle, int maxSpee
 
   // Initialize PIDs to drive straight, stay on target, and rotate to the correct orientation
   pidInit(&controllers[PID_ZERO], 0.0, 0.0, 0.0);
-  pidInit(&controllers[PID_STRAIGHT], 0.1, 0.0, 0.05);
-  pidInit(&controllers[PID_ROTATE_ON_POINT], 0.7, 0.0, 0.05);
-  pidInit(&controllers[PID_ROTATE], -0.8, 0.0, 0.1);
-  pidInit(&controllers[PID_STAY_ON_TARGET], 1, 0.0, 0.05);
+  pidInit(&controllers[PID_STRAIGHT], 0.1, 0.0, 0.02);
+  pidInit(&controllers[PID_ROTATE_ON_POINT], 0.2, 0.0, 0.05);
+  pidInit(&controllers[PID_ROTATE], -0.5, 0.0, 0.0);
+  pidInit(&controllers[PID_STAY_ON_TARGET], 0.8, 0.0, 0.0);
 
   // Also have separate PIDs for the actual motions
   PID headingPID = controllers[PID_STAY_ON_TARGET];
@@ -85,7 +85,15 @@ void driveToPose(double targetX, double targetY, double targetAngle, int maxSpee
     if (distanceToGo < ACCURATE_DISTANCE_ERROR * 2)
     {
       headingPID = controllers[PID_ZERO];
-      targetAnglePID = controllers[PID_ROTATE_ON_POINT];
+      // If within margin for targetAngle, don't change anything
+      if (fabs(targetAngle - currentAngle) < ACCURATE_ANGLE_ERROR)
+      {
+        targetAnglePID = controllers[PID_ZERO];
+      }
+      else
+      {
+        targetAnglePID = controllers[PID_ROTATE_ON_POINT];
+      }
       angleToFace = currentAngle;
     }
     else
@@ -93,17 +101,7 @@ void driveToPose(double targetX, double targetY, double targetAngle, int maxSpee
       headingPID = controllers[PID_STAY_ON_TARGET];
       targetAnglePID = controllers[PID_ROTATE];
     }
-/*
-    // If within margin for targetAngle, don't change anything
-    if (fabs(targetAngle - currentAngle) < ACCURATE_ANGLE_ERROR)
-    {
-      targetAnglePID = controllers[PID_ZERO];
-    }
-    else
-    {
-      targetAnglePID = controllers[PID_ROTATE_ON_POINT];
-    }
-*/
+
     // Finally, calculate target angular velocity of the robot
     double inputOmega = (pidCalculate(&headingPID, angleToFace, currentAngle) + pidCalculate(&targetAnglePID, targetAngle, angleToFace)) * maxSpeed * sideWheelDiameter / 2;
 
@@ -231,6 +229,10 @@ void turnToAngle(double targetAngle, int maxSpeed, bool isAccurate, bool isDegre
   if (maxSpeed < 60 && fabs(targetAngle - robotPose[POSE_ANGLE]) < M_PI / 18)
   {
     pidInit(&controllers[PID_ROTATE_ON_POINT], 6.0, 1.0, 0.5);
+  }
+  else if (maxSpeed > 80)
+  {
+    pidInit(&controllers[PID_ROTATE_ON_POINT], 2.0, 0.1, 0.3);
   }
   else
   {
