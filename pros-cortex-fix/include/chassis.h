@@ -10,6 +10,10 @@
  * @param rightPower - the power  for the right wheels
  */
 void powerMotors(int leftPower, int rightPower);
+/**
+ * Stops all the drive motors
+ */
+void stopMotors();
 
 /**
  * Drives to a pose

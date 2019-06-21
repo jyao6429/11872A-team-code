@@ -1,11 +1,11 @@
 #include "main.h"
 
-// Accurate to about 1.7 degrees
-#define ACCURATE_ANGLE_ERROR 0.03
+// Accurate to about 2 degrees
+#define ACCURATE_ANGLE_ERROR 0.035
 // Accurate to about 5 degrees
 #define INACCURATE_ANGLE_ERROR 0.09
 // Accurate to inches
-#define ACCURATE_DISTANCE_ERROR 2
+#define ACCURATE_DISTANCE_ERROR 1
 #define INACCURATE_DISTANCE_ERROR 4
 
 void powerMotors(int leftPower, int rightPower)
@@ -15,16 +15,25 @@ void powerMotors(int leftPower, int rightPower)
   motorSet(PORT_rightBackMotor, -rightPower);
   motorSet(PORT_rightFrontMotor, -rightPower);
 }
+void stopMotors()
+{
+  motorStop(PORT_leftBackMotor);
+  motorStop(PORT_leftFrontMotor);
+  motorStop(PORT_rightBackMotor);
+  motorStop(PORT_rightFrontMotor);
+}
 
 // Enums for the various PID controllers
 enum PIDControllers
 {
+  PID_ZERO,
   PID_STRAIGHT,
+  PID_ROTATE_ON_POINT,
   PID_ROTATE,
   PID_STAY_ON_TARGET
 };
 // Array of PID controllers for various motions
-PID controllers[3];
+PID controllers[5];
 
 void driveToPose(double targetX, double targetY, double targetAngle, int maxSpeed, bool isAccurate, bool isDegrees)
 {
@@ -36,9 +45,15 @@ void driveToPose(double targetX, double targetY, double targetAngle, int maxSpee
   targetAngle = nearestEquivalentAngle(targetAngle);
 
   // Initialize PIDs to drive straight, stay on target, and rotate to the correct orientation
-  pidInit(&controllers[PID_STRAIGHT], 0.15, 0.0, 0.1);
-  pidInit(&controllers[PID_ROTATE], -1, 0.0, 0.0);
-  pidInit(&controllers[PID_STAY_ON_TARGET], 0.2, 0.0, 0.2);
+  pidInit(&controllers[PID_ZERO], 0.0, 0.0, 0.0);
+  pidInit(&controllers[PID_STRAIGHT], 0.1, 0.0, 0.05);
+  pidInit(&controllers[PID_ROTATE_ON_POINT], 0.7, 0.0, 0.05);
+  pidInit(&controllers[PID_ROTATE], -0.8, 0.0, 0.1);
+  pidInit(&controllers[PID_STAY_ON_TARGET], 1, 0.0, 0.05);
+
+  // Also have separate PIDs for the actual motions
+  PID headingPID = controllers[PID_STAY_ON_TARGET];
+  PID targetAnglePID = controllers[PID_ROTATE];
 
   // Variables to keep track of current state
   bool isAtTarget = false;
@@ -56,7 +71,6 @@ void driveToPose(double targetX, double targetY, double targetAngle, int maxSpee
     int robotDirection = 1;
     mutexGive(mutexes[MUTEX_POSE]);
 
-/* Might not need this */
     // Reverses direction instead of turning completely around in case robot overshoots target
     if (fabs(angleToFace - currentAngle) > M_PI / 2)
     {
@@ -67,11 +81,31 @@ void driveToPose(double targetX, double targetY, double targetAngle, int maxSpee
     // Calculate the velocity and angular velocity to approach the pose
     double inputVelocity = robotDirection * pidCalculate(&controllers[PID_STRAIGHT], distanceToGo, 0) * maxSpeed * sideWheelDiameter / 2;
 
-    double inputOmega = (pidCalculate(&controllers[PID_STAY_ON_TARGET], angleToFace, currentAngle) /* + pidCalculate(&controllers[PID_ROTATE], targetAngle, angleToFace) */) * maxSpeed * sideWheelDiameter / 2;
-    //double alpha = normalizeAngle(angleToFace) - normalizeAngle(currentAngle);
-    //double beta = -normalizeAngle(currentAngle) - alpha;
-
-    //double inputOmega = (0.5 * alpha - 0.2 * beta) * maxSpeed / 7;
+    // If within margin for position, focus on hitting target angle
+    if (distanceToGo < ACCURATE_DISTANCE_ERROR * 2)
+    {
+      headingPID = controllers[PID_ZERO];
+      targetAnglePID = controllers[PID_ROTATE_ON_POINT];
+      angleToFace = currentAngle;
+    }
+    else
+    {
+      headingPID = controllers[PID_STAY_ON_TARGET];
+      targetAnglePID = controllers[PID_ROTATE];
+    }
+/*
+    // If within margin for targetAngle, don't change anything
+    if (fabs(targetAngle - currentAngle) < ACCURATE_ANGLE_ERROR)
+    {
+      targetAnglePID = controllers[PID_ZERO];
+    }
+    else
+    {
+      targetAnglePID = controllers[PID_ROTATE_ON_POINT];
+    }
+*/
+    // Finally, calculate target angular velocity of the robot
+    double inputOmega = (pidCalculate(&headingPID, angleToFace, currentAngle) + pidCalculate(&targetAnglePID, targetAngle, angleToFace)) * maxSpeed * sideWheelDiameter / 2;
 
     // Calculate angular velocities of each wheel
     int leftWheelVelocity = (2 * inputVelocity + inputOmega * (sL + sR)) / sideWheelDiameter;
@@ -81,8 +115,7 @@ void driveToPose(double targetX, double targetY, double targetAngle, int maxSpee
     powerMotors(leftWheelVelocity, rightWheelVelocity);
 
     // Debug
-    //printf("(driveToPose) alpha: %f\tbeta: %f\tinputOmega: %f\n", alpha, beta, inputOmega);
-    printf("(driveToPose) leftWheelVelocity: %d\tX: %f\tY: %f\tANGLE: %f\n", leftWheelVelocity, robotPose[POSE_X], robotPose[POSE_Y], radToDeg(robotPose[POSE_ANGLE]));
+    printf("(driveToPose) inputVelocity: %f\t inputOmega: %f\tX: %f\tY: %f\tANGLE: %f\n", inputVelocity, inputOmega, robotPose[POSE_X], robotPose[POSE_Y], radToDeg(robotPose[POSE_ANGLE]));
 
     if (isAccurate)
     {
@@ -197,11 +230,11 @@ void turnToAngle(double targetAngle, int maxSpeed, bool isAccurate, bool isDegre
   // Initialize turning PID, with larger constants when small angle and slow
   if (maxSpeed < 60 && fabs(targetAngle - robotPose[POSE_ANGLE]) < M_PI / 18)
   {
-    pidInit(&controllers[PID_ROTATE], 6.0, 1.0, 0.5);
+    pidInit(&controllers[PID_ROTATE_ON_POINT], 6.0, 1.0, 0.5);
   }
   else
   {
-    pidInit(&controllers[PID_ROTATE], 3.5, 0.2, 0.35);
+    pidInit(&controllers[PID_ROTATE_ON_POINT], 3.5, 0.2, 0.35);
   }
 
   // Variables to keep track of current state
@@ -242,7 +275,7 @@ void turnToAngle(double targetAngle, int maxSpeed, bool isAccurate, bool isDegre
     }
 
     // Calculate power to wheels
-    int driveOut = pidCalculate(&controllers[PID_ROTATE], targetAngle, currentAngle) * maxSpeed;
+    int driveOut = pidCalculate(&controllers[PID_ROTATE_ON_POINT], targetAngle, currentAngle) * maxSpeed;
 
     // Drive the wheels
     powerMotors(driveOut, -driveOut);

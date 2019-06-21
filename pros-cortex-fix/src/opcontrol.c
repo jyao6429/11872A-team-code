@@ -32,17 +32,20 @@ void testing(void *ignore)
 {
 	resetPosition(0.0, 0.0, 0.0);
 	// Test turning PID
-	//turnToAngle(90, 70, true, true);
-
+	turnToAngle(90.0, 100, true, true);
+	turnToAngle(0.0, 100, true, false);
+	
 	// Test driveStraightToPose PID
-	driveStraightToPoint(0.0, 24.0, 70, true);
+	//driveStraightToPoint(0.0, 24.0, 70, true);
 	//driveStraightToPoint(48.0, 48.0, 70, true);
 	//driveStraightToPoint(48.0, 0.0, 70, true);
 	//driveStraightToPoint(0.0, 0.0, 70, true);
 
 	// Test driveToPose PID
 	//driveToPose(0.0, 24.0, 0.0, 70, true, true);
-	//driveToPose(48.0, 48.0, 90.0, 70, true, true);
+	driveToPose(-48.0, 48.0, -90.0, 100, true, true);
+
+	printf("Done Testing\n");
 }
 
 void operatorControl()
@@ -53,11 +56,14 @@ void operatorControl()
 	{
 		if (digitalRead(PORT_startTestButton) == LOW)
 		{
-			test = taskCreate(testing, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT + 1);
+			test = taskCreate(testing, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT + 3);
+			delay(500);
 		}
 		if (digitalRead(PORT_stopTestButton) == LOW)
 		{
 			taskDelete(test);
+			stopMotors();
+			delay(500);
 		}
 
 		int leftPower = joystickGetAnalog(1, 3);
@@ -69,7 +75,7 @@ void operatorControl()
 		if (abs(rightPower) < 15)
 			rightPower = 0;
 
-		powerMotors(leftPower, rightPower);
+		//powerMotors(leftPower, rightPower);
 
 		// Debug APS
 		mutexTake(mutexes[MUTEX_POSE], 10);
@@ -79,7 +85,7 @@ void operatorControl()
 		// Return to origin when button pressed
 		if (joystickGetDigital(1, 8, JOY_UP))
 		{
-			driveStraightToPose(0.0, 0.0, 0.0, 70, true, false);
+			//driveStraightToPose(0.0, 0.0, 0.0, 70, true, false);
 		}
 
 		delay(20);
