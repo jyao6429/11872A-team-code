@@ -43,7 +43,7 @@ void driveToPose(double targetX, double targetY, double targetAngle, int maxSpee
 
   // Initialize PIDs to drive straight, stay on target, and rotate to the correct orientation
   pidInit(&controllers[PID_ZERO], 0.0, 0.0, 0.0);
-  pidInit(&controllers[PID_STRAIGHT], 0.15, 0.0, 0.02);
+  pidInit(&controllers[PID_STRAIGHT], 0.25, 0.0, 0.02);
   pidInit(&controllers[PID_ROTATE_ON_POINT], 0.45, 0.0, 0.05);
   pidInit(&controllers[PID_ROTATE], -0.5, 0.0, 0.0);
   pidInit(&controllers[PID_STAY_ON_TARGET], 0.9, 0.0, 0.0);
@@ -60,21 +60,21 @@ void driveToPose(double targetX, double targetY, double targetAngle, int maxSpee
   {
     mutexTake(mutexes[MUTEX_POSE], -1);
     // Get current state
-    double distanceToGo = distanceToPoint(targetX, targetY);
+    double distanceToGo = distanceToPointFromRobot(targetX, targetY);
     double currentAngle = normalizeAngle(robotPose[POSE_ANGLE]);
 
     // Get info needed to face in the direction of the point
-    double angleToFace = normalizeAngle(angleToFacePoint(targetX, targetY));
+    double angleToFace = normalizeAngle(angleToFacePointFromRobot(targetX, targetY));
     int robotDirection = 1;
 
     // Info on targetAngle just in case an entire rotation was made at some point
-    targetAngle = normalizeAngle(nearestEquivalentAngle(targetAngle));
+    targetAngle = normalizeAngle(nearestEquivalentAngleFromRobot(targetAngle));
     mutexGive(mutexes[MUTEX_POSE]);
 
     // Reverses direction instead of turning completely around in case robot overshoots target
     if (fabs(angleToFace - currentAngle) > M_PI / 2)
     {
-      angleToFace = normalizeAngle(nearestEquivalentAngle(angleToFace - M_PI));
+      angleToFace = normalizeAngle(nearestEquivalentAngleFromRobot(angleToFace - M_PI));
       robotDirection = -1;
     }
 
@@ -147,7 +147,7 @@ void driveStraightToPose(double targetX, double targetY, double targetAngle, int
 void driveStraightToPoint(double targetX, double targetY, int maxSpeed, bool isAccurate)
 {
   // Initial turn
-  turnToAngle(angleToFacePoint(targetX, targetY), maxSpeed, false, false);
+  turnToAngle(angleToFacePointFromRobot(targetX, targetY), maxSpeed, false, false);
 
   // Initialize PIDs to drive straight and stay on target
   pidInit(&controllers[PID_STRAIGHT], 0.15, 0.0, 0.1);
@@ -161,18 +161,18 @@ void driveStraightToPoint(double targetX, double targetY, int maxSpeed, bool isA
   {
     mutexTake(mutexes[MUTEX_POSE], -1);
     // Get current state
-    double distanceToGo = distanceToPoint(targetX, targetY);
+    double distanceToGo = distanceToPointFromRobot(targetX, targetY);
     double currentAngle = robotPose[POSE_ANGLE];
 
     // Get info needed to face in the direction of the point
-    double angleToFace = angleToFacePoint(targetX, targetY);
+    double angleToFace = angleToFacePointFromRobot(targetX, targetY);
     int robotDirection = 1;
     mutexGive(mutexes[MUTEX_POSE]);
 
     // Reverses direction instead of turning completely around in case robot overshoots target
     if (fabs(angleToFace - currentAngle) > M_PI / 2)
     {
-      angleToFace = nearestEquivalentAngle(angleToFace - M_PI);
+      angleToFace = nearestEquivalentAngleFromRobot(angleToFace - M_PI);
       robotDirection = -1;
     }
 
@@ -223,7 +223,7 @@ void turnToAngle(double targetAngle, int maxSpeed, bool isAccurate, bool isDegre
   if (isDegrees)
     targetAngle = degToRad(targetAngle);
 
-  targetAngle = nearestEquivalentAngle(targetAngle);
+  targetAngle = nearestEquivalentAngleFromRobot(targetAngle);
 
   // Initialize turning PID, with larger constants when small angle and slow
   if (maxSpeed < 60 && fabs(targetAngle - robotPose[POSE_ANGLE]) < M_PI / 18)

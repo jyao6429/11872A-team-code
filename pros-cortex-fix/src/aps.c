@@ -139,47 +139,19 @@ void startTracking(void *ignore)
     delay(2);
   }
 }
-double distanceToPoint(double targetX, double targetY)
+double distanceToPointFromRobot(double targetX, double targetY)
 {
-  return sqrt(pow(targetX - robotPose[POSE_X], 2) + pow(targetY - robotPose[POSE_Y], 2));
+  return distanceToPoint(robotPose[POSE_X], robotPose[POSE_Y], targetX, targetY);
 }
-double angleToFacePoint(double targetX, double targetY)
+double angleToFacePointFromRobot(double targetX, double targetY)
 {
-  double toReturn = nearestEquivalentAngle(-1 * atan2(targetY - robotPose[POSE_Y], targetX - robotPose[POSE_X]) + M_PI / 2);
-  //printf("angleToFacePoint: %f\tX: %f\tY: %f\ttargetX: %f\ttargetY: %f\n", toReturn, robotPose[POSE_X], robotPose[POSE_Y], targetX, targetY);
-  return toReturn;
+  return nearestEquivalentAngleFromRobot(angleToFacePoint(robotPose[POSE_X], robotPose[POSE_Y], targetX, targetY));
 }
-double nearestEquivalentAngle(double target)
+double nearestEquivalentAngleFromRobot(double target)
 {
-  return round((robotPose[POSE_ANGLE] - target) / (2 * M_PI)) * 2 * M_PI + target;
-}
-double normalizeAngle(double angle)
-{
-  return atan2(sin(angle), cos(angle));
-}
-void cartToPolar(double *cartVector, double *polarVector)
-{
-  // Calculates magnitude of vector with distance formula
-  polarVector[MAGNITUDE] = sqrt(pow(cartVector[X_COMP], 2) + pow(cartVector[Y_COMP], 2));
-  // Calculates angle with arctan, automatically gives angle in correct quadrant
-  polarVector[ANGLE] = atan2(cartVector[Y_COMP], cartVector[X_COMP]);
-}
-void polarToCart(double *polarVector, double *cartVector)
-{
-  // Calculate x component with cosine
-  cartVector[X_COMP] = polarVector[MAGNITUDE] * cos(polarVector[ANGLE]);
-  // Calculate y component with sine
-  cartVector[Y_COMP] = polarVector[MAGNITUDE] * sin(polarVector[ANGLE]);
+  return nearestEquivalentAngle(robotPose[POSE_ANGLE], target);
 }
 double calculateTravelDistance(int encoderCount, double wheelDiameter, int encoderResolution)
 {
   return ((double) encoderCount * M_PI * wheelDiameter) / ((double) encoderResolution);
-}
-double degToRad(double degrees)
-{
-  return degrees * (M_PI / 180);
-}
-double radToDeg(double radians)
-{
-  return radians * (180 / M_PI);
 }

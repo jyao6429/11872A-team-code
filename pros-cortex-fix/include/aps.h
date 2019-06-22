@@ -1,22 +1,12 @@
 #ifndef APS_H
 #define APS_H
 
-// Enums for Pose, Cartesian and Polar
+// Enum for Pose
 enum Pose
 {
   POSE_X,
   POSE_Y,
   POSE_ANGLE
-};
-enum Cartesian
-{
-  X_COMP,
-  Y_COMP
-};
-enum Polar
-{
-  MAGNITUDE,
-  ANGLE
 };
 
 // Physical parameters in inches
@@ -99,49 +89,31 @@ void resetPosition(double resetX, double resetY, double resetA);
 void startTracking(void *ignore);
 
 /**
- * Calculates the distance from the current position to a point
+ * Calculates the distance from the current robot position to a point
  *
  * @param targetX - the x component of the target point
  * @param targetY - the y component of the target point
+ *
+ * @return the absolute distance between the robot and target point
  */
-double distanceToPoint(double targetX, double targetY);
+double distanceToPointFromRobot(double targetX, double targetY);
 /**
  * Calculate the orientation of the robot to face a certain point
  *
  * @param targetX - the x component of the target point
  * @param targetY - the y component of the target point
+ *
+ * @return the angle to face target point from the current robot position in the range [-PI, PI]
  */
-double angleToFacePoint(double targetX, double targetY);
+double angleToFacePointFromRobot(double targetX, double targetY);
 /**
- * Calculates nearest equivalent angle in radians
+ * Calculates nearest equivalent angle in radians from current orientation
  *
  * @param target - the target orientation in radians
  *
  * @return the target orientation + 2 x pi x k added
  */
-double nearestEquivalentAngle(double target);
-/**
- * Gives back the equivalent angle in the range -PI to PI
- *
- * @param angle - the angle to normalize
- *
- * @return the angle in the range -PI to PI
- */
-double normalizeAngle(double angle);
-/**
- * Converts cartesian coordinates into polar
- *
- * @param *cartVector - the cartesian array to convert from
- * @param *polarVector - the polar array to convert to
- */
-void cartToPolar(double *cartVector, double *polarVector);
-/**
- * Converts polar coordinates into cartesian
- *
- * @param *polarVector - the polar array to convert from
- * @param *cartVector - the cartesian array to convert to
- */
-void polarToCart(double *polarVector, double *cartVector);
+double nearestEquivalentAngleFromRobot(double target);
 /**
  * Converts encoder counts into linear distance traveled in the units of the diameter of the tracking wheel
  *
@@ -152,19 +124,5 @@ void polarToCart(double *polarVector, double *cartVector);
  * @return the distance traveled by that wheel
  */
 double calculateTravelDistance(int encoderCount, double wheelDiameter, int encoderResolution);
-/**
- * Converts degrees to radians
- *
- * @param degrees - the angle to convert in degrees
- * @return the converted angle in radians
- */
-double degToRad(double degrees);
-/**
- * Converts radians to degrees
- *
- * @param radians - the angle to convert in radians
- * @return the converted angle in degrees
- */
- double radToDeg(double radians);
 
 #endif
