@@ -1,6 +1,8 @@
 #ifndef APS_H
 #define APS_H
 
+#include "main.h"
+
 // Enum for Pose
 enum Pose
 {
@@ -88,6 +90,7 @@ void resetPosition(double resetX, double resetY, double resetA);
  */
 void startTracking(void *ignore);
 
+double distanceToLineFromRobot(LineTarget *targetLine);
 /**
  * Calculates the distance from the current robot position to a point
  *

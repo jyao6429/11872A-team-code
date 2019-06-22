@@ -43,7 +43,7 @@ void testing(void *ignore)
 
 	// Test driveToPose PID
 	//driveToPose(0.0, 24.0, 0.0, 70, true, true);
-	driveToPose(-48.0, 48.0, -90.0, 70, true, true);
+	driveToPose(0.0, 48.0, -10.0, 100, true, true);
 	//driveToPose(48.0, -48.0, -90.0, 70, true, true);
 
 	printf("Done Testing\n");

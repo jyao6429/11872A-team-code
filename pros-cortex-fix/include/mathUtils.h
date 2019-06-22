@@ -1,6 +1,8 @@
 #ifndef MATH_UTILS_H
 #define MATH_UTILS_H
 
+#include "main.h"
+
 // Enums for Cartesian and Polar
 enum Cartesian
 {
@@ -19,6 +21,8 @@ typedef struct
   double a, b, c, targetX, targetY, targetAngle;
 } LineTarget;
 
+double distanceToLine(LineTarget *targetLine, double sourceX, double sourceY);
+void matchLineWithPose(LineTarget *targetLine, double targetX, double targetY, double targetAngle, bool isDegrees);
 /**
  * Calculates the distance from the current position to a point
  *

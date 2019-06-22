@@ -139,6 +139,10 @@ void startTracking(void *ignore)
     delay(2);
   }
 }
+double distanceToLineFromRobot(LineTarget *targetLine)
+{
+  return distanceToLine(targetLine, robotPose[POSE_X], robotPose[POSE_Y]);
+}
 double distanceToPointFromRobot(double targetX, double targetY)
 {
   return distanceToPoint(robotPose[POSE_X], robotPose[POSE_Y], targetX, targetY);

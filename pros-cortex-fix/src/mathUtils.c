@@ -1,5 +1,9 @@
 #include "main.h"
 
+double distanceToLine(LineTarget *targetLine, double sourceX, double sourceY)
+{
+  return (targetLine->a * sourceX + targetLine->b * sourceY + targetLine->c) / sqrt(pow(targetLine->a, 2) + pow(targetLine->b, 2));
+}
 void matchLineWithPose(LineTarget *targetLine, double targetX, double targetY, double targetAngle, bool isDegrees)
 {
   if (isDegrees)
