@@ -28,10 +28,10 @@
 #include <API.h>
 
 // User includes
+#include "mathUtils.h"
 #include "aps.h"
 #include "chassis.h"
 #include "global.h"
-#include "mathUtils.h"
 #include "NERD_PID.h"
 
 // Other includes

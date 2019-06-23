@@ -41,12 +41,23 @@ void driveAlongLineToPose(double targetX, double targetY, double targetAngle, in
   LineTarget targetLine;
   matchLineWithPose(&targetLine, targetX, targetY, targetAngle, isDegrees);
 
-  targetAngle = targetLine.targetAngle;
+  // If angle is in 2nd or 3rd quadrant, need to reverse the direction the robot turns to meet the line
+  int turnDirection = 1;
+  targetAngle = normalizeAngle(targetLine.targetAngle);
+
+  if (targetAngle < 0)
+    turnDirection = -1;
 
   // Initialize PIDs
-  pidInit(&controllers[PID_STRAIGHT], 0.25, 0.0, 0.02);
-  pidInit(&controllers[PID_ROTATE], 0.5, 0.0, 0.0);
-  pidInit(&controllers[PID_STAY_ON_TARGET], -1.0, 0.0, 0.0);
+  pidInit(&controllers[PID_ZERO], 0.0, 0.0, 0.0);
+  pidInit(&controllers[PID_STRAIGHT], 0.12, 0.0, 0.02);
+  pidInit(&controllers[PID_ROTATE_ON_POINT], 0.6, 0.2, 0.05);
+  pidInit(&controllers[PID_ROTATE], 0.5, 0.02, 0.0);
+  pidInit(&controllers[PID_STAY_ON_TARGET], 0.07, 0.01, 0.0);
+
+  // Actual controllers for rotation
+  PID *stayOnTargetAngle = &controllers[PID_ROTATE];
+  PID *stayOnLine = &controllers[PID_STAY_ON_TARGET];
 
   // Variables to keep track of current state
   bool isAtTarget = false;
@@ -60,7 +71,7 @@ void driveAlongLineToPose(double targetX, double targetY, double targetAngle, in
     double distanceFromLine = distanceToLineFromRobot(&targetLine);
     double currentAngle = robotPose[POSE_ANGLE];
 
-    // Get info needed to face in the direction of the point
+    // Get info needed to face in the direction of the point, just to change robot direction
     double angleToFace = angleToFacePointFromRobot(targetX, targetY);
     int robotDirection = 1;
 
@@ -77,8 +88,19 @@ void driveAlongLineToPose(double targetX, double targetY, double targetAngle, in
     // Calculate the velocity and angular velocity to approach the pose
     double inputVelocity = robotDirection  * pidCalculate(&controllers[PID_STRAIGHT], distanceToGo, 0) * maxSpeed * sideWheelDiameter / 2 - robotDirection * 10;
 
+    // Ignore deviation from line if within margin of error
+    if (distanceToGo < ACCURATE_DISTANCE_ERROR)
+    {
+      stayOnLine = &controllers[PID_ZERO];
+      stayOnTargetAngle = &controllers[PID_ROTATE_ON_POINT];
+    }
+    else
+    {
+      stayOnLine = &controllers[PID_STAY_ON_TARGET];
+      stayOnTargetAngle = &controllers[PID_ROTATE];
+    }
     // Finally, calculate target angular velocity of the robot
-    double inputOmega = (pidCalculate(&controllers[PID_STAY_ON_TARGET], distanceFromLine, 0) + pidCalculate(&controllers[PID_ROTATE], targetAngle, currentAngle)) * maxSpeed * sideWheelDiameter / 2;
+    double inputOmega = (robotDirection * turnDirection * pidCalculate(stayOnLine, distanceFromLine, 0) + pidCalculate(stayOnTargetAngle, targetAngle, currentAngle)) * maxSpeed * sideWheelDiameter / 2;
 
     // Calculate angular velocities of each wheel
     int leftWheelVelocity = (2 * inputVelocity + inputOmega * (sL + sR)) / sideWheelDiameter;
@@ -88,7 +110,7 @@ void driveAlongLineToPose(double targetX, double targetY, double targetAngle, in
     powerMotors(leftWheelVelocity, rightWheelVelocity);
 
     // Debug
-    printf("(dAL)T: %f\t W: %f\tD: %f\t H: %f\tDF: %f\tX: %f\tY: %f\tAG: %f\n", radToDeg(targetAngle), inputOmega, distanceToGo, radToDeg(angleToFace), radToDeg(targetAngle - angleToFace), robotPose[POSE_X], robotPose[POSE_Y], radToDeg(currentAngle));
+    printf("(dAL)iV: %3.3f   iW: %3.3f   DTG: %3.3f   DFL: %3.3f   TA: %3.3f   X: %3.3f   Y: %3.3f   AG: %3.3f\n", inputVelocity, inputOmega, distanceToGo, distanceFromLine, radToDeg(targetAngle), robotPose[POSE_X], robotPose[POSE_Y], radToDeg(currentAngle));
 
     if (isAccurate)
     {
