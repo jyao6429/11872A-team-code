@@ -35,6 +35,20 @@ enum PIDControllers
 // Array of PID controllers for various motions
 PID controllers[5];
 
+void driveAndParkToPose(double targetX, double targetY, double targetAngle, int maxSpeed, bool isAccurate, bool isDegrees)
+{
+  if (isDegrees)
+    targetAngle = degToRad(targetAngle);
+
+  // Calculate coordinates to line up for parking (12 in away from target point)
+  double lineUpX = targetX - 12 * sin(targetAngle);
+  double lineUpY = targetY - 12 * cos(targetAngle);
+
+  // Drive to the line up
+  driveToPose(lineUpX, lineUpY, targetAngle, maxSpeed, false, false);
+  // Park the robot following line
+  driveAlongLineToPose(targetX, targetY, targetAngle, maxSpeed, isAccurate, false);
+}
 void driveAlongLineToPose(double targetX, double targetY, double targetAngle, int maxSpeed, bool isAccurate, bool isDegrees)
 {
   // Get the line to follow

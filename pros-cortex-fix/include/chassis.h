@@ -15,6 +15,7 @@ void powerMotors(int leftPower, int rightPower);
  */
 void stopMotors();
 
+void driveAndParkToPose(double targetX, double targetY, double targetAngle, int maxSpeed, bool isAccurate, bool isDegrees);
 void driveAlongLineToPose(double targetX, double targetY, double targetAngle, int maxSpeed, bool isAccurate, bool isDegrees);
 /**
  * Drives to a pose

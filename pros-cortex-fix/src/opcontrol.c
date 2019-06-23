@@ -47,7 +47,10 @@ void testing(void *ignore)
 	//driveToPose(48.0, -48.0, -90.0, 70, true, true);
 
 	// Test driveAlongLineToPose
-	driveAlongLineToPose(-48.0, 48.0, -45.0, 100, true, true);
+	//driveAlongLineToPose(48.0, 12.0, 70.0, 100, true, true);
+
+	// Test driveAndParkToPose
+	driveAndParkToPose(-48.0, 48.0, -90.0, 100, true, true);
 
 	printf("Done Testing\n");
 }
