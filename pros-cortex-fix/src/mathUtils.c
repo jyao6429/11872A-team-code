@@ -9,14 +9,26 @@ void matchLineWithPose(LineTarget *targetLine, double targetX, double targetY, d
   if (isDegrees)
     targetAngle = degToRad(targetAngle);
 
-  double slope = tan(targetAngle + M_PI);
+  double slope = tan(-targetAngle + M_PI / 2);
 
-  targetLine->a = -slope;
-  targetLine->b = 1;
-  targetLine->c = slope * targetX - targetY;
+  if (fabs(slope) > 1000000)
+  {
+    targetLine->a = -1;
+    targetLine->b = 0;
+    targetLine->c = targetX;
+  }
+  else
+  {
+    targetLine->a = -slope;
+    targetLine->b = 1;
+    targetLine->c = slope * targetX - targetY;
+  }
   targetLine->targetX = targetX;
   targetLine->targetY = targetY;
   targetLine->targetAngle = targetAngle;
+
+  // Debug
+  printf("a: %3.3f   b: %3.3f   c: %3.3f   TX: %3.3f   TY: %3.3f   TA: %3.3f\n", targetLine->a, targetLine->b, targetLine->c, targetX, targetY, targetAngle);
 }
 double distanceToPoint(double sourceX, double sourceY, double targetX, double targetY)
 {

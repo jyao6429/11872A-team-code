@@ -65,9 +65,9 @@ void driveAlongLineToPose(double targetX, double targetY, double targetAngle, in
   // Initialize PIDs
   pidInit(&controllers[PID_ZERO], 0.0, 0.0, 0.0);
   pidInit(&controllers[PID_STRAIGHT], 0.12, 0.0, 0.02);
-  pidInit(&controllers[PID_ROTATE_ON_POINT], 0.6, 0.2, 0.05);
-  pidInit(&controllers[PID_ROTATE], 0.5, 0.02, 0.0);
-  pidInit(&controllers[PID_STAY_ON_TARGET], 0.07, 0.01, 0.0);
+  pidInit(&controllers[PID_ROTATE_ON_POINT], 0.5, 0.0, 0.05);
+  pidInit(&controllers[PID_ROTATE], 0.6, 0.0, 0.0);
+  pidInit(&controllers[PID_STAY_ON_TARGET], 0.05, 0.0, 0.0);
 
   // Actual controllers for rotation
   PID *stayOnTargetAngle = &controllers[PID_ROTATE];
@@ -100,7 +100,7 @@ void driveAlongLineToPose(double targetX, double targetY, double targetAngle, in
     }
 
     // Calculate the velocity and angular velocity to approach the pose
-    double inputVelocity = robotDirection  * pidCalculate(&controllers[PID_STRAIGHT], distanceToGo, 0) * maxSpeed * sideWheelDiameter / 2 - robotDirection * 10;
+    double inputVelocity = robotDirection * pidCalculate(&controllers[PID_STRAIGHT], distanceToGo, 0) * maxSpeed * sideWheelDiameter / 2 - robotDirection * 10;
 
     // Ignore deviation from line if within margin of error
     if (distanceToGo < ACCURATE_DISTANCE_ERROR)
@@ -114,7 +114,10 @@ void driveAlongLineToPose(double targetX, double targetY, double targetAngle, in
       stayOnTargetAngle = &controllers[PID_ROTATE];
     }
     // Finally, calculate target angular velocity of the robot
-    double inputOmega = (robotDirection * turnDirection * pidCalculate(stayOnLine, distanceFromLine, 0) + pidCalculate(stayOnTargetAngle, targetAngle, currentAngle)) * maxSpeed * sideWheelDiameter / 2;
+    double stayOnLineCorrection = robotDirection * turnDirection * pidCalculate(stayOnLine, distanceFromLine, 0) * maxSpeed * sideWheelDiameter / 2;
+    double stayOnTargetAngleCorrection = pidCalculate(stayOnTargetAngle, targetAngle, currentAngle) * maxSpeed * sideWheelDiameter / 2;
+
+    double inputOmega = stayOnLineCorrection + stayOnTargetAngleCorrection;
 
     // Calculate angular velocities of each wheel
     int leftWheelVelocity = (2 * inputVelocity + inputOmega * (sL + sR)) / sideWheelDiameter;
@@ -124,7 +127,7 @@ void driveAlongLineToPose(double targetX, double targetY, double targetAngle, in
     powerMotors(leftWheelVelocity, rightWheelVelocity);
 
     // Debug
-    printf("(dAL)iV: %3.3f   iW: %3.3f   DTG: %3.3f   DFL: %3.3f   TA: %3.3f   X: %3.3f   Y: %3.3f   AG: %3.3f\n", inputVelocity, inputOmega, distanceToGo, distanceFromLine, radToDeg(targetAngle), robotPose[POSE_X], robotPose[POSE_Y], radToDeg(currentAngle));
+    printf("(dAL)iV: %3.3f   iW: %3.3f   DTG: %3.3f   DFL: %3.3f   LC: %3.3f   AC: %3.3f   TA: %3.3f   X: %3.3f   Y: %3.3f   AG: %3.3f\n", inputVelocity, inputOmega, distanceToGo, distanceFromLine, stayOnLineCorrection, stayOnTargetAngleCorrection, radToDeg(targetAngle), robotPose[POSE_X], robotPose[POSE_Y], radToDeg(currentAngle));
 
     if (isAccurate)
     {
@@ -158,8 +161,8 @@ void driveToPose(double targetX, double targetY, double targetAngle, int maxSpee
   pidInit(&controllers[PID_ZERO], 0.0, 0.0, 0.0);
   pidInit(&controllers[PID_STRAIGHT], 0.25, 0.0, 0.02);
   pidInit(&controllers[PID_ROTATE_ON_POINT], 0.5, 0.2, 0.05);
-  pidInit(&controllers[PID_ROTATE], -0.5, 0.0, 0.0);
-  pidInit(&controllers[PID_STAY_ON_TARGET], 0.9, 0.0, 0.0);
+  pidInit(&controllers[PID_ROTATE], -0.4, 0.0, 0.0);
+  pidInit(&controllers[PID_STAY_ON_TARGET], 1.2, 0.0, 0.0);
 
   // Also have separate PIDs for the actual motions
   PID *headingPID = &controllers[PID_STAY_ON_TARGET];
@@ -181,7 +184,6 @@ void driveToPose(double targetX, double targetY, double targetAngle, int maxSpee
     int robotDirection = 1;
 
     // Info on targetAngle just in case an entire rotation was made at some point
-    targetAngle = normalizeAngle(nearestEquivalentAngleFromRobot(targetAngle));
     mutexGive(mutexes[MUTEX_POSE]);
 
     // Reverses direction instead of turning completely around in case robot overshoots target
@@ -226,7 +228,7 @@ void driveToPose(double targetX, double targetY, double targetAngle, int maxSpee
     powerMotors(leftWheelVelocity, rightWheelVelocity);
 
     // Debug
-    printf("(dTP)T: %f\t W: %f\tD: %f\t H: %f\tDF: %f\tX: %f\tY: %f\tAG: %f\n", radToDeg(targetAngle), inputOmega, distanceToGo, radToDeg(angleToFace), radToDeg(targetAngle - angleToFace), robotPose[POSE_X], robotPose[POSE_Y], radToDeg(currentAngle));
+    printf("(dTP)iV: %3.3f   iW: %3.3f   DTG: %3.3f   TA: %3.3f   X: %3.3f   Y: %3.3f   AG: %3.3f\n", inputVelocity, inputOmega, distanceToGo, radToDeg(targetAngle), robotPose[POSE_X], robotPose[POSE_Y], radToDeg(currentAngle));
 
     if (isAccurate)
     {
@@ -242,9 +244,18 @@ void driveToPose(double targetX, double targetY, double targetAngle, int maxSpee
         powerMotors(0, 0);
       }
     }
-    else if (distanceToGo < INACCURATE_DISTANCE_ERROR && fabs(currentAngle - targetAngle) < INACCURATE_ANGLE_ERROR)
+    else
     {
-      isAtTarget = true;
+      // If not within range, reset timer
+      if (distanceToGo > INACCURATE_DISTANCE_ERROR || fabs(currentAngle - targetAngle) > INACCURATE_ANGLE_ERROR)
+      {
+        atTargetTime = millis();
+      }
+      // If within range for at least 200ms, then target is reached
+      if (millis() - atTargetTime > 100)
+      {
+        isAtTarget = true;
+      }
     }
 
     delay(20);

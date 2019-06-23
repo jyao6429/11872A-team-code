@@ -42,17 +42,22 @@ void testing(void *ignore)
 	//driveStraightToPoint(0.0, 0.0, 70, true);
 
 	// Test driveToPose PID
-	//driveToPose(0.0, 24.0, 0.0, 70, true, true);
+	driveToPose(0.0, 24.0, 45.0, 100, false, true);
 	//driveToPose(0.0, 48.0, -10.0, 100, true, true);
 	//driveToPose(48.0, -48.0, -90.0, 70, true, true);
 
 	// Test driveAlongLineToPose
-	//driveAlongLineToPose(48.0, 12.0, 70.0, 100, true, true);
+	//driveAlongLineToPose(-24.0, 24.0, -45.0, 100, true, true);
+	//driveAlongLineToPose(-48.0, 48.0, -90.0, 100, true, true);
+	//driveAlongLineToPose(2.0, 12.0, 0.0, 100, true, true);
 
 	// Test driveAndParkToPose
-	driveAndParkToPose(-48.0, 48.0, -90.0, 100, true, true);
+	//driveToPose(-24.0, 48.0, -100.0, 100, false, true);
+	//driveToPose(-24.0, 0.0, 90.0, 100, false, true);
+	//driveAndParkToPose(0.0, 0.0, 0.0, 100, true, true);
 
 	printf("Done Testing\n");
+	stopMotors();
 }
 
 void operatorControl()
