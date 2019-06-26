@@ -13,6 +13,9 @@ const int backEncoderResolution = 360;   // back encoder ticks per 360 degrees o
 // Previous position and orientation
 double robotPose[3] = {0.0, 0.0, 0.0};
 double resetAngle = 0.0;
+// Velocities of the wheels
+double leftWheelLinearVelocity = 0.0;
+double rightWheelLinearVelocity = 0.0;
 // Previous encoder values
 int prevLeftEncoder = 0;
 int prevRightEncoder = 0;
@@ -73,6 +76,8 @@ void resetPosition(double resetX, double resetY, double resetA)
 }
 void startTracking(void *ignore)
 {
+  unsigned long timer = millis();
+
   while (true)
   {
     // Get current encoder values
@@ -84,6 +89,18 @@ void startTracking(void *ignore)
     double deltaLeftDistance = calculateTravelDistance(currentLeftEncoder - prevLeftEncoder, sideWheelDiameter, sideEncoderResolution);
     double deltaRightDistance = calculateTravelDistance(currentRightEncoder - prevRightEncoder, sideWheelDiameter, sideEncoderResolution);
     double deltaBackDistance = calculateTravelDistance(currentBackEncoder - prevBackEncoder, backWheelDiameter, backEncoderResolution);
+
+    // Calculate velocities
+    unsigned long deltaTimeMS = millis() - timer;
+    timer = millis();
+
+    if (deltaTimeMS != 0)
+    {
+      mutexTake(mutexes[MUTEX_VELOCITY], -1);
+      leftWheelLinearVelocity = deltaLeftDistance / ((double) deltaTimeMS * 0.001);
+      rightWheelLinearVelocity = deltaRightDistance / ((double) deltaTimeMS * 0.001);
+      mutexGive(mutexes[MUTEX_VELOCITY]);
+    }
 
     // Update prev values;
     prevLeftEncoder = currentLeftEncoder;

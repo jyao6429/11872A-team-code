@@ -28,12 +28,16 @@
  */
 TaskHandle test;
 
-void testing(void *ignore)
+void testVControl(void *ignore)
+{
+	initializeVelocityController();
+}
+void testChassis(void *ignore)
 {
 	resetPosition(0.0, 0.0, 0.0);
 	// Test turning PID
-	//turnToAngle(90.0, 100, true, true);
-	//turnToAngle(0.0, 100, true, false);
+	turnToAngle(90.0, 100, true, true);
+	turnToAngle(0.0, 100, true, false);
 
 	// Test driveStraightToPose PID
 	//driveStraightToPoint(0.0, 24.0, 70, true);
@@ -42,7 +46,7 @@ void testing(void *ignore)
 	//driveStraightToPoint(0.0, 0.0, 70, true);
 
 	// Test driveToPose PID
-	driveToPose(0.0, 24.0, 45.0, 100, false, true);
+	//driveToPose(0.0, 24.0, 45.0, 100, false, true);
 	//driveToPose(0.0, 48.0, -10.0, 100, true, true);
 	//driveToPose(48.0, -48.0, -90.0, 70, true, true);
 

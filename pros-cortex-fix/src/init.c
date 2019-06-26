@@ -40,6 +40,8 @@ void initialize()
 {
   // Create mutexes
   mutexes[MUTEX_POSE] = mutexCreate();
+  mutexes[MUTEX_VELOCITY] = mutexCreate();
+  mutexes[MUTEX_TARGET_VELOCITY] = mutexCreate();
 
   // Initialize encoders
   leftEncoder = encoderInit(PORT_leftEncoder, PORT_leftEncoder + 1, false);

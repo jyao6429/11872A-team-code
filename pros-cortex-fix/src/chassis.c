@@ -8,9 +8,31 @@
 #define ACCURATE_DISTANCE_ERROR 1.5
 #define INACCURATE_DISTANCE_ERROR 3
 
+// compensates for non-linearity of control value vs speed curve
+const unsigned int TrueSpeed[128] =
+{
+  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+  0, 21, 21, 21, 22, 22, 22, 23, 24, 24,
+ 25, 25, 25, 25, 26, 27, 27, 28, 28, 28,
+ 28, 29, 30, 30, 30, 31, 31, 32, 32, 32,
+ 33, 33, 34, 34, 35, 35, 35, 36, 36, 37,
+ 37, 37, 37, 38, 38, 39, 39, 39, 40, 40,
+ 41, 41, 42, 42, 43, 44, 44, 45, 45, 46,
+ 46, 47, 47, 48, 48, 49, 50, 50, 51, 52,
+ 52, 53, 54, 55, 56, 57, 57, 58, 59, 60,
+ 61, 62, 63, 64, 65, 66, 67, 67, 68, 70,
+ 71, 72, 72, 73, 74, 76, 77, 78, 79, 79,
+ 80, 81, 83, 84, 84, 86, 86, 87, 87, 88,
+ 88, 89, 89, 90, 90,127,127,127
+};
+
 void powerMotors(int leftPower, int rightPower)
 {
-  motorSet(PORT_leftBackMotor, leftPower);
+  // Clamping fucntion, as well as looking up proper speed in the array
+  leftPower = ((leftPower < 0) ? -1 : 1) * ((abs(leftPower) > 127) ? 127 : TrueSpeed[abs(leftPower)]);
+  rightPower = ((rightPower < 0) ? -1 : 1) * ((abs(rightPower) > 127) ? 127 : TrueSpeed[abs(rightPower)]);
+
+  motorSet(PORT_leftBackMotor, TrueSpeed[leftPower]);
   motorSet(PORT_leftFrontMotor, leftPower);
   motorSet(PORT_rightBackMotor, -rightPower);
   motorSet(PORT_rightFrontMotor, -rightPower);
@@ -159,10 +181,10 @@ void driveToPose(double targetX, double targetY, double targetAngle, int maxSpee
 
   // Initialize PIDs to drive straight, stay on target, and rotate to the correct orientation
   pidInit(&controllers[PID_ZERO], 0.0, 0.0, 0.0);
-  pidInit(&controllers[PID_STRAIGHT], 0.25, 0.0, 0.02);
+  pidInit(&controllers[PID_STRAIGHT], 0.15, 0.0, 0.02);
   pidInit(&controllers[PID_ROTATE_ON_POINT], 0.5, 0.2, 0.05);
-  pidInit(&controllers[PID_ROTATE], -0.4, 0.0, 0.0);
-  pidInit(&controllers[PID_STAY_ON_TARGET], 1.2, 0.0, 0.0);
+  pidInit(&controllers[PID_ROTATE], -0.5, 0.0, 0.0);
+  pidInit(&controllers[PID_STAY_ON_TARGET], 1.0, 0.0, 0.0);
 
   // Also have separate PIDs for the actual motions
   PID *headingPID = &controllers[PID_STAY_ON_TARGET];
@@ -197,7 +219,7 @@ void driveToPose(double targetX, double targetY, double targetAngle, int maxSpee
     double inputVelocity = robotDirection  * pidCalculate(&controllers[PID_STRAIGHT], distanceToGo, 0) * maxSpeed * sideWheelDiameter / 2 - robotDirection * 10;
 
     // If within margin for position, focus on hitting target angle
-    if (distanceToGo < ACCURATE_DISTANCE_ERROR)
+    if (distanceToGo < INACCURATE_DISTANCE_ERROR)
     {
       headingPID = &controllers[PID_ZERO];
       // If within margin for targetAngle, don't change anything
@@ -217,8 +239,10 @@ void driveToPose(double targetX, double targetY, double targetAngle, int maxSpee
       targetAnglePID = &controllers[PID_ROTATE];
     }
 
+    double headingCorrection = pidCalculate(headingPID, angleToFace, currentAngle) * maxSpeed * sideWheelDiameter / 2;
+    double targetAngleCorrection = pidCalculate(targetAnglePID, targetAngle, angleToFace) * maxSpeed * sideWheelDiameter / 2;
     // Finally, calculate target angular velocity of the robot
-    double inputOmega = (pidCalculate(headingPID, angleToFace, currentAngle) + pidCalculate(targetAnglePID, targetAngle, angleToFace)) * maxSpeed * sideWheelDiameter / 2;
+    double inputOmega = (headingCorrection + targetAngleCorrection);
 
     // Calculate angular velocities of each wheel
     int leftWheelVelocity = (2 * inputVelocity + inputOmega * (sL + sR)) / sideWheelDiameter;
@@ -228,7 +252,7 @@ void driveToPose(double targetX, double targetY, double targetAngle, int maxSpee
     powerMotors(leftWheelVelocity, rightWheelVelocity);
 
     // Debug
-    printf("(dTP)iV: %3.3f   iW: %3.3f   DTG: %3.3f   TA: %3.3f   X: %3.3f   Y: %3.3f   AG: %3.3f\n", inputVelocity, inputOmega, distanceToGo, radToDeg(targetAngle), robotPose[POSE_X], robotPose[POSE_Y], radToDeg(currentAngle));
+    printf("(dTP)iV: %3.3f   iW: %3.3f   LW: %d   RW: %d   DTG: %3.3f   HC: %3.3f   TAC: %3.3f   TA: %3.3f   X: %3.3f   Y: %3.3f   AG: %3.3f\n", inputVelocity, inputOmega, leftWheelVelocity, rightWheelVelocity, distanceToGo, headingCorrection, targetAngleCorrection, radToDeg(targetAngle), robotPose[POSE_X], robotPose[POSE_Y], radToDeg(currentAngle));
 
     if (isAccurate)
     {
@@ -251,7 +275,7 @@ void driveToPose(double targetX, double targetY, double targetAngle, int maxSpee
       {
         atTargetTime = millis();
       }
-      // If within range for at least 200ms, then target is reached
+      // If within range for at least 100ms, then target is reached
       if (millis() - atTargetTime > 100)
       {
         isAtTarget = true;
@@ -356,7 +380,7 @@ void turnToAngle(double targetAngle, int maxSpeed, bool isAccurate, bool isDegre
   }
   else if (maxSpeed > 80)
   {
-    pidInit(&controllers[PID_ROTATE_ON_POINT], 2.0, 0.1, 0.3);
+    pidInit(&controllers[PID_ROTATE_ON_POINT], 1.5, 0.0, 0.0);
   }
   else
   {

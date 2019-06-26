@@ -36,6 +36,14 @@ double robotPose[3];
  * The angle at last reset
  */
 double resetAngle;
+/**
+ * The linear velocity of the left wheel in inches per second
+ */
+double leftWheelLinearVelocity;
+/**
+ * The linear velocity of the right wheel in inches per second
+ */
+double rightWheelLinearVelocity;
 
 /**
  * Gets the current count for the left tracking encoder
