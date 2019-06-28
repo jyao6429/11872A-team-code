@@ -3,20 +3,26 @@
 
 #include "main.h"
 
-// Enums for Cartesian and Polar
-enum Cartesian
+// Structs
+typedef struct Cart
 {
-  X_COMP,
-  Y_COMP
-};
-enum Polar
-{
-  MAGNITUDE,
-  ANGLE
-};
+  double x;
+  double y;
+} Cart;
 
-// Struct for line travelling information
-typedef struct
+typedef struct Polar
+{
+  double magnitude;
+  double angle;
+} Polar;
+
+typedef struct Line
+{
+  Pose p1;
+  Pose p2;
+} Line;
+
+typedef struct LineTarget
 {
   double a, b, c, targetX, targetY, targetAngle;
 } LineTarget;
@@ -45,6 +51,9 @@ double distanceToPoint(double sourceX, double sourceY, double targetX, double ta
  * @return the angle to face target point from source point in the range [-PI, PI]
  */
 double angleToFacePoint(double sourceX, double sourceY, double targetX, double targetY);
+
+double getAngleOfLine(Line line);
+double getLengthOfLine(Line line);
 /**
  * Calculates nearest equivalent angle in radians
  *
@@ -80,17 +89,17 @@ double degToRad(double degrees);
  /**
   * Converts cartesian coordinates into polar
   *
-  * @param *cartVector - the cartesian array to convert from
-  * @param *polarVector - the polar array to convert to
+  * @param cartVector - the cartesian vector to convert from
+  * @param *polarVector - the polar vector to convert to
   */
- void cartToPolar(double *cartVector, double *polarVector);
+void cartToPolar(Cart cartVector, Polar *polarVector);
  /**
   * Converts polar coordinates into cartesian
   *
-  * @param *polarVector - the polar array to convert from
-  * @param *cartVector - the cartesian array to convert to
+  * @param polarVector - the polar vector to convert from
+  * @param *cartVector - the cartesian vector to convert to
   */
- void polarToCart(double *polarVector, double *cartVector);
+void polarToCart(Polar polarVector, Cart *cartVector);
 
 
 #endif

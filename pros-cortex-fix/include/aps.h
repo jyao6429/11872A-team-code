@@ -3,100 +3,84 @@
 
 #include "main.h"
 
-// Enum for Pose
-enum Pose
-{
-  POSE_X,
-  POSE_Y,
-  POSE_ANGLE
-};
-
 // Physical parameters in inches
-
 // distance from center to left tracking wheel
-const double sL;
+const double sL = 4.568;
 // distance from center to right tracking wheel
-const double sR;
+const double sR = 4.568;
 // distance from center to back tracking wheel
-const double sB;
+const double sB = 4.77;
 // diameter of side wheels
-const double sideWheelDiameter;
+const double sideWheelDiameter = 2.75;
 // diameter of back wheel
-const double backWheelDiameter;
+const double backWheelDiameter = 2.75;
+// side encoder ticks per 360 degrees of motion
+const int sideEncoderResolution = 360;
+// back encoder ticks per 360 degrees of motion
+const int backEncoderResolution = 360;
 
-// Previous encoder values
-int prevLeftEncoder;
-int prevRightEncoder;
-int prevBackEncoder;
-/**
- * The previous position vector and orientation calculated by the APS
- */
-double robotPose[3];
-/**
- * The angle at last reset
- */
+// Structs for pose and velocity
+// Container for position and orientation
+typedef struct Pose
+{
+  double angle;
+  double x;
+  double y;
+  int prevLeft;
+  int prevRight;
+  int prevBack;
+} Pose;
+// Container for linear and angular velocities
+typedef struct Vel
+{
+  double angle;
+  double x;
+  double y;
+  unsigned long prevTime;
+  double prevPoseAngle;
+  double prevPoseX;
+  double prevPoseY;
+} Vel;
+
+// Variables for global position and velocity
+// The global position of the robot
+Pose globalPose;
+// The global velocity of the robot
+Vel globalVel;
+// The angle at last reset
 double resetAngle;
-/**
- * The linear velocity of the left wheel in inches per second
- */
-double leftWheelLinearVelocity;
-/**
- * The linear velocity of the right wheel in inches per second
- */
-double rightWheelLinearVelocity;
+
+// handles the tracking task
+TaskHandle APSTask;
 
 /**
- * Gets the current count for the left tracking encoder
+ * Resets the position to given parameters, and restarts the APS
  *
- * @return the number of ticks
- */
-int getLeftEncoder();
-/**
- * Gets the current count for the right tracking encoder
- *
- * @return the number of ticks
- */
-int getRightEncoder();
-/**
- * Gets the current count for the back tracking encoder
- *
- * @return the number of ticks
- */
-int getBackEncoder();
-/**
- * Resets the left encoder
- */
-void resetLeftEncoder();
-/**
- * Resets the right encoder
- */
-void resetRightEncoder();
-/**
- * Resets the back encoder
- */
-void resetBackEncoder();
-
-/**
- * Initializes the Absolute Positioning System
- *
+ * @param *position - the position struct
  * @param startX - the starting x coordinate in inches
  * @param startY - the starting y coordinate in inches
  * @param startAngle - the starting angle in degrees
+ * @param isDegrees - if startAngle is given in degrees
  */
-void initializeAPS(double startX, double startY, double startAngle);
+void resetPositionFull(Pose *position, double startX, double startY, double startAngle, bool isDegrees);
 /**
- * Resets the Absolute Positioning System
+ * Resets the given pose to 0
  *
- * @param resetX - the reset x coordinate in inches
- * @param resetY - the reset y coordinate in inches
- * @param resetAngle - the reset angle in degrees
+ * @param *position - the position struct
  */
-void resetPosition(double resetX, double resetY, double resetA);
+void resetPosition(Pose *position);
 /**
- * Starts tracking the robot position
+ * Resets the given velocity to 0, with prevPoses as the given position struct
+ *
+ * @param *velocity - the velocity struct
+ * @param position - the position struct
+ */
+void resetVelocity(Vel *velocity, Pose position);
+/**
+ * Starts tracking the robot position and velocity
  * This shoud be started as a task
  */
-void startTracking(void *ignore);
+void trackPoseTask(void *ignore);
 
 double distanceToLineFromRobot(LineTarget *targetLine);
 /**
@@ -135,5 +119,35 @@ double nearestEquivalentAngleFromRobot(double target);
  * @return the distance traveled by that wheel
  */
 double calculateTravelDistance(int encoderCount, double wheelDiameter, int encoderResolution);
+/**
+ * Gets the current count for the left tracking encoder
+ *
+ * @return the number of ticks
+ */
+int getLeftEncoder();
+/**
+ * Gets the current count for the right tracking encoder
+ *
+ * @return the number of ticks
+ */
+int getRightEncoder();
+/**
+ * Gets the current count for the back tracking encoder
+ *
+ * @return the number of ticks
+ */
+int getBackEncoder();
+/**
+ * Resets the left encoder
+ */
+void resetLeftEncoder();
+/**
+ * Resets the right encoder
+ */
+void resetRightEncoder();
+/**
+ * Resets the back encoder
+ */
+void resetBackEncoder();
 
 #endif

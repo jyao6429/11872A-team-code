@@ -41,7 +41,7 @@ void velocityController(void *ignore)
     int rightPowerDiff = pidCalculate(&controllers[PID_RIGHT], currentRightTarget, currentRightVelocity) * 15;
 
     // Debug
-    printf("CLV: %3.3f   CRV: %3.3f   TLV: %3.3f   TRV: %3.3f   PLP: %3.3d   PRP: %3.3d   CLP: %3.3d   CRP: %3.3d\n", currentLeftVelocity, currentRightVelocity, currentLeftTarget, currentRightTarget, prevLeftPower, prevRightPower, prevLeftPower + leftPowerDiff, prevRightPower + rightPowerDiff);
+    printf("CLV: %3.3f   CRV: %3.3f   TLV: %3.3f   TRV: %3.3f   PLP: %d   PRP: %d   CLP: %d   CRP: %d\n", currentLeftVelocity, currentRightVelocity, currentLeftTarget, currentRightTarget, prevLeftPower, prevRightPower, prevLeftPower + leftPowerDiff, prevRightPower + rightPowerDiff);
     // power the motors
     powerMotors(prevLeftPower + leftPowerDiff, prevRightPower + rightPowerDiff);
 
@@ -54,15 +54,19 @@ void velocityController(void *ignore)
 }
 void initializeVelocityController()
 {
-  if (taskGetState(velocityTask) == TASK_DEAD || taskGetState(velocityTask) == TASK_RUNNABLE)
+  if (taskGetState(velocityTask) != TASK_RUNNING || taskGetState(velocityTask) != TASK_SLEEPING || taskGetState(velocityTask) != TASK_SUSPENDED)
   {
+    print("Starting velocity controller\n");
     velocityTask = taskCreate(velocityController, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT + 2);
   }
+  else
+    print("Failed to start velocity controller\n");
 }
 void stopVelocityController()
 {
-  if (taskGetState(velocityTask) != TASK_DEAD || taskGetState(velocityTask) != TASK_RUNNABLE)
+  if (taskGetState(velocityTask) == TASK_RUNNING || taskGetState(velocityTask) == TASK_SLEEPING || taskGetState(velocityTask) == TASK_SUSPENDED)
   {
+    print("Stopping velocity controller\n");
     taskDelete(velocityTask);
     targetLeftVelocity = 0.0;
     targetRightVelocity = 0.0;
@@ -70,6 +74,9 @@ void stopVelocityController()
     prevLeftPower = 0;
     prevRightPower = 0;
   }
+  else
+    print("Failed to stop velocity controller");
+
 }
 void setTargetVelocity(double leftV, double rightV)
 {

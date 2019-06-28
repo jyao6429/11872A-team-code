@@ -38,6 +38,16 @@ double angleToFacePoint(double sourceX, double sourceY, double targetX, double t
 {
   return -atan2(targetY - sourceY, targetX - sourceX) + M_PI / 2;
 }
+
+double getAngleOfLine(Line line)
+{
+  // Note, since angle is calculated from y axis, x and y are flipped
+  return atan2(line.p2.x - line.p1.x, line.p2.y - line.p1.y);
+}
+double getLengthOfLine(Line line)
+{
+  return sqrt(pow(line.p2.x - line.p1.x, 2) + pow(line.p2.y - line.p1.y, 2));
+}
 double nearestEquivalentAngle(double source, double target)
 {
   return round((source - target) / (2 * M_PI)) * 2 * M_PI + target;
@@ -54,17 +64,24 @@ double radToDeg(double radians)
 {
   return radians * (180 / M_PI);
 }
-void cartToPolar(double *cartVector, double *polarVector)
+void cartToPolar(Cart cartVector, Polar *polarVector)
 {
-  // Calculates magnitude of vector with distance formula
-  polarVector[MAGNITUDE] = sqrt(pow(cartVector[X_COMP], 2) + pow(cartVector[Y_COMP], 2));
-  // Calculates angle with arctan, automatically gives angle in correct quadrant
-  polarVector[ANGLE] = atan2(cartVector[Y_COMP], cartVector[X_COMP]);
+  if (cartVector.x != 0.0 || cartVector.y != 0.0)
+  {
+    // Calculates magnitude of vector with distance formula
+    polarVector->magnitude = sqrt(pow(cartVector.x, 2) + pow(cartVector.y, 2));
+    // Calculates angle with arctan, automatically gives angle in correct quadrant
+    polarVector->angle = atan2(cartVector.y, cartVector.x);
+  }
+  else
+  {
+    polarVector->magnitude = polarVector->angle = 0.0;
+  }
 }
-void polarToCart(double *polarVector, double *cartVector)
+void polarToCart(Polar polarVector, Cart *cartVector)
 {
   // Calculate x component with cosine
-  cartVector[X_COMP] = polarVector[MAGNITUDE] * cos(polarVector[ANGLE]);
+  cartVector->x = polarVector.magnitude * cos(polarVector.angle);
   // Calculate y component with sine
-  cartVector[Y_COMP] = polarVector[MAGNITUDE] * sin(polarVector[ANGLE]);
+  cartVector->y = polarVector.magnitude * sin(polarVector.angle);
 }

@@ -53,7 +53,7 @@ void pidInit(PID *pid, double Kp, double Ki, double Kd)
 }
 void pidInitCopy(PID *pid, PID *toCopy)
 {
-	pid->Kp = toCopy->Ki;
+	pid->Kp = toCopy->Kp;
 	pid->Ki = toCopy->Ki;
 	pid->Kd = toCopy->Kd;
 	pid->Kf = toCopy->Kf;
