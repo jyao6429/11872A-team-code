@@ -31,6 +31,8 @@ TaskHandle test;
 void testVControl(void *ignore)
 {
 	initializeVelocityController();
+
+	setTargetVelocity(12.0, 12.0);
 }
 void testChassis(void *ignore)
 {
@@ -72,12 +74,13 @@ void operatorControl()
 	{
 		if (digitalRead(PORT_startTestButton) == LOW)
 		{
-			test = taskCreate(testing, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT + 3);
+			test = taskCreate(testVControl, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT + 3);
 			delay(500);
 		}
 		if (digitalRead(PORT_stopTestButton) == LOW)
 		{
 			taskDelete(test);
+			stopVelocityController();
 			stopMotors();
 			delay(500);
 		}

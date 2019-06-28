@@ -40,6 +40,8 @@ void velocityController(void *ignore)
     int leftPowerDiff = pidCalculate(&controllers[PID_LEFT], currentLeftTarget, currentLeftVelocity) * 15;
     int rightPowerDiff = pidCalculate(&controllers[PID_RIGHT], currentRightTarget, currentRightVelocity) * 15;
 
+    // Debug
+    printf("CLV: %3.3f   CRV: %3.3f   TLV: %3.3f   TRV: %3.3f   PLP: %3.3d   PRP: %3.3d   CLP: %3.3d   CRP: %3.3d\n", currentLeftVelocity, currentRightVelocity, currentLeftTarget, currentRightTarget, prevLeftPower, prevRightPower, prevLeftPower + leftPowerDiff, prevRightPower + rightPowerDiff);
     // power the motors
     powerMotors(prevLeftPower + leftPowerDiff, prevRightPower + rightPowerDiff);
 
