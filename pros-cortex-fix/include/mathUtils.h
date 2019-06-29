@@ -7,20 +7,17 @@
 // Structs
 typedef struct Cart
 {
-  double x;
-  double y;
+  double x, y;
 } Cart;
 
 typedef struct Polar
 {
-  double magnitude;
-  double angle;
+  double magnitude, angle;
 } Polar;
 
 typedef struct Line
 {
-  Pose p1;
-  Pose p2;
+  Pose p1, p2;
 } Line;
 
 typedef struct

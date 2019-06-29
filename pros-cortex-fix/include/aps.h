@@ -23,23 +23,14 @@ const int backEncoderResolution;
 // Container for position and orientation
 typedef struct Pose
 {
-  double angle;
-  double x;
-  double y;
-  int prevLeft;
-  int prevRight;
-  int prevBack;
+  double angle, x, y;
+  int prevLeft, prevRight, prevBack;
 } Pose;
 // Container for linear and angular velocities
 typedef struct Vel
 {
-  double angle;
-  double x;
-  double y;
+  double angle, x, y, prevPoseAngle, prevPoseX, prevPoseY;
   unsigned long prevTime;
-  double prevPoseAngle;
-  double prevPoseX;
-  double prevPoseY;
 } Vel;
 
 // Variables for global position and velocity

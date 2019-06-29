@@ -17,8 +17,18 @@ const int backEncoderResolution = 360;
 
 void resetPositionFull(Pose *position, double startX, double startY, double startAngle, bool isDegrees)
 {
+  // Convert to radians if needed
+  if (isDegrees)
+    startAngle = degToRad(startAngle);
+
+  printf("(resetPositionFull) X: %3.3f   Y: %3.3f   A: %3.3f\n", startX, startY, radToDeg(startAngle));
+
   // Stop task
-  taskDelete(APSTask);
+  unsigned int APSState = taskGetState(APSTask);
+  if (APSTask != NULL && (APSState == TASK_RUNNING || APSState == TASK_SLEEPING || APSState == TASK_SUSPENDED))
+    taskDelete(APSTask);
+
+//print("Deleted task if needed\n");
 
   // Reset everything
   resetPosition(position);
@@ -28,9 +38,7 @@ void resetPositionFull(Pose *position, double startX, double startY, double star
   resetRightEncoder();
   resetBackEncoder();
 
-  // Convert to radians if needed
-  if (isDegrees)
-    startAngle = degToRad(startAngle);
+//print("Resetted everyting\n");
 
   // Set the new positions
   resetAngle = startAngle;
@@ -38,8 +46,12 @@ void resetPositionFull(Pose *position, double startX, double startY, double star
   position->x = startX;
   position->y = startY;
 
+//print("Set new data\n");
+
   // Create new task to track position
   APSTask = taskCreate(trackPoseTask, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT + 2);
+
+//print("Task created\n");
 }
 void resetPosition(Pose *position)
 {
@@ -104,11 +116,9 @@ void trackPosition(Pose *position, int currentLeft, int currentRight, int curren
   double sinAvg = sin(avgAngle);
 
   // Update the global position by incrementing by a shifted localOffset
-  mutexTake(mutexes[MUTEX_POSE], -1);
   position->x += localOffset.x * cosAvg + localOffset.y * sinAvg;
   position->y += localOffset.x * -sinAvg + localOffset.y * cosAvg;
   position->angle = newAngle;
-  mutexGive(mutexes[MUTEX_POSE]);
 }
 void trackVelocity(Vel *velocity, Pose position)
 {

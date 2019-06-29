@@ -84,7 +84,7 @@ void turnToAngleNew(double targetAngle, TurnDir turnDir, double fullPowerRatio, 
       break;
   }
   // Log
-  printf("TA: %3.3f   X: %3.3f   Y:%3.3f   A: %3.3f", radToDeg(targetAngle), globalPose.x, globalPose.y, radToDeg(globalPose.angle));
+  printf("TA: %3.3f   X: %3.3f   Y: %3.3f   A: %3.3f\n", radToDeg(targetAngle), globalPose.x, globalPose.y, radToDeg(globalPose.angle));
 }
 void applyHarshStop()
 {
