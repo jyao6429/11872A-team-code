@@ -28,14 +28,17 @@ const unsigned int TrueSpeed[128] =
 
 void powerMotors(int leftPower, int rightPower)
 {
-  // Clamping fucntion, as well as looking up proper speed in the array
-  leftPower = ((leftPower < 0) ? -1 : 1) * ((abs(leftPower) > 127) ? 127 : TrueSpeed[abs(leftPower)]);
-  rightPower = ((rightPower < 0) ? -1 : 1) * ((abs(rightPower) > 127) ? 127 : TrueSpeed[abs(rightPower)]);
-
-  motorSet(PORT_leftBackMotor, TrueSpeed[leftPower]);
+  motorSet(PORT_leftBackMotor, leftPower);
   motorSet(PORT_leftFrontMotor, leftPower);
   motorSet(PORT_rightBackMotor, -rightPower);
   motorSet(PORT_rightFrontMotor, -rightPower);
+}
+void powerMotorsLinear(int leftPower, int rightPower)
+{
+  // Clamping fucntion, as well as looking up proper speed in the array
+  leftPower = ((leftPower < 0) ? -1 : 1) * ((abs(leftPower) > 127) ? 127 : TrueSpeed[abs(leftPower)]);
+  rightPower = ((rightPower < 0) ? -1 : 1) * ((abs(rightPower) > 127) ? 127 : TrueSpeed[abs(rightPower)]);
+  powerMotors(leftPower, rightPower);
 }
 void stopMotors()
 {
@@ -57,6 +60,7 @@ enum PIDControllers
 // Array of PID controllers for various motions
 PID controllers[5];
 
+/*
 void driveAndParkToPose(double targetX, double targetY, double targetAngle, int maxSpeed, bool isAccurate, bool isDegrees)
 {
   if (isDegrees)
@@ -436,3 +440,4 @@ void turnToAngle(double targetAngle, int maxSpeed, bool isAccurate, bool isDegre
     delay(20);
   }
 }
+*/

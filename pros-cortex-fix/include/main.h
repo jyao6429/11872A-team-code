@@ -30,6 +30,7 @@
 // User includes
 #include "mathUtils.h"
 #include "aps.h"
+#include "motionAlgorithms.h"
 #include "velocityControl.h"
 #include "chassis.h"
 #include "global.h"

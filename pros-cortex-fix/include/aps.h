@@ -5,19 +5,19 @@
 
 // Physical parameters in inches
 // distance from center to left tracking wheel
-const double sL = 4.568;
+const double sL;
 // distance from center to right tracking wheel
-const double sR = 4.568;
+const double sR;
 // distance from center to back tracking wheel
-const double sB = 4.77;
+const double sB;
 // diameter of side wheels
-const double sideWheelDiameter = 2.75;
+const double sideWheelDiameter;
 // diameter of back wheel
-const double backWheelDiameter = 2.75;
+const double backWheelDiameter;
 // side encoder ticks per 360 degrees of motion
-const int sideEncoderResolution = 360;
+const int sideEncoderResolution;
 // back encoder ticks per 360 degrees of motion
-const int backEncoderResolution = 360;
+const int backEncoderResolution;
 
 // Structs for pose and velocity
 // Container for position and orientation
@@ -82,7 +82,7 @@ void resetVelocity(Vel *velocity, Pose position);
  */
 void trackPoseTask(void *ignore);
 
-double distanceToLineFromRobot(LineTarget *targetLine);
+//double distanceToLineFromRobot(LineTarget *targetLine);
 /**
  * Calculates the distance from the current robot position to a point
  *
@@ -91,7 +91,7 @@ double distanceToLineFromRobot(LineTarget *targetLine);
  *
  * @return the absolute distance between the robot and target point
  */
-double distanceToPointFromRobot(double targetX, double targetY);
+//double distanceToPointFromRobot(double targetX, double targetY);
 /**
  * Calculate the orientation of the robot to face a certain point
  *
@@ -100,7 +100,7 @@ double distanceToPointFromRobot(double targetX, double targetY);
  *
  * @return the angle to face target point from the current robot position in the range [-PI, PI]
  */
-double angleToFacePointFromRobot(double targetX, double targetY);
+//double angleToFacePointFromRobot(double targetX, double targetY);
 /**
  * Calculates nearest equivalent angle in radians from current orientation
  *

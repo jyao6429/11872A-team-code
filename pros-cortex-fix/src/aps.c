@@ -1,5 +1,20 @@
 #include "main.h"
 
+// distance from center to left tracking wheel
+const double sL = 4.568;
+// distance from center to right tracking wheel
+const double sR = 4.568;
+// distance from center to back tracking wheel
+const double sB = 4.77;
+// diameter of side wheels
+const double sideWheelDiameter = 2.75;
+// diameter of back wheel
+const double backWheelDiameter = 2.75;
+// side encoder ticks per 360 degrees of motion
+const int sideEncoderResolution = 360;
+// back encoder ticks per 360 degrees of motion
+const int backEncoderResolution = 360;
+
 void resetPositionFull(Pose *position, double startX, double startY, double startAngle, bool isDegrees)
 {
   // Stop task
@@ -130,6 +145,8 @@ void trackPoseTask(void *ignore)
     delay(1);
   }
 }
+
+/*
 double distanceToLineFromRobot(LineTarget *targetLine)
 {
   return distanceToLine(targetLine, globalPose.x, globalPose.y);
@@ -142,6 +159,7 @@ double angleToFacePointFromRobot(double targetX, double targetY)
 {
   return nearestEquivalentAngleFromRobot(angleToFacePoint(globalPose.x, globalPose.y, targetX, targetY));
 }
+*/
 double nearestEquivalentAngleFromRobot(double target)
 {
   return nearestEquivalentAngle(globalPose.angle, target);

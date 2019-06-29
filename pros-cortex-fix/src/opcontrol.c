@@ -36,7 +36,7 @@ void testVControl(void *ignore)
 }
 void testChassis(void *ignore)
 {
-	resetPosition(0.0, 0.0, 0.0);
+	resetPositionFull(&globalPose, 0.0, 0.0, 0.0, false);
 	// Test turning PID
 	turnToAngle(90.0, 100, true, true);
 	turnToAngle(0.0, 100, true, false);
@@ -65,7 +65,12 @@ void testChassis(void *ignore)
 	printf("Done Testing\n");
 	stopMotors();
 }
+void testNew(void *ignore)
+{
+	resetPositionFull(&globalPose, 0.0, 0.0, 0.0, true);
 
+	turnToAngleNew(90.0, TURN_CW, 0.35, 25, 12, true, true);
+}
 void operatorControl()
 {
 	printf("Hello PROS User!\n");
@@ -74,13 +79,12 @@ void operatorControl()
 	{
 		if (digitalRead(PORT_startTestButton) == LOW)
 		{
-			test = taskCreate(testVControl, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT + 3);
+			test = taskCreate(testNew, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT + 3);
 			delay(500);
 		}
 		if (digitalRead(PORT_stopTestButton) == LOW)
 		{
 			taskDelete(test);
-			stopVelocityController();
 			stopMotors();
 			delay(500);
 		}

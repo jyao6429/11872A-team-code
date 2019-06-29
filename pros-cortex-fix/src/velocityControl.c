@@ -1,5 +1,5 @@
 #include "main.h"
-
+/*
 // Variables to hold target velocity
 double targetLeftVelocity = 0.0;
 double targetRightVelocity = 0.0;
@@ -85,3 +85,4 @@ void setTargetVelocity(double leftV, double rightV)
   targetRightVelocity = rightV;
   mutexGive(mutexes[MUTEX_TARGET_VELOCITY]);
 }
+*/

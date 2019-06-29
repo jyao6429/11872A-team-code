@@ -1,6 +1,7 @@
 #ifndef MATH_UTILS_H
 #define MATH_UTILS_H
 
+#include "aps.h"
 #include "main.h"
 
 // Structs
@@ -22,7 +23,7 @@ typedef struct Line
   Pose p2;
 } Line;
 
-typedef struct LineTarget
+typedef struct
 {
   double a, b, c, targetX, targetY, targetAngle;
 } LineTarget;
