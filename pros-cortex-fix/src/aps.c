@@ -1,15 +1,15 @@
 #include "main.h"
 
 // distance from center to left tracking wheel
-const double sL = 4.568;
+const double sL = 4.65;
 // distance from center to right tracking wheel
-const double sR = 4.568;
+const double sR = 4.65;
 // distance from center to back tracking wheel
 const double sB = 4.77;
 // diameter of side wheels
-const double sideWheelDiameter = 2.75;
+const double sideWheelDiameter = 2.783;
 // diameter of back wheel
-const double backWheelDiameter = 2.75;
+const double backWheelDiameter = 2.783;
 // side encoder ticks per 360 degrees of motion
 const int sideEncoderResolution = 360;
 // back encoder ticks per 360 degrees of motion
