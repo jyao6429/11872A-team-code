@@ -70,6 +70,7 @@ void testNew(void *ignore)
 	resetPositionFull(&globalPose, 0.0, 0.0, 0.0, true);
 
 	turnToAngleNew(-360.0, TURN_CCW, 0.7, 40, 12, true, true);
+	
 	while (true)
 	{
 		printf("X: %3.3f   Y: %3.3f   A: %3.3f\n", globalPose.x, globalPose.y, radToDeg(globalPose.angle));

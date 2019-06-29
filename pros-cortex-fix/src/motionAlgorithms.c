@@ -1,6 +1,6 @@
 #include "main.h"
 
-void turnToAngleNew(double targetAngle, TurnDir turnDir, double fullPowerRatio, int coastPower, double angleError, bool harshStop, bool isDegrees)
+void turnToAngleNew(double targetAngle, TurnDir turnDir, double fullPowerRatio, int coastPower, double stopPowerDiff, bool harshStop, bool isDegrees)
 {
   // Convert to radians if needed
   if (isDegrees)
@@ -38,7 +38,7 @@ void turnToAngleNew(double targetAngle, TurnDir turnDir, double fullPowerRatio, 
       powerMotors(coastPower, -coastPower);
 
       // Wait until within error range
-      while (globalPose.angle < targetAngle - degToRad(angleError))
+      while (globalPose.angle < targetAngle - degToRad(stopPowerDiff))
       {
         delay(10);
       }
@@ -53,7 +53,7 @@ void turnToAngleNew(double targetAngle, TurnDir turnDir, double fullPowerRatio, 
 
       break;
     case TURN_CCW:
-      // Convert targetAngle to be nearest equivalent greater than the current robot orientation
+      // Convert targetAngle to be nearest equivalent less than the current robot orientation
       targetAngle = globalPose.angle - fmod(globalPose.angle - targetAngle, M_PI * 2);
       // Calculate angle to stop going at full power
       endFullPower = globalPose.angle * (1 - fullPowerRatio) + targetAngle * fullPowerRatio;
@@ -69,7 +69,7 @@ void turnToAngleNew(double targetAngle, TurnDir turnDir, double fullPowerRatio, 
       powerMotors(-coastPower, coastPower);
 
       // Wait until within error range
-      while (globalPose.angle > targetAngle + degToRad(angleError))
+      while (globalPose.angle > targetAngle + degToRad(stopPowerDiff))
       {
         delay(10);
       }
@@ -84,7 +84,89 @@ void turnToAngleNew(double targetAngle, TurnDir turnDir, double fullPowerRatio, 
       break;
   }
   // Log
-  printf("TA: %3.3f   X: %3.3f   Y: %3.3f   A: %3.3f\n", radToDeg(targetAngle), globalPose.x, globalPose.y, radToDeg(globalPose.angle));
+  printf("TA: %3.3f   X: %3.3f   Y:%3.3f   A: %3.3f", radToDeg(targetAngle), globalPose.x, globalPose.y, radToDeg(globalPose.angle));
+}
+void turnToTargetNew(double targetX, double targetY, TurnDir turnDir, double fullPowerRatio, int coastPower, double stopPowerDiff, double angleOffset, bool harshStop)
+{
+  // Calculate correct turn direction if not given
+  if (turnDir == TURN_CH)
+  {
+    if (fmod(atan2(targetX - globalPose.x, targetY - globalPose.y) + angleOffset - globalPose.angle, M_PI * 2) > M_PI)
+      turnDir = TURN_CCW;
+    else
+      turnDir = TURN_CW;
+  }
+
+  // Variable to store the angle to stop turning at full power
+  double endFullPower, targetAngle;
+
+  // Switch between the turn directions
+  switch (turnDir)
+  {
+    case TURN_CW:
+      // Calculate targetAngle to be nearest equivalent angle greater than the current robot orientation
+      targetAngle = globalPose.angle + fmod(atan2(targetX - globalPose.x, targetY - globalPose.y) + angleOffset - globalPose.angle, M_PI * 2);
+      // Calculate angle to stop going at full power
+      endFullPower = globalPose.angle * (1 - fullPowerRatio) + targetAngle * fullPowerRatio;
+      // Set motors to full power
+      powerMotors(127, -127);
+
+      // Wait until past endFullPower
+      while (globalPose.angle < endFullPower)
+      {
+        delay(10);
+      }
+      // Now set to coastPower
+      powerMotors(coastPower, -coastPower);
+
+      // Wait until within error range
+      while (globalPose.angle < nearestEquivalentAngle(atan2(targetX - globalPose.x, targetY - globalPose.y) + angleOffset, targetAngle) - degToRad(stopPowerDiff))
+      {
+        delay(10);
+      }
+
+      // Now stop the robot according to parameters
+      if (harshStop)
+      {
+        powerMotors(-20, 20);
+        delay(150);
+      }
+      stopMotors();
+
+      break;
+    case TURN_CCW:
+      // Calculate targetAngle to be nearest equivalent angle less than the current robot orientation
+      targetAngle = globalPose.angle - fmod(globalPose.angle - atan2(targetX - globalPose.x, targetY - globalPose.y) - angleOffset, M_PI * 2);
+      // Calculate angle to stop going at full power
+      endFullPower = globalPose.angle * (1 - fullPowerRatio) + targetAngle * fullPowerRatio;
+      // Set motors to full power
+      powerMotors(-127, 127);
+
+      // Wait until past endFullPower
+      while (globalPose.angle > endFullPower)
+      {
+        delay(10);
+      }
+      // Now set to coastPower
+      powerMotors(-coastPower, coastPower);
+
+      // Wait until within error range
+      while (globalPose.angle > nearestEquivalentAngle(atan2(targetX - globalPose.x, targetY - globalPose.y) + angleOffset, targetAngle) + degToRad(stopPowerDiff))
+      {
+        delay(10);
+      }
+
+      // Now stop the robot according to parameters
+      if (harshStop)
+      {
+        powerMotors(20, -20);
+        delay(150);
+      }
+      stopMotors();
+      break;
+  }
+  // Log
+  printf("TXF: %3.3f   TYF: %3.3f   TA: %3.3f   X: %3.3f   Y:%3.3f   A: %3.3f", targetX, targetY, radToDeg(targetAngle), globalPose.x, globalPose.y, radToDeg(globalPose.angle));
 }
 void applyHarshStop()
 {

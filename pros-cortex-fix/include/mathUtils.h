@@ -59,7 +59,7 @@ double getLengthOfLine(Line line);
  *
  * @return the target orientation + 2 x pi x k added
  */
- double nearestEquivalentAngle(double source, double target);
+double nearestEquivalentAngle(double angle, double reference);
 /**
  * Gives back the equivalent angle in the range -PI to PI
  *

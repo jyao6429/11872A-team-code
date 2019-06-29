@@ -48,9 +48,9 @@ double getLengthOfLine(Line line)
 {
   return sqrt(pow(line.p2.x - line.p1.x, 2) + pow(line.p2.y - line.p1.y, 2));
 }
-double nearestEquivalentAngle(double source, double target)
+double nearestEquivalentAngle(double angle, double reference)
 {
-  return round((source - target) / (2 * M_PI)) * 2 * M_PI + target;
+  return round((reference - angle) / (2 * M_PI)) * 2 * M_PI + angle;
 }
 double normalizeAngle(double angle)
 {
