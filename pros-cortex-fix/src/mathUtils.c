@@ -80,8 +80,15 @@ void cartToPolar(Cart cartVector, Polar *polarVector)
 }
 void polarToCart(Polar polarVector, Cart *cartVector)
 {
-  // Calculate x component with cosine
-  cartVector->x = polarVector.magnitude * cos(polarVector.angle);
-  // Calculate y component with sine
-  cartVector->y = polarVector.magnitude * sin(polarVector.angle);
+  if (polarVector.magnitude != 0.0)
+  {
+    // Calculate x component with cosine
+    cartVector->x = polarVector.magnitude * cos(polarVector.angle);
+    // Calculate y component with sine
+    cartVector->y = polarVector.magnitude * sin(polarVector.angle);
+  }
+  else
+  {
+    cartVector->x = cartVector->y = 0.0;
+  }
 }

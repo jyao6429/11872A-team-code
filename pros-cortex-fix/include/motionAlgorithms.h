@@ -29,6 +29,19 @@ typedef enum MTTMode
 Cart lastTarget;
 
 /**
+ * Turns to face a specific point with an offset if desired
+ *
+ * @param targetX - the x component of the target point
+ * @param targetY - the y component of the target point
+ * @param targetAngle - the angle to sweep to
+ * @param targetRadius - (e.g. 10 - 20) the radius of the circle to follow in inches
+ * @param turnDir - the direction to turn based on TurnDir enum (TURN_CH = chooses automatically)
+ * @param power - (-127 - 127) the power to take the turn, negatives means the robot travels backwards
+ * @param slowPark - if the sweeps should be slower, but more accurate
+ * @param isDegrees - if the targetAngle is given in degrees
+ */
+void sweepTurnToTarget(double targetX, double targetY, double targetAngle, double targetRadius, TurnDir turnDir, int power, bool slowPark, bool isDegrees);
+/**
  * Turns to a specified orientation
  *
  * @param targetAngle - the angle to turn to

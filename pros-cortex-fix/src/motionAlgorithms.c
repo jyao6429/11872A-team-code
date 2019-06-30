@@ -1,5 +1,202 @@
 #include "main.h"
 
+void sweepTurnToTarget(double targetX, double targetY, double targetAngle, double targetRadius, TurnDir turnDir, int power, bool slowPark, bool isDegrees)
+{
+  // Convert targetAngle to radians if needed
+  if (isDegrees)
+    targetAngle = degToRad(targetAngle);
+
+  // Vectors for position calculations
+  Cart cartVector;
+  Polar polarVector;
+
+  // Calculate correct turn direction if not given
+  if (turnDir == TURN_CH)
+  {
+    cartVector.x = globalPose.x - targetX;
+    cartVector.y = globalPose.y - targetY;
+    cartToPolar(cartVector, &polarVector);
+    polarVector.angle += targetAngle;
+    polarToCart(polarVector, &cartVector);
+    turnDir = cartVector.x > 0 ? TURN_CW : TURN_CCW;
+  }
+
+  // The x and y coordinates of the center of the circle the robot is going to follow
+  double xOrigin, yOrigin;
+  // The velocities of the robot
+  double linearV, angularV, prevAngluarV = 0.0;
+  // The relative radius and angle to the center of the circle
+  double localRadius, localAngle;
+
+  // Constant gains (probably need to tune these)
+
+  // localRadius vs targetRadius
+  const double kR = 15.0;
+  // localAngle vs robot angle
+	const double kA = 5.0;
+  // base angularV to power
+	const double kB = 60.0;
+  // proportional angularV
+	const double kP = 30.0;
+  // derivative angularV
+	const double kD = 2000.0;
+
+  // Cycle variables
+  unsigned long cycleTime = millis();
+  const int dT = 40;
+
+  // Switch between turning clockwise or counterclockwise
+  switch (turnDir)
+  {
+    case TURN_CW:
+      // Calculate the coordinates of the center of the circle
+      cartVector.y = 0;
+      cartVector.x = targetRadius;
+      cartToPolar(cartVector, &polarVector);
+      polarVector.angle -= targetAngle;
+      polarToCart(polarVector, &cartVector);
+      yOrigin = targetY + cartVector.y;
+      xOrigin = targetX + cartVector.x;
+
+      // Calculate the angle to the circle
+      localAngle = atan2(globalPose.x - xOrigin, globalPose.y - yOrigin);
+
+      // Find nearestEquivalentAngle of targetAngle, rotating by 180 degrees if going backwards
+      targetAngle = nearestEquivalentAngle(targetAngle, power > 0 ? globalPose.angle : (globalPose.angle + M_PI));
+
+      // Make the move, keeping track of cycle
+      cycleTime = millis();
+      do
+      {
+        // Get the global orientation of the robot
+        double globalAngle = globalPose.angle;
+        if (power < 0)
+          globalAngle += M_PI;
+
+        // Relative distance to origin
+        double deltaY = globalPose.y - yOrigin;
+        double deltaX = globalPose.x - xOrigin;
+
+        // Do local calculations again
+        localRadius = sqrt(pow(deltaX, 2) + pow(deltaY, 2));
+        localAngle = nearestEquivalentAngle(atan2(deltaX, deltaY), localAngle);
+
+        // Get and calculate velocities of the robot
+        angularV = globalVel.angle;
+        linearV = globalVel.x * sin(localAngle + M_PI / 2) + globalVel.y * cos(localAngle + M_PI / 2);
+
+        // Calculate target angular velocity of the robot, based on the various errors
+                          // The angular velocity needed to hold the curve based on the tangential velocity, with a minimum of 15 in/s
+        double targetOmega = fmax(linearV, 15) / localRadius
+                          // The natural log of the percent error of the current radius verses the target radius
+                           + kR * log(localRadius / targetRadius)
+                          // The error of the angle the robot is facing verses the required angle to complete the turn
+                           + kA * (nearestEquivalentAngle(localAngle + M_PI / 2, globalAngle) - globalAngle);
+
+        // Calculate the differential power to follow the curve
+                               // The expected power needed for this target
+        int turnPowerDiff = round(kB * targetOmega
+                               // The PD controller for angularV
+                                + kP * (targetOmega - angularV) + kD * (prevAngluarV - angularV) / (double) dT);
+
+        // Update previous angularV
+        prevAngluarV = angularV;
+
+        // Clamp the difference from 0 - 150
+        if (turnPowerDiff < 0)
+          turnPowerDiff = 0;
+        else if (turnPowerDiff > 150)
+          turnPowerDiff = 150;
+
+        // Depends on if driving forward or backwards, power the motors
+        if (power > 0)
+          powerMotors(power, power - turnPowerDiff);
+        else
+          powerMotors(power + turnPowerDiff, power);
+
+        // Make sure loops with correct cycle
+        taskDelayUntil(&cycleTime, dT);
+
+        // Loop while angle error is greater than the target margin
+      } while ((power > 0 ? globalPose.angle : (globalPose.angle + M_PI)) - targetAngle < (slowPark ? -0.1 : -0.15));
+      break;
+    case TURN_CCW:
+      // Calculate the coordinates of the center of the circle
+      cartVector.y = 0;
+      cartVector.x = targetRadius;
+      cartToPolar(cartVector, &polarVector);
+      polarVector.angle += targetAngle;
+      polarToCart(polarVector, &cartVector);
+      yOrigin = targetY + cartVector.y;
+      xOrigin = targetX + cartVector.x;
+
+      // Calculate the angle to the circle
+      localAngle = atan2(globalPose.x - xOrigin, globalPose.y - yOrigin);
+
+      // Find nearestEquivalentAngle of targetAngle, rotating by 180 degrees if going backwards
+      targetAngle = nearestEquivalentAngle(targetAngle, power > 0 ? globalPose.angle : (globalPose.angle + M_PI));
+
+      // Make the move, keeping track of cycle
+      cycleTime = millis();
+      do
+      {
+        // Get the global orientation of the robot
+        double globalAngle = globalPose.angle;
+        if (power < 0)
+          globalAngle += M_PI;
+
+        // Relative distance to origin
+        double deltaY = globalPose.y - yOrigin;
+        double deltaX = globalPose.x - xOrigin;
+
+        // Do local calculations again
+        localRadius = sqrt(pow(deltaX, 2) + pow(deltaY, 2));
+        localAngle = nearestEquivalentAngle(atan2(deltaX, deltaY), localAngle);
+
+        // Get and calculate velocities of the robot
+        angularV = globalVel.angle;
+        linearV = globalVel.x * sin(localAngle - M_PI / 2) + globalVel.y * cos(localAngle - M_PI / 2);
+
+        // Calculate target angular velocity of the robot, based on the various errors
+                          // The angular velocity needed to hold the curve based on the tangential velocity, with a minimum of 15 in/s
+        double targetOmega = -fmax(linearV, 15) / localRadius
+                          // The natural log of the percent error of the current radius verses the target radius
+                           + kR * log(targetRadius / localRadius)
+                          // The error of the angle the robot is facing verses the required angle to complete the turn
+                           + kA * (nearestEquivalentAngle(localAngle - M_PI / 2, globalAngle) - globalAngle);
+
+        // Calculate the differential power to follow the curve
+                               // The expected power needed for this target
+        int turnPowerDiff = round(kB * targetOmega
+                               // The PD controller for angularV
+                                + kP * (targetOmega - angularV) + kD * (prevAngluarV - angularV) / (double) dT);
+
+        // Update previous angularV
+        prevAngluarV = angularV;
+
+        // Clamp the difference from 0 - -150
+        if (turnPowerDiff > 0)
+          turnPowerDiff = 0;
+        else if (turnPowerDiff < -150)
+          turnPowerDiff = -150;
+
+        // Depends on if driving forward or backwards, power the motors
+        if (power > 0)
+          powerMotors(power + turnPowerDiff, power);
+        else
+          powerMotors(power, power - turnPowerDiff);
+
+        // Make sure loops with correct cycle
+        taskDelayUntil(&cycleTime, dT);
+
+        // Loop while angle error is greater than the target margin
+      } while ((power > 0 ? globalPose.angle : (globalPose.angle + M_PI)) - targetAngle > (slowPark ? 0.1 : 0.15));
+      break;
+  }
+  stopMotors();
+  // Log
+  printf("(sweepTurnToTarget)   TX: %3.3f   TY: %3.3f   TA: %3.3f   X: %3.3f   Y: %3.3f   A: %3.3f\n", targetX, targetY, targetAngle, globalPose.x, globalPose.y, radToDeg(globalPose.angle));
+}
 void turnToAngleNew(double targetAngle, TurnDir turnDir, double fullPowerRatio, int coastPower, double stopPowerDiff, bool harshStop, bool isDegrees)
 {
   // Convert to radians if needed
@@ -50,7 +247,6 @@ void turnToAngleNew(double targetAngle, TurnDir turnDir, double fullPowerRatio, 
         delay(150);
       }
       stopMotors();
-
       break;
     case TURN_CCW:
       // Convert targetAngle to be nearest equivalent less than the current robot orientation
@@ -84,7 +280,7 @@ void turnToAngleNew(double targetAngle, TurnDir turnDir, double fullPowerRatio, 
       break;
   }
   // Log
-  printf("TA: %3.3f   X: %3.3f   Y:%3.3f   A: %3.3f", radToDeg(targetAngle), globalPose.x, globalPose.y, radToDeg(globalPose.angle));
+  printf("(turnToAngleNew)   TA: %3.3f   X: %3.3f   Y:%3.3f   A: %3.3f", radToDeg(targetAngle), globalPose.x, globalPose.y, radToDeg(globalPose.angle));
 }
 void turnToTargetNew(double targetX, double targetY, TurnDir turnDir, double fullPowerRatio, int coastPower, double stopPowerDiff, double angleOffset, bool harshStop)
 {
@@ -132,7 +328,6 @@ void turnToTargetNew(double targetX, double targetY, TurnDir turnDir, double ful
         delay(150);
       }
       stopMotors();
-
       break;
     case TURN_CCW:
       // Calculate targetAngle to be nearest equivalent angle less than the current robot orientation
@@ -166,7 +361,7 @@ void turnToTargetNew(double targetX, double targetY, TurnDir turnDir, double ful
       break;
   }
   // Log
-  printf("TXF: %3.3f   TYF: %3.3f   TA: %3.3f   X: %3.3f   Y:%3.3f   A: %3.3f", targetX, targetY, radToDeg(targetAngle), globalPose.x, globalPose.y, radToDeg(globalPose.angle));
+  printf("(turnToTargetNew)   TXF: %3.3f   TYF: %3.3f   TA: %3.3f   X: %3.3f   Y:%3.3f   A: %3.3f", targetX, targetY, radToDeg(targetAngle), globalPose.x, globalPose.y, radToDeg(globalPose.angle));
 }
 void applyHarshStop()
 {
