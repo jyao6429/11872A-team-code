@@ -69,13 +69,16 @@ void testNew(void *ignore)
 {
 	resetPositionFull(&globalPose, 0.0, 0.0, 0.0, true);
 
-	turnToAngleNew(-360.0, TURN_CCW, 0.7, 40, 12, true, true);
-	
-	while (true)
+	//turnToAngleNew(-360.0, TURN_CCW, 0.7, 40, 12, true, true);
+
+	sweepTurnToTarget(-36.0, 36.0, -90.0, 36, TURN_CCW, 127, true, true);
+
+	while (false)
 	{
 		printf("X: %3.3f   Y: %3.3f   A: %3.3f\n", globalPose.x, globalPose.y, radToDeg(globalPose.angle));
 		delay(50);
 	}
+	printf("Done Testing\n");
 }
 void operatorControl()
 {
@@ -92,6 +95,7 @@ void operatorControl()
 		{
 			taskDelete(test);
 			stopMotors();
+			printf("Stopped Testing\n");
 			delay(500);
 		}
 

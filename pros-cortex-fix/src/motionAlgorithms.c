@@ -35,15 +35,15 @@ void sweepTurnToTarget(double targetX, double targetY, double targetAngle, doubl
   // localAngle vs robot angle
 	const double kA = 5.0;
   // base angularV to power
-	const double kB = 60.0;
+	const double kB = 95.0;
   // proportional angularV
-	const double kP = 30.0;
+	const double kP = 50.0;
   // derivative angularV
-	const double kD = 2000.0;
+	const double kD = 000.0;
 
   // Cycle variables
   unsigned long cycleTime = millis();
-  const int dT = 40;
+  const int dT = 20;
 
   // Switch between turning clockwise or counterclockwise
   switch (turnDir)
@@ -110,9 +110,12 @@ void sweepTurnToTarget(double targetX, double targetY, double targetAngle, doubl
 
         // Depends on if driving forward or backwards, power the motors
         if (power > 0)
-          powerMotors(power, power - turnPowerDiff);
+          powerMotorsLinear(power, power - turnPowerDiff);
         else
-          powerMotors(power + turnPowerDiff, power);
+          powerMotorsLinear(power + turnPowerDiff, power);
+
+        // Debug
+        printf("CAV: %3.3f   CLV: %3.3f   TAV: %3.3f   TPD: %d   LR: %3.3f   LA: %3.3f   TR: %3.3f   GA: %3.3f   TA: %3.3f\n", radToDeg(angularV), linearV, radToDeg(targetOmega), turnPowerDiff, localRadius, radToDeg(localAngle), targetRadius, radToDeg(globalAngle), radToDeg(targetAngle));
 
         // Make sure loops with correct cycle
         taskDelayUntil(&cycleTime, dT);
@@ -182,9 +185,12 @@ void sweepTurnToTarget(double targetX, double targetY, double targetAngle, doubl
 
         // Depends on if driving forward or backwards, power the motors
         if (power > 0)
-          powerMotors(power + turnPowerDiff, power);
+          powerMotorsLinear(power + turnPowerDiff, power);
         else
-          powerMotors(power, power - turnPowerDiff);
+          powerMotorsLinear(power, power - turnPowerDiff);
+
+        // Debug
+        printf("CAV: %3.3f   CLV: %3.3f   TAV: %3.3f   TPD: %d   LR: %3.3f   LA: %3.3f   TR: %3.3f   GA: %3.3f   TA: %3.3f\n", radToDeg(angularV), linearV, radToDeg(targetOmega), turnPowerDiff, localRadius, radToDeg(localAngle - M_PI / 2), targetRadius, radToDeg(globalAngle), radToDeg(targetAngle));
 
         // Make sure loops with correct cycle
         taskDelayUntil(&cycleTime, dT);
@@ -195,7 +201,7 @@ void sweepTurnToTarget(double targetX, double targetY, double targetAngle, doubl
   }
   stopMotors();
   // Log
-  printf("(sweepTurnToTarget)   TX: %3.3f   TY: %3.3f   TA: %3.3f   X: %3.3f   Y: %3.3f   A: %3.3f\n", targetX, targetY, targetAngle, globalPose.x, globalPose.y, radToDeg(globalPose.angle));
+  printf("(sweepTurnToTarget)   TX: %3.3f   TY: %3.3f   TA: %3.3f   X: %3.3f   Y: %3.3f   A: %3.3f\n", targetX, targetY, radToDeg(targetAngle), globalPose.x, globalPose.y, radToDeg(globalPose.angle));
 }
 void turnToAngleNew(double targetAngle, TurnDir turnDir, double fullPowerRatio, int coastPower, double stopPowerDiff, bool harshStop, bool isDegrees)
 {

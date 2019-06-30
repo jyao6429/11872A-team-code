@@ -10,6 +10,7 @@
  * @param rightPower - the power  for the right wheels
  */
 void powerMotors(int leftPower, int rightPower);
+void powerMotorsLinear(int leftPower, int rightPower);
 /**
  * Stops all the drive motors
  */
