@@ -49,7 +49,7 @@ void resetPositionFull(Pose *position, double startX, double startY, double star
 //print("Set new data\n");
 
   // Create new task to track position
-  APSTask = taskCreate(trackPoseTask, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT + 2);
+  APSTask = taskCreate(trackPoseTask, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT + 1);
 
 //print("Task created\n");
 }

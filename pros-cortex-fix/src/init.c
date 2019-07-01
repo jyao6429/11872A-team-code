@@ -38,6 +38,12 @@ void initializeIO()
  */
 void initialize()
 {
+  // initialize JINX
+  initJINX(stdout);
+  delay(100);
+  taskCreate(JINXRun, TASK_DEFAULT_STACK_SIZE, NULL, (TASK_PRIORITY_DEFAULT + 3));
+  delay(100);
+
   // Create mutexes
   mutexes[MUTEX_POSE] = mutexCreate();
   mutexes[MUTEX_VELOCITY] = mutexCreate();

@@ -28,6 +28,8 @@
 #include <API.h>
 
 // User includes
+#include "JINX.h"
+#include "debug.h"
 #include "mathUtils.h"
 #include "aps.h"
 #include "motionAlgorithms.h"

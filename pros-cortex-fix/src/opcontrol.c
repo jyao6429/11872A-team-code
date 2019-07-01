@@ -88,7 +88,7 @@ void operatorControl()
 	{
 		if (digitalRead(PORT_startTestButton) == LOW)
 		{
-			test = taskCreate(testNew, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT + 3);
+			test = taskCreate(testNew, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT + 2);
 			delay(500);
 		}
 		if (digitalRead(PORT_stopTestButton) == LOW)
