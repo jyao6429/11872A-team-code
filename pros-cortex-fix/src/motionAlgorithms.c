@@ -35,11 +35,11 @@ void sweepTurnToTarget(double targetX, double targetY, double targetAngle, doubl
   // localAngle vs robot angle
 	const double kA = 5.0;
   // base angularV to power
-	const double kB = 95.0;
+	const double kB = 70.0;
   // proportional angularV
-	const double kP = 50.0;
+	const double kP = 40.0;
   // derivative angularV
-	const double kD = 2000.0;
+	const double kD = 000.0;
 
   // Cycle variables
   unsigned long cycleTime = millis();
@@ -162,7 +162,7 @@ void sweepTurnToTarget(double targetX, double targetY, double targetAngle, doubl
 
         // Calculate target angular velocity of the robot, based on the various errors
                           // The angular velocity needed to hold the curve based on the tangential velocity, with a minimum of 15 in/s
-        double targetOmega = -fmax(linearV, 7) / localRadius
+        double targetOmega = -fmax(linearV, 10) / localRadius
                           // The natural log of the percent error of the current radius verses the target radius
                            + kR * log(targetRadius / localRadius)
                           // The error of the angle the robot is facing verses the required angle to complete the turn
@@ -200,6 +200,7 @@ void sweepTurnToTarget(double targetX, double targetY, double targetAngle, doubl
         logDataInt("turnPowerDiff", turnPowerDiff);
         logDataDouble("linearV", linearV);
         logDataDouble("angularV", radToDeg(angularV));
+        logDataDouble("angularVkB", angularV * kB);
 
         // Make sure loops with correct cycle
         taskDelayUntil(&cycleTime, dT);

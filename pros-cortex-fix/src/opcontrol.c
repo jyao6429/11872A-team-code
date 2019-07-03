@@ -65,6 +65,34 @@ void testChassis(void *ignore)
 	printf("Done Testing\n");
 	stopMotors();
 }
+void gatherVelocityData(void *ignore)
+{
+	resetPositionFull(&globalPose, 0.0, 0.0, 0.0, true);
+
+	int powerDiff = -150;
+	unsigned long timer = millis();
+
+	while (powerDiff <= 0)
+	{
+		powerMotorsLinear(127 + powerDiff, 127);
+
+		double angularV = globalVel.angle;
+
+		// Debug
+		logDataInt("powerDiff", powerDiff);
+		logDataDouble("angularV80", angularV * 80);
+		logDataDouble("angularV70", angularV * 70);
+		logDataDouble("angularVDeg", radToDeg(angularV));
+
+		if (millis() - timer > 500)
+		{
+			powerDiff += 15;
+			timer = millis();
+		}
+		delay(40);
+	}
+	stopMotors();
+}
 void testNew(void *ignore)
 {
 	resetPositionFull(&globalPose, 0.0, 0.0, 0.0, true);
