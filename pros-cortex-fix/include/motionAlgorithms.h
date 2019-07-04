@@ -60,8 +60,9 @@ void moveToTargetSimple(double targetX, double targetY, double startX, double st
  * @param dropEarly - (0 - 15) the distance from the target when to start breaking if needed, this also affects the deceleration point
  * @param stopType - the StopType to use to park
  * @param mode - the MTTMode to use to travel the line
+ * @param isDegrees - if the angle is given in degrees
  */
-void moveToTargetDisSimple(double angle, double distance, double startX, double startY, int power, int startPower, double maxErrorX, double decelEarly, int decelPower, double dropEarly, StopType stopType, MTTMode mode);
+void moveToTargetDisSimple(double angle, double distance, double startX, double startY, int power, int startPower, double maxErrorX, double decelEarly, int decelPower, double dropEarly, StopType stopType, MTTMode mode, bool isDegrees);
 /**
  * Turns to face a specific point with an offset if desired
  *

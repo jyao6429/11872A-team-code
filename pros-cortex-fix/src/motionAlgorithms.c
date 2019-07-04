@@ -187,8 +187,12 @@ void moveToTargetSimple(double targetX, double targetY, double startX, double st
   // log
   printf("TX: %3.3f   TY: %3.3f   SX: %3.3f   SY: %3.3f   X: %3.3f   Y: %3.3f\n", targetX, targetY, startX, startY, globalPose.x, globalPose.y);
 }
-void moveToTargetDisSimple(double angle, double distance, double startX, double startY, int power, int startPower, double maxErrorX, double decelEarly, int decelPower, double dropEarly, StopType stopType, MTTMode mode)
+void moveToTargetDisSimple(double angle, double distance, double startX, double startY, int power, int startPower, double maxErrorX, double decelEarly, int decelPower, double dropEarly, StopType stopType, MTTMode mode, bool isDegrees)
 {
+  // Convert angle to radians if needed
+  if (isDegrees)
+    angle = degToRad(angle);
+
   moveToTargetSimple(startX + distance * sin(angle), startY + distance * cos(angle), startX, startY, power, startPower, maxErrorX, decelEarly, decelPower, dropEarly, stopType, mode);
 }
 void sweepTurnToTarget(double targetX, double targetY, double targetAngle, double targetRadius, TurnDir turnDir, int power, bool slowPark, bool isDegrees)
