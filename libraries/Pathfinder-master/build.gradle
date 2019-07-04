@@ -1,0 +1,149 @@
+plugins {
+    id 'edu.wpi.first.Toolchain' version '2019.1.1-beta-3-pre4' apply false
+}
+
+import edu.wpi.first.toolchain.NativePlatforms
+
+allprojects {
+    apply plugin: 'idea'
+    apply plugin: 'maven-publish'
+
+    group = 'jaci.pathfinder'
+    version = '2019.3.06-UNSTABLE'
+
+    publishing {
+        repositories {
+            maven {
+                name = "distLocal"
+                url = "${rootProject.buildDir}/mvnDistRepo"
+            }
+            publications.all {
+                groupId project.group
+            }
+        }
+    }
+}
+
+subprojects {
+    plugins.withType(CPlugin).whenPluginAdded {
+        project.apply plugin: 'visual-studio'
+        project.apply plugin: 'edu.wpi.first.Toolchain'
+
+        toolchainsPlugin.withRaspbian()
+        toolchainsPlugin.withRoboRIO()
+
+        toolchainsPlugin.getByName('roboRio').optional = true
+
+        ext.is64 = NativePlatforms.desktopArch() == "x86-64"
+        ext.desktop32Classifier = NativePlatforms.desktopOS() + "x86"
+
+        project.model {
+            buildTypes {
+                release
+                debug
+            }
+
+            platforms {
+                // If we're on x86 64-bit, also compile for x86 32-bit
+                if (is64) {
+                    "${desktop32Classifier}" {
+                        architecture 'x86'
+                    }
+                }
+            }
+
+            components {
+                withType(TargetedNativeComponent) {
+                    targetPlatform NativePlatforms.desktop
+                    targetPlatform NativePlatforms.raspbian
+                    targetPlatform NativePlatforms.roborio
+
+                    if (is64)
+                        targetPlatform ext.desktop32Classifier
+                }
+            }
+        }
+    }
+
+    plugins.withType(CppPlugin).whenPluginAdded {
+        project.apply plugin: 'visual-studio'
+        project.apply plugin: 'edu.wpi.first.Toolchain'
+
+        toolchainsPlugin.withRaspbian()
+        toolchainsPlugin.withRoboRIO()
+
+        toolchainsPlugin.getByName('roboRio').optional = true
+
+        project.model {
+            components {
+                withType(TargetedNativeComponent) {
+                    targetPlatform NativePlatforms.desktop
+                    targetPlatform NativePlatforms.raspbian
+                    targetPlatform NativePlatforms.roborio
+                }
+            }
+        }
+    }
+
+    ext.binaryPublishers = [:]
+    ext.binaryArtifacts = { scope, name, jar ->
+        if (binaryPublishers[name] == null)
+            binaryPublishers[name] = []
+        binaryPublishers[name] << [scope: scope, jar: jar]
+    }
+
+    project.model {
+        binaries {
+            withType(NativeBinarySpec) {
+                def bin = it
+                if (it.buildable && !(it instanceof StaticLibraryBinary)) {
+                    def shared = bin instanceof SharedLibraryBinary
+                    def taskSuffix = "${component.name}${targetPlatform.name}${buildType.name}"
+                    def source = (shared ? bin.sharedLibraryFile : bin.executable.file)
+
+                    def ziptask = task "zip${taskSuffix}"(type: Zip) {
+                        def allsrc = [source]
+                        if (shared && bin.targetPlatform.operatingSystem.isWindows()) {
+                            allsrc << bin.sharedLibraryLinkFile
+                        }
+                        from(allsrc as Set<File>)
+                        into(targetPlatform.name)
+
+                        baseName = component.name
+                        classifier = targetPlatform.name
+
+                        dependsOn bin.tasks.withType(AbstractLinkTask)
+                    }
+
+                    def jartask = task "jar${taskSuffix}"(type: Jar) {
+                        from(source)
+                        into(targetPlatform.name)
+
+                        baseName = component.name
+                        classifier = targetPlatform.name
+
+                        dependsOn bin.tasks.withType(AbstractLinkTask)
+                    }
+
+                    if (binaryPublishers[bin.component.name] != null) {
+                        binaryPublishers[bin.component.name].each { entry ->
+                            entry.scope.artifact(entry.jar ? jartask : ziptask) {
+                                classifier targetPlatform.name + (buildType.name == 'debug' ? 'debug' : '')
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+apply from: 'vendordeps.gradle'
+
+task cleanMaven(type: Delete) {
+    delete "$buildDir/mvnDistRepo"
+}
+
+wrapper {
+    gradleVersion = '5.0'
+}
