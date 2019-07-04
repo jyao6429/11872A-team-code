@@ -49,8 +49,30 @@ double distanceToPoint(double sourceX, double sourceY, double targetX, double ta
  * @return the angle to face target point from source point in the range [-PI, PI]
  */
 double angleToFacePoint(double sourceX, double sourceY, double targetX, double targetY);
-
+/**
+ * Modifies given coordinates to the nearest point to those coordinates on a given line
+ *
+ * @param *x - the pointer to the x coordinate
+ * @param *y - the pointer to the y coordiante
+ * @param m - the slope of the line
+ * @param b - the y intercept of the line
+ */
+void nearestPointOnLine(double *x, double *y, double m, double b);
+/**
+ * Calculate the angle of the line with respect to the y axis
+ *
+ * @param line - the Line struct to calculate the angle to
+ *
+ * @return the angle of the line in the range [-PI, PI]
+ */
 double getAngleOfLine(Line line);
+/**
+ * Calculate the length of the line defined by two points
+ *
+ * @param line - the Line struct to calculate the distance to
+ *
+ * @return the disntance in inches of the line
+ */
 double getLengthOfLine(Line line);
 /**
  * Calculates nearest equivalent angle in radians
@@ -83,20 +105,20 @@ double degToRad(double degrees);
  *
  * @return the converted angle in degrees
  */
- double radToDeg(double radians);
- /**
-  * Converts cartesian coordinates into polar
-  *
-  * @param cartVector - the cartesian vector to convert from
-  * @param *polarVector - the polar vector to convert to
-  */
+double radToDeg(double radians);
+/**
+ * Converts cartesian coordinates into polar
+ *
+ * @param cartVector - the cartesian vector to convert from
+ * @param *polarVector - the polar vector to convert to
+ */
 void cartToPolar(Cart cartVector, Polar *polarVector);
- /**
-  * Converts polar coordinates into cartesian
-  *
-  * @param polarVector - the polar vector to convert from
-  * @param *cartVector - the cartesian vector to convert to
-  */
+/**
+ * Converts polar coordinates into cartesian
+ *
+ * @param polarVector - the polar vector to convert from
+ * @param *cartVector - the cartesian vector to convert to
+ */
 void polarToCart(Polar polarVector, Cart *cartVector);
 
 

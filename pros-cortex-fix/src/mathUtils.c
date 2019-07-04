@@ -39,6 +39,11 @@ double angleToFacePoint(double sourceX, double sourceY, double targetX, double t
   return -atan2(targetY - sourceY, targetX - sourceX) + M_PI / 2;
 }
 
+void nearestPointOnLine(double *x, double *y, double m, double b)
+{
+  *x = (*y + *x / m - b) / (m + 1 / m);
+  *y = m * *x + b;
+}
 double getAngleOfLine(Line line)
 {
   // Note, since angle is calculated from y axis, x and y are flipped
