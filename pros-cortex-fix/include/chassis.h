@@ -10,7 +10,31 @@
  * @param rightPower - the power  for the right wheels
  */
 void powerMotors(int leftPower, int rightPower);
+/**
+ * Powers the motors on the chassis using TrueSpeed
+ *
+ * @param leftPower - the power for the left wheels
+ * @param rightPower - the power  for the right wheels
+ */
+void powerMotorsLinear(int leftPower, int rightPower);
+/**
+ * Stops all the drive motors
+ */
+void stopMotors();
 
+void driveAndParkToPose(double targetX, double targetY, double targetAngle, int maxSpeed, bool isAccurate, bool isDegrees);
+void driveAlongLineToPose(double targetX, double targetY, double targetAngle, int maxSpeed, bool isAccurate, bool isDegrees);
+/**
+ * Drives to a pose
+ *
+ * @param targetX - the x component of the target point
+ * @param targetY - the y component of the target point
+ * @param targetAngle - the target orientation
+ * @param maxSpeed - the maximum speed to take
+ * @param isAccurate - if the drive needs to be accurate
+ * @param isDegrees - if targetAngle is given in degrees
+ */
+void driveToPose(double targetX, double targetY, double targetAngle, int maxSpeed, bool isAccurate, bool isDegrees);
 /**
  * Drives in a straight line to a point, then turns to face the correct orientation
  *
@@ -18,9 +42,10 @@ void powerMotors(int leftPower, int rightPower);
  * @param targetY - the y component of the target point
  * @param targetAngle - the target orientation
  * @param maxSpeed - the maximum speed to take
+ * @param isAccurate - if the drive needs to be accurate
  * @param isDegrees - if targetAngle is given in degrees
  */
-void driveStraightToPose(double targetX, double targetY, double targetAngle, int maxSpeed, bool isDegrees);
+void driveStraightToPose(double targetX, double targetY, double targetAngle, int maxSpeed, bool isAccurate, bool isDegrees);
 /**
  * Drives in a straight line to a point
  *

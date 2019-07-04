@@ -31,12 +31,17 @@ extern Encoder backEncoder;
 // Potentiometer port
 extern const int PORT_liftPot;
 
+extern const int PORT_startTestButton;
+extern const int PORT_stopTestButton;
+
 // Enum for different mutexes
 enum MutexTypes
 {
-  MUTEX_POSE
+  MUTEX_POSE,
+  MUTEX_VELOCITY,
+  MUTEX_TARGET_VELOCITY
 };
 // Mutexes
-Mutex mutexes[1];
+Mutex mutexes[3];
 
 #endif

@@ -28,7 +28,12 @@
 #include <API.h>
 
 // User includes
+#include "JINX.h"
+#include "debug.h"
+#include "mathUtils.h"
 #include "aps.h"
+#include "motionAlgorithms.h"
+#include "velocityControl.h"
 #include "chassis.h"
 #include "global.h"
 #include "NERD_PID.h"

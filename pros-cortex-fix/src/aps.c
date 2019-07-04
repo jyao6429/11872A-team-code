@@ -1,23 +1,183 @@
 #include "main.h"
 
-// Physical parameters in inches
-const double sL = 4.568;                 // distance from center to left tracking wheel
-const double sR = 4.568;                 // distance from center to right tracking wheel
-const double sB = 4.5;                   // distance from center to back tracking wheel
-const double sideWheelDiameter = 2.75;   // diameter of side wheels
-const double backWheelDiameter = 2.75;   // diameter of back wheel
-// Encoder counts
-const int sideEncoderResolution = 360;   // side encoder ticks per 360 degrees of motion
-const int backEncoderResolution = 360;   // back encoder ticks per 360 degrees of motion
+// distance from center to left tracking wheel
+const double sL = 4.65;
+// distance from center to right tracking wheel
+const double sR = 4.65;
+// distance from center to back tracking wheel
+const double sB = 4.77;
+// diameter of side wheels
+const double sideWheelDiameter = 2.783;
+// diameter of back wheel
+const double backWheelDiameter = 2.783;
+// side encoder ticks per 360 degrees of motion
+const int sideEncoderResolution = 360;
+// back encoder ticks per 360 degrees of motion
+const int backEncoderResolution = 360;
 
-// Previous position and orientation
-double robotPose[3] = {0.0, 0.0, 0.0};
-double resetAngle = 0.0;
-// Previous encoder values
-int prevLeftEncoder = 0;
-int prevRightEncoder = 0;
-int prevBackEncoder = 0;
+void resetPositionFull(Pose *position, double startX, double startY, double startAngle, bool isDegrees)
+{
+  // Convert to radians if needed
+  if (isDegrees)
+    startAngle = degToRad(startAngle);
 
+  printf("(resetPositionFull) X: %3.3f   Y: %3.3f   A: %3.3f\n", startX, startY, radToDeg(startAngle));
+
+  // Stop task
+  unsigned int APSState = taskGetState(APSTask);
+  if (APSTask != NULL && (APSState == TASK_RUNNING || APSState == TASK_SLEEPING || APSState == TASK_SUSPENDED))
+    taskDelete(APSTask);
+
+//print("Deleted task if needed\n");
+
+  // Reset everything
+  resetPosition(position);
+
+  // Reset all the encoders
+  resetLeftEncoder();
+  resetRightEncoder();
+  resetBackEncoder();
+
+//print("Resetted everyting\n");
+
+  // Set the new positions
+  resetAngle = startAngle;
+  position->angle = startAngle;
+  position->x = startX;
+  position->y = startY;
+
+//print("Set new data\n");
+
+  // Create new task to track position
+  APSTask = taskCreate(trackPoseTask, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT + 1);
+
+//print("Task created\n");
+}
+void resetPosition(Pose *position)
+{
+  // Reset everything to 0
+  position->angle = position->x = position->y = 0.0;
+  position->prevLeft = position->prevRight = position->prevBack = 0;
+}
+void resetVelocity(Vel *velocity, Pose position)
+{
+  // Reset velocities to 0
+  velocity->angle = velocity->x = velocity->y = 0;
+
+  // Set position and time to current
+  velocity->prevPoseAngle = position.angle;
+  velocity->prevPoseX = position.x;
+  velocity->prevPoseY = position.y;
+
+  velocity->prevTime = millis();
+}
+void trackPosition(Pose *position, int currentLeft, int currentRight, int currentBack)
+{
+  // Calculate traveled distance in inches
+  double deltaLeftDistance = calculateTravelDistance(currentLeft - position->prevLeft, sideWheelDiameter, sideEncoderResolution);
+  double deltaRightDistance = calculateTravelDistance(currentRight - position->prevRight, sideWheelDiameter, sideEncoderResolution);
+  double deltaBackDistance = calculateTravelDistance(currentBack - position->prevBack, backWheelDiameter, backEncoderResolution);
+
+  // Update prev values;
+  position->prevLeft = currentLeft;
+  position->prevRight = currentRight;
+  position->prevBack = currentBack;
+
+  // Calculate total change since last reset
+  double totalLeftDistance = calculateTravelDistance(currentLeft, sideWheelDiameter, sideEncoderResolution);
+  double totalRightDistance = calculateTravelDistance(currentRight, sideWheelDiameter, sideEncoderResolution);
+
+  // Calculate new absolute orientation
+  double newAngle = resetAngle + (totalLeftDistance - totalRightDistance) / (sL + sR);
+
+  // Calculate change in angle
+  double deltaAngle = (deltaLeftDistance - deltaRightDistance) / (sL + sR);
+
+  // Calculate local offset vector
+  Cart localOffset;
+
+  // If drove straight
+  if (deltaAngle == 0.0)
+  {
+    localOffset.x = deltaBackDistance;
+    localOffset.y = deltaRightDistance;
+  }
+  else
+  {
+    localOffset.x = 2.0 * sin(deltaAngle / 2.0) * ((deltaBackDistance / deltaAngle) + sB);
+    localOffset.y = 2.0 * sin(deltaAngle / 2.0) * ((deltaRightDistance / deltaAngle) + sR);
+  }
+
+  // Calculate average angle
+  double avgAngle = newAngle - (deltaAngle / 2);
+
+  // Calculate cosine and sine of avgAngle
+  double cosAvg = cos(avgAngle);
+  double sinAvg = sin(avgAngle);
+
+  // Update the global position by incrementing by a shifted localOffset
+  position->x += localOffset.x * cosAvg + localOffset.y * sinAvg;
+  position->y += localOffset.x * -sinAvg + localOffset.y * cosAvg;
+  position->angle = newAngle;
+}
+void trackVelocity(Vel *velocity, Pose position)
+{
+  // Timer for velocity
+  unsigned long currentTime = millis();
+  long deltaTime = currentTime - velocity->prevTime;
+
+  // Only run every 40 ms, so have time to change position
+  if (deltaTime > 40)
+  {
+    // Get position info
+    double poseAngle = position.angle;
+    double poseX = position.x;
+    double poseY = position.y;
+
+    // Calculate velocities
+    velocity->angle = (poseAngle - velocity->prevPoseAngle) / ((double) deltaTime * 0.001);
+    velocity->x = (poseX - velocity->prevPoseX) / ((double) deltaTime * 0.001);
+    velocity->y = (poseY - velocity->prevPoseY) / ((double) deltaTime * 0.001);
+
+    // Update previous position and time info
+    velocity->prevPoseAngle = poseAngle;
+    velocity->prevPoseX = poseX;
+    velocity->prevPoseY = poseY;
+    velocity->prevTime = currentTime;
+  }
+}
+void trackPoseTask(void *ignore)
+{
+  while(true)
+  {
+    trackPosition(&globalPose, getLeftEncoder(), getRightEncoder(), getBackEncoder());
+    trackVelocity(&globalVel, globalPose);
+    delay(1);
+  }
+}
+
+/*
+double distanceToLineFromRobot(LineTarget *targetLine)
+{
+  return distanceToLine(targetLine, globalPose.x, globalPose.y);
+}
+double distanceToPointFromRobot(double targetX, double targetY)
+{
+  return distanceToPoint(globalPose.x, globalPose.y, targetX, targetY);
+}
+double angleToFacePointFromRobot(double targetX, double targetY)
+{
+  return nearestEquivalentAngleFromRobot(angleToFacePoint(globalPose.x, globalPose.y, targetX, targetY));
+}
+*/
+double nearestEquivalentAngleFromRobot(double target)
+{
+  return nearestEquivalentAngle(globalPose.angle, target);
+}
+double calculateTravelDistance(int encoderCount, double wheelDiameter, int encoderResolution)
+{
+  return ((double) encoderCount * M_PI * wheelDiameter) / ((double) encoderResolution);
+}
 // Not sure if using v5 or cortex, just rewrite these functions to make code work
 int getLeftEncoder()
 {
@@ -34,148 +194,12 @@ int getBackEncoder()
 void resetLeftEncoder()
 {
   encoderReset(leftEncoder);
-  prevLeftEncoder = 0;
 }
 void resetRightEncoder()
 {
   encoderReset(rightEncoder);
-  prevRightEncoder = 0;
 }
 void resetBackEncoder()
 {
   encoderReset(backEncoder);
-  prevBackEncoder = 0;
-}
-void initializeAPS(double startX, double startY, double startAngle)
-{
-  // Reset to starting positions
-  resetPosition(startX, startY, startAngle);
-
-  // Create new tasks to track position
-  taskCreate(startTracking, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT + 1);
-}
-void resetPosition(double resetX, double resetY, double resetA)
-{
-  // Reset all the encoders
-  resetLeftEncoder();
-  resetRightEncoder();
-  resetBackEncoder();
-
-  // Set reset pose
-  mutexTake(mutexes[MUTEX_POSE], -1);
-  robotPose[POSE_X] = resetX;
-  robotPose[POSE_Y] = resetY;
-  robotPose[POSE_ANGLE] = degToRad(resetA);
-  mutexGive(mutexes[MUTEX_POSE]);
-
-  // Set reset orientation
-  resetAngle = degToRad(resetA);
-}
-void startTracking(void *ignore)
-{
-  while (true)
-  {
-    // Get current encoder values
-    int currentLeftEncoder = getLeftEncoder();
-    int currentRightEncoder = getRightEncoder();
-    int currentBackEncoder = getBackEncoder();
-
-    // Calculate traveled distance in inches
-    double deltaLeftDistance = calculateTravelDistance(currentLeftEncoder - prevLeftEncoder, sideWheelDiameter, sideEncoderResolution);
-    double deltaRightDistance = calculateTravelDistance(currentRightEncoder - prevRightEncoder, sideWheelDiameter, sideEncoderResolution);
-    double deltaBackDistance = calculateTravelDistance(currentBackEncoder - prevBackEncoder, backWheelDiameter, backEncoderResolution);
-
-    // Update prev values;
-    prevLeftEncoder = currentLeftEncoder;
-    prevRightEncoder = currentRightEncoder;
-    prevBackEncoder = currentBackEncoder;
-
-    // Calculate total change since last reset
-    double totalLeftDistance = calculateTravelDistance(currentLeftEncoder, sideWheelDiameter, sideEncoderResolution);
-    double totalRightDistance = calculateTravelDistance(currentRightEncoder, sideWheelDiameter, sideEncoderResolution);
-
-    // Calculate new absolute orientation
-    double newAngle = resetAngle + (totalLeftDistance - totalRightDistance) / (sL + sR);
-
-    // Calculate change in angle
-    double deltaAngle = (deltaLeftDistance - deltaRightDistance) / (sL + sR);
-
-    // Calculate local offset vector
-    double localOffset[] = {0.0, 0.0};
-
-    // If drove straight
-    if (deltaAngle == 0.0)
-    {
-      localOffset[X_COMP] = deltaBackDistance;
-      localOffset[Y_COMP] = deltaRightDistance;
-    }
-    else
-    {
-      localOffset[X_COMP] = 2 * sin(deltaAngle / 2) * ((deltaBackDistance / deltaAngle) + sB);
-      localOffset[Y_COMP] = 2 * sin(deltaAngle / 2) * ((deltaRightDistance / deltaAngle) + sR);
-    }
-
-    // Calculate average angle
-    double avgAngle = newAngle - (deltaAngle / 2);
-
-    // Convert localOffset to a polar vector
-    double localPolar[] = {0.0, 0.0};
-    cartToPolar(localOffset, localPolar);
-
-    // Shift angle
-    localPolar[ANGLE] -= avgAngle;
-
-    // Converting back to cartesian gives the globalOffset
-    double globalOffset[] = {0.0, 0.0};
-    polarToCart(localPolar, globalOffset);
-
-    // Calculate new absolute position and orientation
-    mutexTake(mutexes[MUTEX_POSE], -1);
-    robotPose[POSE_X] += globalOffset[X_COMP];
-    robotPose[POSE_Y] += globalOffset[Y_COMP];
-    robotPose[POSE_ANGLE] = newAngle;
-    mutexGive(mutexes[MUTEX_POSE]);
-
-    delay(2);
-  }
-}
-double distanceToPoint(double targetX, double targetY)
-{
-  return sqrt(pow(targetX - robotPose[POSE_X], 2) + pow(targetY - robotPose[POSE_Y], 2));
-}
-double angleToFacePoint(double targetX, double targetY)
-{
-  double toReturn = nearestEquivalentAngle(-1 * atan2(targetY - robotPose[POSE_Y], targetX - robotPose[POSE_X]) + M_PI / 2);
-  //printf("angleToFacePoint: %f\tX: %f\tY: %f\ttargetX: %f\ttargetY: %f\n", toReturn, robotPose[POSE_X], robotPose[POSE_Y], targetX, targetY);
-  return toReturn;
-}
-double nearestEquivalentAngle(double target)
-{
-  return round((robotPose[POSE_ANGLE] - target) / (2 * M_PI)) * 2 * M_PI + target;
-}
-void cartToPolar(double *cartVector, double *polarVector)
-{
-  // Calculates magnitude of vector with distance formula
-  polarVector[MAGNITUDE] = sqrt(pow(cartVector[X_COMP], 2) + pow(cartVector[Y_COMP], 2));
-  // Calculates angle with arctan, automatically gives angle in correct quadrant
-  polarVector[ANGLE] = atan2(cartVector[Y_COMP], cartVector[X_COMP]);
-}
-void polarToCart(double *polarVector, double *cartVector)
-{
-  // Calculate x component with cosine
-  cartVector[X_COMP] = polarVector[MAGNITUDE] * cos(polarVector[ANGLE]);
-  // Calculate y component with sine
-  cartVector[Y_COMP] = polarVector[MAGNITUDE] * sin(polarVector[ANGLE]);
-}
-double calculateTravelDistance(int encoderCount, double wheelDiameter, int encoderResolution)
-{
-  return ((double) encoderCount * M_PI * wheelDiameter) / ((double) encoderResolution);
-}
-double degToRad(double degrees)
-{
-  return degrees * (M_PI / 180);
-}
-double radToDeg(double radians)
-{
-  return radians * (180 / M_PI);
 }

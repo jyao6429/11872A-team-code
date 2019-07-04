@@ -1,26 +1,9 @@
 #ifndef APS_H
 #define APS_H
 
-// Enums for Pose, Cartesian and Polar
-enum Pose
-{
-  POSE_X,
-  POSE_Y,
-  POSE_ANGLE
-};
-enum Cartesian
-{
-  X_COMP,
-  Y_COMP
-};
-enum Polar
-{
-  MAGNITUDE,
-  ANGLE
-};
+#include "main.h"
 
 // Physical parameters in inches
-
 // distance from center to left tracking wheel
 const double sL;
 // distance from center to right tracking wheel
@@ -31,20 +14,102 @@ const double sB;
 const double sideWheelDiameter;
 // diameter of back wheel
 const double backWheelDiameter;
+// side encoder ticks per 360 degrees of motion
+const int sideEncoderResolution;
+// back encoder ticks per 360 degrees of motion
+const int backEncoderResolution;
 
-// Previous encoder values
-int prevLeftEncoder;
-int prevRightEncoder;
-int prevBackEncoder;
-/**
- * The previous position vector and orientation calculated by the APS
- */
-double robotPose[3];
-/**
- * The angle at last reset
- */
+// Structs for pose and velocity
+// Container for position and orientation
+typedef struct Pose
+{
+  double angle, x, y;
+  int prevLeft, prevRight, prevBack;
+} Pose;
+// Container for linear and angular velocities
+typedef struct Vel
+{
+  double angle, x, y, prevPoseAngle, prevPoseX, prevPoseY;
+  unsigned long prevTime;
+} Vel;
+
+// Variables for global position and velocity
+// The global position of the robot
+Pose globalPose;
+// The global velocity of the robot
+Vel globalVel;
+// The angle at last reset
 double resetAngle;
 
+// handles the tracking task
+TaskHandle APSTask;
+
+/**
+ * Resets the position to given parameters, and restarts the APS
+ *
+ * @param *position - the position struct
+ * @param startX - the starting x coordinate in inches
+ * @param startY - the starting y coordinate in inches
+ * @param startAngle - the starting angle in degrees
+ * @param isDegrees - if startAngle is given in degrees
+ */
+void resetPositionFull(Pose *position, double startX, double startY, double startAngle, bool isDegrees);
+/**
+ * Resets the given pose to 0
+ *
+ * @param *position - the position struct
+ */
+void resetPosition(Pose *position);
+/**
+ * Resets the given velocity to 0, with prevPoses as the given position struct
+ *
+ * @param *velocity - the velocity struct
+ * @param position - the position struct
+ */
+void resetVelocity(Vel *velocity, Pose position);
+/**
+ * Starts tracking the robot position and velocity
+ * This shoud be started as a task
+ */
+void trackPoseTask(void *ignore);
+
+//double distanceToLineFromRobot(LineTarget *targetLine);
+/**
+ * Calculates the distance from the current robot position to a point
+ *
+ * @param targetX - the x component of the target point
+ * @param targetY - the y component of the target point
+ *
+ * @return the absolute distance between the robot and target point
+ */
+//double distanceToPointFromRobot(double targetX, double targetY);
+/**
+ * Calculate the orientation of the robot to face a certain point
+ *
+ * @param targetX - the x component of the target point
+ * @param targetY - the y component of the target point
+ *
+ * @return the angle to face target point from the current robot position in the range [-PI, PI]
+ */
+//double angleToFacePointFromRobot(double targetX, double targetY);
+/**
+ * Calculates nearest equivalent angle in radians from current orientation
+ *
+ * @param target - the target orientation in radians
+ *
+ * @return the target orientation + 2 x pi x k added
+ */
+double nearestEquivalentAngleFromRobot(double target);
+/**
+ * Converts encoder counts into linear distance traveled in the units of the diameter of the tracking wheel
+ *
+ * @param encoderCount - the number of encoder ticks
+ * @param wheelDiameter - the diameter of the tracking wheel
+ * @param encoderResolution - the number of encoder ticks per 360 degrees
+ *
+ * @return the distance traveled by that wheel
+ */
+double calculateTravelDistance(int encoderCount, double wheelDiameter, int encoderResolution);
 /**
  * Gets the current count for the left tracking encoder
  *
@@ -75,88 +140,5 @@ void resetRightEncoder();
  * Resets the back encoder
  */
 void resetBackEncoder();
-
-/**
- * Initializes the Absolute Positioning System
- *
- * @param startX - the starting x coordinate in inches
- * @param startY - the starting y coordinate in inches
- * @param startAngle - the starting angle in degrees
- */
-void initializeAPS(double startX, double startY, double startAngle);
-/**
- * Resets the Absolute Positioning System
- *
- * @param resetX - the reset x coordinate in inches
- * @param resetY - the reset y coordinate in inches
- * @param resetAngle - the reset angle in degrees
- */
-void resetPosition(double resetX, double resetY, double resetA);
-/**
- * Starts tracking the robot position
- * This shoud be started as a task
- */
-void startTracking(void *ignore);
-
-/**
- * Calculates the distance from the current position to a point
- *
- * @param targetX - the x component of the target point
- * @param targetY - the y component of the target point
- */
-double distanceToPoint(double targetX, double targetY);
-/**
- * Calculate the orientation of the robot to face a certain point
- *
- * @param targetX - the x component of the target point
- * @param targetY - the y component of the target point
- */
-double angleToFacePoint(double targetX, double targetY);
-/**
- * Calculates nearest equivalent angle in radians
- *
- * @param target - the target orientation in radians
- *
- * @return the target orientation + 2 x pi x k added
- */
-double nearestEquivalentAngle(double target);
-/**
- * Converts cartesian coordinates into polar
- *
- * @param *cartVector - the cartesian array to convert from
- * @param *polarVector - the polar array to convert to
- */
-void cartToPolar(double *cartVector, double *polarVector);
-/**
- * Converts polar coordinates into cartesian
- *
- * @param *polarVector - the polar array to convert from
- * @param *cartVector - the cartesian array to convert to
- */
-void polarToCart(double *polarVector, double *cartVector);
-/**
- * Converts encoder counts into linear distance traveled in the units of the diameter of the tracking wheel
- *
- * @param encoderCount - the number of encoder ticks
- * @param wheelDiameter - the diameter of the tracking wheel
- * @param encoderResolution - the number of encoder ticks per 360 degrees
- *
- * @return the distance traveled by that wheel
- */
-double calculateTravelDistance(int encoderCount, double wheelDiameter, int encoderResolution);
-/**
- * Converts degrees to radians
- *
- * @param degrees - the angle to convert in degrees
- * @return the converted angle in radians
- */
-double degToRad(double degrees);
-/**
- * Converts radians to degrees
- *
- * @param radians - the angle to convert in radians
- * @return the converted angle in degrees
- */
- double radToDeg(double radians);
 
 #endif

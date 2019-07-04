@@ -19,6 +19,8 @@
  */
 void initializeIO()
 {
+  pinMode(PORT_startTestButton, INPUT);
+  pinMode(PORT_stopTestButton, INPUT);
 }
 
 /*
@@ -36,14 +38,19 @@ void initializeIO()
  */
 void initialize()
 {
+  // initialize JINX
+  initJINX(stdout);
+  delay(100);
+  taskCreate(JINXRun, TASK_DEFAULT_STACK_SIZE, NULL, (TASK_PRIORITY_DEFAULT + 3));
+  delay(100);
+
   // Create mutexes
   mutexes[MUTEX_POSE] = mutexCreate();
+  mutexes[MUTEX_VELOCITY] = mutexCreate();
+  mutexes[MUTEX_TARGET_VELOCITY] = mutexCreate();
 
   // Initialize encoders
   leftEncoder = encoderInit(PORT_leftEncoder, PORT_leftEncoder + 1, false);
   rightEncoder = encoderInit(PORT_rightEncoder, PORT_rightEncoder + 1, true);
   backEncoder = encoderInit(PORT_backEncoder, PORT_backEncoder + 1, true);
-
-  // Start tracking
-  initializeAPS(0.0, 0.0, 0.0);
 }
