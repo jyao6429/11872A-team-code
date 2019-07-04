@@ -28,39 +28,12 @@
  */
 TaskHandle test;
 
-void testVControl(void *ignore)
-{
-	initializeVelocityController();
-
-	setTargetVelocity(12.0, 12.0);
-}
 void testChassis(void *ignore)
 {
 	resetPositionFull(&globalPose, 0.0, 0.0, 0.0, false);
 	// Test turning PID
 	turnToAngle(90.0, 100, true, true);
 	turnToAngle(0.0, 100, true, false);
-
-	// Test driveStraightToPose PID
-	//driveStraightToPoint(0.0, 24.0, 70, true);
-	//driveStraightToPoint(48.0, 48.0, 70, true);
-	//driveStraightToPoint(48.0, 0.0, 70, true);
-	//driveStraightToPoint(0.0, 0.0, 70, true);
-
-	// Test driveToPose PID
-	//driveToPose(0.0, 24.0, 45.0, 100, false, true);
-	//driveToPose(0.0, 48.0, -10.0, 100, true, true);
-	//driveToPose(48.0, -48.0, -90.0, 70, true, true);
-
-	// Test driveAlongLineToPose
-	//driveAlongLineToPose(-24.0, 24.0, -45.0, 100, true, true);
-	//driveAlongLineToPose(-48.0, 48.0, -90.0, 100, true, true);
-	//driveAlongLineToPose(2.0, 12.0, 0.0, 100, true, true);
-
-	// Test driveAndParkToPose
-	//driveToPose(-24.0, 48.0, -100.0, 100, false, true);
-	//driveToPose(-24.0, 0.0, 90.0, 100, false, true);
-	//driveAndParkToPose(0.0, 0.0, 0.0, 100, true, true);
 
 	printf("Done Testing\n");
 	stopMotors();

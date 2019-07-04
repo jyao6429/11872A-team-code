@@ -25,30 +25,6 @@ typedef struct
   double a, b, c, targetX, targetY, targetAngle;
 } LineTarget;
 
-double distanceToLine(LineTarget *targetLine, double sourceX, double sourceY);
-void matchLineWithPose(LineTarget *targetLine, double targetX, double targetY, double targetAngle, bool isDegrees);
-/**
- * Calculates the distance from the current position to a point
- *
- * @param sourceX - the x component of the source point
- * @param sourceY - the y component of the source point
- * @param targetX - the x component of the target point
- * @param targetY - the y component of the target point
- *
- * @return the absolute distance between the two points
- */
-double distanceToPoint(double sourceX, double sourceY, double targetX, double targetY);
-/**
- * Calculate the orientation of the robot to face a certain point
- *
- * @param sourceX - the x component of the source point
- * @param sourceY - the y component of the source point
- * @param targetX - the x component of the target point
- * @param targetY - the y component of the target point
- *
- * @return the angle to face target point from source point in the range [-PI, PI]
- */
-double angleToFacePoint(double sourceX, double sourceY, double targetX, double targetY);
 /**
  * Modifies given coordinates to the nearest point to those coordinates on a given line
  *

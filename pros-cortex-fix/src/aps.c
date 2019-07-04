@@ -156,24 +156,6 @@ void trackPoseTask(void *ignore)
   }
 }
 
-/*
-double distanceToLineFromRobot(LineTarget *targetLine)
-{
-  return distanceToLine(targetLine, globalPose.x, globalPose.y);
-}
-double distanceToPointFromRobot(double targetX, double targetY)
-{
-  return distanceToPoint(globalPose.x, globalPose.y, targetX, targetY);
-}
-double angleToFacePointFromRobot(double targetX, double targetY)
-{
-  return nearestEquivalentAngleFromRobot(angleToFacePoint(globalPose.x, globalPose.y, targetX, targetY));
-}
-*/
-double nearestEquivalentAngleFromRobot(double target)
-{
-  return nearestEquivalentAngle(globalPose.angle, target);
-}
 double calculateTravelDistance(int encoderCount, double wheelDiameter, int encoderResolution)
 {
   return ((double) encoderCount * M_PI * wheelDiameter) / ((double) encoderResolution);

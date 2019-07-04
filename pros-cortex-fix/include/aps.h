@@ -73,25 +73,6 @@ void resetVelocity(Vel *velocity, Pose position);
  */
 void trackPoseTask(void *ignore);
 
-//double distanceToLineFromRobot(LineTarget *targetLine);
-/**
- * Calculates the distance from the current robot position to a point
- *
- * @param targetX - the x component of the target point
- * @param targetY - the y component of the target point
- *
- * @return the absolute distance between the robot and target point
- */
-//double distanceToPointFromRobot(double targetX, double targetY);
-/**
- * Calculate the orientation of the robot to face a certain point
- *
- * @param targetX - the x component of the target point
- * @param targetY - the y component of the target point
- *
- * @return the angle to face target point from the current robot position in the range [-PI, PI]
- */
-//double angleToFacePointFromRobot(double targetX, double targetY);
 /**
  * Calculates nearest equivalent angle in radians from current orientation
  *
