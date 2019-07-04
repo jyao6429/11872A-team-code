@@ -365,11 +365,11 @@
             "-fdiagnostics-color",
             "-std=gnu99",
             "-o",
-            "bin/motionAlgorithms.c.o",
-            "src\\motionAlgorithms.c"
+            "bin/opcontrol.c.o",
+            "src\\opcontrol.c"
         ],
         "directory": "C:\\Users\\Lijing\\Documents\\Github\\11872A-team-code\\pros-cortex-fix",
-        "file": "src\\motionAlgorithms.c"
+        "file": "src\\opcontrol.c"
     },
     {
         "arguments": [
@@ -396,10 +396,10 @@
             "-fdiagnostics-color",
             "-std=gnu99",
             "-o",
-            "bin/opcontrol.c.o",
-            "src\\opcontrol.c"
+            "bin/motionAlgorithms.c.o",
+            "src\\motionAlgorithms.c"
         ],
         "directory": "C:\\Users\\Lijing\\Documents\\Github\\11872A-team-code\\pros-cortex-fix",
-        "file": "src\\opcontrol.c"
+        "file": "src\\motionAlgorithms.c"
     }
 ]

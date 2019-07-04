@@ -44,7 +44,24 @@ Cart lastTarget;
  * @param stopType - the StopType to use to park
  * @param mode - the MTTMode to use to travel the line
  */
-void moveToTargetSimple(double targetX, double targetY, double startX, double startY, int power, int startPower, double maxErrorX, double decelEarly, double decelPower, double dropEarly, StopType stopType, MTTMode mode);
+void moveToTargetSimple(double targetX, double targetY, double startX, double startY, int power, int startPower, double maxErrorX, double decelEarly, int decelPower, double dropEarly, StopType stopType, MTTMode mode);
+/**
+ * Moves a desired distance along a line in the direction of the given angle
+ *
+ * @param angle - the orientation to move in
+ * @param distance - the distance to travel in inches
+ * @param startX - the x component of the starting point
+ * @param startY - the y component of the starting point
+ * @param power - (-127 - 127) the power to travel the line, negatives means the robot travels backwards
+ * @param startPower - the starting power to ramp up to power (No use with MTT_SIMPLE)
+ * @param maxErrorX - (e.g. 0.5 - 1) the maxiumum error perpendicular to the line in inches
+ * @param decelEarly - (0 - 20) the distance from the target when to use the constant decelPower
+ * @param decelPower - (0 - 50) the power to use when decelerating
+ * @param dropEarly - (0 - 15) the distance from the target when to start breaking if needed, this also affects the deceleration point
+ * @param stopType - the StopType to use to park
+ * @param mode - the MTTMode to use to travel the line
+ */
+void moveToTargetDisSimple(double angle, double distance, double startX, double startY, int power, int startPower, double maxErrorX, double decelEarly, int decelPower, double dropEarly, StopType stopType, MTTMode mode);
 /**
  * Turns to face a specific point with an offset if desired
  *
