@@ -96,10 +96,14 @@ void gatherVelocityData(void *ignore)
 void testNew(void *ignore)
 {
 	resetPositionFull(&globalPose, 0.0, 0.0, 0.0, true);
+	resetVelocity(&globalVel, globalPose);
 
 	//turnToTargetNew(-12, 0, TURN_CCW, 0.5, 25, 12, 0.0, true, true);
 
 	//sweepTurnToTarget(12.0, 12.0, 90.0, 12, TURN_CW, 127, true, true);
+
+	moveToTargetSimple(0.0, 36.0, 0.0, 0.0, 127, 127, 1, 0, 0, 0, STOP_NONE, MTT_SIMPLE);
+	moveToTargetSimple(-36, 72, 0, 36, 127, 127, 0.5, 0, 50, 0, STOP_HARSH, MTT_CASCADING);
 
 	while (false)
 	{

@@ -29,12 +29,13 @@ void moveToTargetSimple(double targetX, double targetY, double startX, double st
   Cart currentPosCart;
   Polar currentPosPolar;
 
-  // More variables (FINISH)
+  // Store sine and cosine of the lineAngle
   double lineSin = sin(lineAngle);
   double lineCos = cos(lineAngle);
+  // Stores the robot's linear velocity along the direction of the line
   double currentVel = 0.0;
 
-  // Holds the last applied power
+  // Stores the last applied power
   int prevPower = startPower;
   // The amount to correct for deviation from the line
   double angleCorrection = 0.0;
@@ -85,7 +86,7 @@ void moveToTargetSimple(double targetX, double targetY, double startX, double st
           // Simply a P controller (NEED TO TUNE CONSTANT)
           finalPower = round((-127.0 / 40.0) * currentPosCart.y * copysign(1.0, power));
           break;
-        case MTT_CASCADING:;          
+        case MTT_CASCADING:;
           // Need to tune these constants
           double kB, kP;
           if (false)
@@ -182,6 +183,9 @@ void moveToTargetSimple(double targetX, double targetY, double startX, double st
     applyHarshStop();
   else
     stopMotors();
+
+  // log
+  printf("TX: %3.3f   TY: %3.3f   SX: %3.3f   SY: %3.3f   X: %3.3f   Y: %3.3f\n", targetX, targetY, startX, startY, globalPose.x, globalPose.y);
 }
 void sweepTurnToTarget(double targetX, double targetY, double targetAngle, double targetRadius, TurnDir turnDir, int power, bool slowPark, bool isDegrees)
 {
