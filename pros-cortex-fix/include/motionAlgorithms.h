@@ -13,9 +13,9 @@ typedef enum TurnDir
 
 typedef enum StopType
 {
-  STOP_NONE,
-  STOP_SOFT,
-  STOP_HARSH
+  STOP_NONE = 0b00000000,
+  STOP_SOFT = 0b00000001,
+  STOP_HARSH = 0b00000010
 } StopType;
 
 typedef enum MTTMode
@@ -64,8 +64,9 @@ void turnToAngleNew(double targetAngle, TurnDir turnDir, double fullPowerRatio, 
  * @param stopPowerDiff - (e.g. 10 - 15) the angle error in degrees to cut the motors
  * @param angleOffset - the desired offset to the angle directly facing the point
  * @param harshStop - if the robot should brake at the end of the turn
+ * @param isDegrees - if the angleOffset is given in degrees
  */
-void turnToTargetNew(double targetX, double targetY, TurnDir turnDir, double fullPowerRatio, int coastPower, double stopPowerDiff, double angleOffset, bool harshStop);
+void turnToTargetNew(double targetX, double targetY, TurnDir turnDir, double fullPowerRatio, int coastPower, double stopPowerDiff, double angleOffset, bool harshStop, bool isDegrees);
 /**
  * Harshly stops the robot
  */

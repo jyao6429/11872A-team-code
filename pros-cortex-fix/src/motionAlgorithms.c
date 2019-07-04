@@ -1,5 +1,188 @@
 #include "main.h"
 
+// Maxiumum achievable linear velocity by the robot in inches per second
+#define MAX_LINEAR_VEL 26.0
+
+void moveToTargetSimple(double targetX, double targetY, double startX, double startY, int power, int startPower, double maxErrorX, double decelEarly, double decelPower, double dropEarly, StopType stopType, MTTMode mode)
+{
+  // Set current target
+  lastTarget.x = targetX;
+  lastTarget.y = targetY;
+
+  // Create the line to follow
+  Line followLine;
+
+  // Set start and end points
+  followLine.p1.x = startX;
+  followLine.p1.y = startY;
+  followLine.p2.x = targetX;
+  followLine.p2.y = targetY;
+
+  // Get line info
+  double lineLength = getLengthOfLine(followLine);
+  double lineAngle = getAngleOfLine(followLine);
+
+  // Get angle to follow, reversing if needed
+  double pidAngle = nearestEquivalentAngle(lineAngle - (power < 0 ? M_PI : 0), globalPose.angle);
+
+  // Vectors for current position relative to the ending point
+  Cart currentPosCart;
+  Polar currentPosPolar;
+
+  // More variables (FINISH)
+  double lineSin = sin(lineAngle);
+  double lineCos = cos(lineAngle);
+  double currentVel = 0.0;
+
+  // Holds the last applied power
+  int prevPower = startPower;
+  // The amount to correct for deviation from the line
+  double angleCorrection = 0.0;
+
+  // Just start driving if mode is simple
+  if (mode == MTT_SIMPLE)
+    powerMotorsLinear(power, power);
+
+  // The final power applied to the wheels after all calculations
+  int finalPower = power;
+
+  // Variable for cycling
+  unsigned long cycleTime = millis();
+  int dT = 10;
+
+  do
+  {
+    // Calculate relative position to ending point
+    currentPosCart.x = globalPose.x - targetX;
+    currentPosCart.y = globalPose.y - targetY;
+    // Rotate vector so it lines up with line
+    cartToPolar(currentPosCart, &currentPosPolar);
+    currentPosPolar.angle += lineAngle;
+    polarToCart(currentPosPolar, &currentPosCart);
+
+    // Calculate deviations from line
+    if (maxErrorX != 0.0)
+    {
+      // Error from not following line straight
+      double errAngle = globalPose.angle - pidAngle;
+      // Error from deviation from line
+      double errX = currentPosCart.x + currentPosCart.y * tan(errAngle);
+      // The correct angle to face if going straight to target points
+      double correctAngle = atan2(targetX - globalPose.x, targetY - globalPose.y);
+      // Correct if going backwards
+      if (power < 0)
+        correctAngle += M_PI;
+      // Calculate the needed angleCorrection (NEED TO TUNE CONSTANT)
+      angleCorrection = (fabs(errX) > maxErrorX) ? 8.0 * (nearestEquivalentAngle(correctAngle, globalPose.angle) - globalPose.angle) * copysign(1.0, power) : 0.0;
+    }
+
+    // Switch between the modes
+    if (mode != MTT_SIMPLE)
+    {
+      switch (mode)
+      {
+        case MTT_PROPORTIONAL:
+          // Simply a P controller (NEED TO TUNE CONSTANT)
+          finalPower = round((-127.0 / 40.0) * currentPosCart.y * copysign(1.0, power));
+          break;
+        case MTT_CASCADING:;          
+          // Need to tune these constants
+          double kB, kP;
+          if (false)
+          {
+            kB = 6.0;
+            kP = 3.5;
+          }
+          else
+          {
+            kB = 5.5;
+            kP = 3.0;
+          }
+
+          // Calculate target velocity (what does this mean?)
+          double vTarget = MAX_LINEAR_VEL * (1 - exp(0.07 * (currentPosCart.y + dropEarly)));
+          finalPower = round((kB * vTarget + kP * (vTarget - currentVel)) * copysign(1.0, power));
+          break;
+      }
+      // Clamp finalPower from 30 to power
+      if (abs(finalPower) > abs(power))
+        finalPower = power;
+      else if (abs(finalPower) < 30)
+        finalPower = 30 * copysign(1.0, power);
+
+      // Calculate deltaPower, clamping it to +-5
+      int deltaPower = finalPower - prevPower;
+      if (abs(deltaPower) > 5)
+        deltaPower = 5 * copysign(1.0, deltaPower);
+
+      finalPower = prevPower += deltaPower;
+    }
+
+    // Power the motors based on direction of angleCorrection
+    switch ((int) copysign(1.01, angleCorrection))
+    {
+      case 0:
+        powerMotorsLinear(finalPower, finalPower);
+        break;
+      case 1:
+        powerMotorsLinear(finalPower, finalPower * exp(-angleCorrection));
+        break;
+      case -1:
+        powerMotorsLinear(finalPower * exp(angleCorrection), finalPower);
+        break;
+    }
+
+    // Update current velocity with respect to the line
+    currentVel = lineSin * globalVel.x + lineCos * globalVel.y;
+
+    taskDelayUntil(&cycleTime, dT);
+  } while(currentPosCart.y < -dropEarly - fmax((currentVel * ((stopType & STOP_SOFT) ? 0.175 : 0.098)), decelEarly));
+
+  // Start decelerating
+  powerMotorsLinear(decelPower, decelPower);
+
+  do
+  {
+    // Calculate relative position to ending point
+    currentPosCart.x = globalPose.x - targetX;
+    currentPosCart.y = globalPose.y - targetY;
+    // Rotate vector so it lines up with line
+    cartToPolar(currentPosCart, &currentPosPolar);
+    currentPosPolar.angle += lineAngle;
+    polarToCart(currentPosPolar, &currentPosCart);
+
+    // Update current velocity with respect to the line
+    currentVel = lineSin * globalVel.x + lineCos * globalVel.y;
+
+    taskDelayUntil(&cycleTime, dT);
+  } while(currentPosCart.y < -dropEarly - (currentVel * ((stopType & STOP_SOFT) ? 0.175 : 0.098)));
+
+  // Stop with given parameters
+  if (stopType & STOP_SOFT)
+  {
+    powerMotors(-6 * copysign(1.0, power), -6 * copysign(1.0, power));
+    do
+    {
+      // Calculate relative position to ending point
+      currentPosCart.x = globalPose.x - targetX;
+      currentPosCart.y = globalPose.y - targetY;
+      // Rotate vector so it lines up with line
+      cartToPolar(currentPosCart, &currentPosPolar);
+      currentPosPolar.angle += lineAngle;
+      polarToCart(currentPosPolar, &currentPosCart);
+
+      // Update current velocity with respect to the line
+      currentVel = lineSin * globalVel.x + lineCos * globalVel.y;
+
+      taskDelayUntil(&cycleTime, dT);
+    } while(currentVel > 7 && currentPosCart.y < 0);
+  }
+
+  if (stopType & STOP_HARSH)
+    applyHarshStop();
+  else
+    stopMotors();
+}
 void sweepTurnToTarget(double targetX, double targetY, double targetAngle, double targetRadius, TurnDir turnDir, int power, bool slowPark, bool isDegrees)
 {
   // Convert targetAngle to radians if needed
@@ -306,8 +489,11 @@ void turnToAngleNew(double targetAngle, TurnDir turnDir, double fullPowerRatio, 
   // Log
   printf("(turnToAngleNew)   TA: %3.3f   X: %3.3f   Y:%3.3f   A: %3.3f", radToDeg(targetAngle), globalPose.x, globalPose.y, radToDeg(globalPose.angle));
 }
-void turnToTargetNew(double targetX, double targetY, TurnDir turnDir, double fullPowerRatio, int coastPower, double stopPowerDiff, double angleOffset, bool harshStop)
+void turnToTargetNew(double targetX, double targetY, TurnDir turnDir, double fullPowerRatio, int coastPower, double stopPowerDiff, double angleOffset, bool harshStop, bool isDegrees)
 {
+  // Convert angleOffset to radians if needed
+  if (isDegrees)
+    angleOffset = degToRad(angleOffset);
   // Calculate correct turn direction if not given
   if (turnDir == TURN_CH)
   {

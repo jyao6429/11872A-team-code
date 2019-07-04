@@ -97,7 +97,7 @@ void testNew(void *ignore)
 {
 	resetPositionFull(&globalPose, 0.0, 0.0, 0.0, true);
 
-	//turnToTargetNew(-12, 0, TURN_CCW, 0.5, 25, 12, 0.0, true);
+	//turnToTargetNew(-12, 0, TURN_CCW, 0.5, 25, 12, 0.0, true, true);
 
 	//sweepTurnToTarget(12.0, 12.0, 90.0, 12, TURN_CW, 127, true, true);
 
