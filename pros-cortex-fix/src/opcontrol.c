@@ -26,24 +26,21 @@
  *
  * This task should never exit; it should end with some kind of infinite loop, even if empty.
  */
-TaskHandle test;
 
 void operatorControl()
 {
-	printf("Hello PROS User!\n");
+	printf("Starting operatorControl\n");
 
-	while (1)
+	while (true)
 	{
 		if (digitalRead(PORT_startTestButton) == LOW)
 		{
-			test = taskCreate(testNew, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT + 2);
+			startTesting();
 			delay(500);
 		}
 		if (digitalRead(PORT_stopTestButton) == LOW)
 		{
-			taskDelete(test);
-			stopMotors();
-			printf("Stopped Testing\n");
+			stopTesting();
 			delay(500);
 		}
 
