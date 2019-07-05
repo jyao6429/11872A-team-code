@@ -45,10 +45,14 @@ TaskHandle testHandler;
 
 void testTask(void *ignore)
 {
+	// Reset all positions
 	resetPositionFull(&globalPose, 0.0, 0.0, 0.0, true);
 	resetVelocity(&globalVel, globalPose);
 
+	// Call method for the test
 	testNewMotionAlgorithms();
+
+	stopMotors();
 
 	// Debug if wanted
 	while (false)
@@ -56,6 +60,7 @@ void testTask(void *ignore)
 		printf("X: %3.3f   Y: %3.3f   A: %3.3f   XV: %3.3f   YV: %3.3f   AV: %3.3f\n", globalPose.x, globalPose.y, radToDeg(globalPose.angle), globalVel.x, globalVel.y, radToDeg(globalVel.angle));
 		delay(50);
 	}
+	printf("Done Testing\n");
 }
 void startTesting()
 {
@@ -67,8 +72,6 @@ void startTesting()
 	print("Starting test\n");
 	// Start the task
 	testHandler = taskCreate(testTask, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT + 1);
-	stopMotors();
-	printf("Done Testing\n");
 }
 void stopTesting()
 {

@@ -55,17 +55,6 @@ void operatorControl()
 
 		//powerMotors(leftPower, rightPower);
 
-		// Debug APS
-		mutexTake(mutexes[MUTEX_POSE], 10);
-		//printf("X: %f\tY: %f\tANGLE: %f\n", robotPose[POSE_X], robotPose[POSE_Y], radToDeg(robotPose[POSE_ANGLE]));
-		mutexGive(mutexes[MUTEX_POSE]);
-
-		// Return to origin when button pressed
-		if (joystickGetDigital(1, 8, JOY_UP))
-		{
-			//driveStraightToPose(0.0, 0.0, 0.0, 70, true, false);
-		}
-
 		delay(20);
 	}
 }

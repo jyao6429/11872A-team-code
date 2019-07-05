@@ -2,12 +2,15 @@
 
 void asyncChassisTask(void *ignore)
 {
+  // Store the current move
   mutexTake(mutexes[MUTEX_ASYNC], -1);
   AsyncChassisOptions currentMove = nextMove;
   mutexGive(mutexes[MUTEX_ASYNC]);
 
+  // Switch between each motion type
   if (currentMove != ASYNC_NONE)
   {
+    // Set variable
     isChassisMoving = true;
     switch (currentMove)
     {
@@ -27,6 +30,7 @@ void asyncChassisTask(void *ignore)
         turnToTargetNew(turnContainer.targetX, turnContainer.targetY, turnContainer.turnDir, turnContainer.fullPowerRatio, turnContainer.coastPower, turnContainer.stopPowerDiff, turnContainer.angleOffset, turnContainer.harshStop, turnContainer.isDegrees);
         break;
     }
+    // Reset variables
     isChassisMoving = false;
     mutexTake(mutexes[MUTEX_ASYNC], 10);
     nextMove = ASYNC_NONE;
@@ -39,14 +43,14 @@ void waitUntilChassisMoveComplete()
 }
 void initializeAsyncChassisController()
 {
+  // Checks if there is an actual motion to do
+  if (nextMove == ASYNC_NONE)
+    return;
+
   // Stop task if needed
   unsigned int asyncState = taskGetState(asyncChassisHandle);
   if (asyncChassisHandle != NULL && (asyncState == TASK_RUNNING || asyncState == TASK_SLEEPING || asyncState == TASK_SUSPENDED))
     taskDelete(asyncChassisHandle);
-
-  // Checks if there is an actual motion to do
-  if (nextMove == ASYNC_NONE)
-    return;
 
   // Start the task
   asyncChassisHandle = taskCreate(asyncChassisTask, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT + 1);
