@@ -72,10 +72,10 @@ void moveToTargetDisSimple(double angle, double distance, double startX, double 
  * @param targetRadius - (e.g. 10 - 20) the radius of the circle to follow in inches
  * @param turnDir - the direction to turn based on TurnDir enum (TURN_CH = chooses automatically)
  * @param power - (-127 - 127) the power to take the turn, negatives means the robot travels backwards
- * @param slowPark - if the sweeps should be slower, but more accurate
+ * @param isAccurate - if the sweeps should be more accurate
  * @param isDegrees - if the targetAngle is given in degrees
  */
-void sweepTurnToTarget(double targetX, double targetY, double targetAngle, double targetRadius, TurnDir turnDir, int power, bool slowPark, bool isDegrees);
+void sweepTurnToTarget(double targetX, double targetY, double targetAngle, double targetRadius, TurnDir turnDir, int power, bool isAccurate, bool isDegrees);
 /**
  * Turns to a specified orientation
  *
