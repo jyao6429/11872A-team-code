@@ -43,11 +43,11 @@ typedef struct TTTRegularContainer
 
 // Variables for handling async tasks
 // Keeps track when the robot is performing a move
-bool isChassisMoving = false;
+bool isChassisMoving;
 // Handles the async task
 TaskHandle asyncChassisHandle;
 // The next move to be performed by the robot
-AsyncChassisOptions nextMove = ASYNC_NONE;
+AsyncChassisOptions nextMove;
 // Container variables for each motion
 MTTContainer mttContainer;
 TTTSweepContainer sweepContainer;

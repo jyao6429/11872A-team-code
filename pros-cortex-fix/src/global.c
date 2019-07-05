@@ -26,4 +26,4 @@ const int PORT_startTestButton = 7;
 const int PORT_stopTestButton = 8;
 
 // Mutexes
-Mutex mutexes[3];
+Mutex mutexes[2];
