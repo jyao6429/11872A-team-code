@@ -7,29 +7,22 @@ void asyncChassisTask(void *ignore)
   AsyncChassisOptions currentMove = nextMove;
   mutexGive(mutexes[MUTEX_ASYNC]);
 
-  print("Starting asyncChassisTask...\n");
-
   // Switch between each motion type
   switch (currentMove)
   {
     case ASYNC_MTT_SIMPLE:
-      print("ASYNC_MTT_SIMPLE\n");
       moveToTargetSimple(mttContainer.targetX, mttContainer.targetY, mttContainer.startX, mttContainer.startY, mttContainer.power, mttContainer.startPower, mttContainer.maxErrorX, mttContainer.decelEarly, mttContainer.decelPower, mttContainer.dropEarly, mttContainer.stopType, mttContainer.mode);
       break;
     case ASYNC_MTT_DIS:
-      print("ASYNC_MTT_DIS\n");
       moveToTargetDisSimple(mttContainer.angle, mttContainer.distance, mttContainer.startX, mttContainer.startY, mttContainer.power, mttContainer.startPower, mttContainer.maxErrorX, mttContainer.decelEarly, mttContainer.decelPower, mttContainer.dropEarly, mttContainer.stopType, mttContainer.mode, mttContainer.isDegrees);
       break;
     case ASYNC_TTT_SWEEP:
-      print("ASYNC_TTT_SWEEP\n");
       sweepTurnToTarget(sweepContainer.targetX, sweepContainer.targetY, sweepContainer.targetAngle, sweepContainer.targetRadius, sweepContainer.turnDir, sweepContainer.power, sweepContainer.isAccurate, sweepContainer.isDegrees);
       break;
     case ASYNC_TTT_ANGLE:
-      print("ASYNC_TTT_ANGLE\n");
       turnToAngleNew(turnContainer.targetAngle, turnContainer.turnDir, turnContainer.fullPowerRatio, turnContainer.coastPower, turnContainer.stopPowerDiff, turnContainer.harshStop, turnContainer.isDegrees);
       break;
     case ASYNC_TTT_TARGET:
-      print("ASYNC_TTT_TARGET\n");
       turnToTargetNew(turnContainer.targetX, turnContainer.targetY, turnContainer.turnDir, turnContainer.fullPowerRatio, turnContainer.coastPower, turnContainer.stopPowerDiff, turnContainer.angleOffset, turnContainer.harshStop, turnContainer.isDegrees);
       break;
     case ASYNC_NONE:
@@ -53,7 +46,6 @@ void initializeAsyncChassisController()
 
   // Stop task if needed
   unsigned int asyncState = taskGetState(asyncChassisHandle);
-  printf("asyncState: %d\n", asyncState);
   if (asyncChassisHandle != NULL && (asyncState == TASK_RUNNING || asyncState == TASK_SLEEPING || asyncState == TASK_SUSPENDED))
     taskDelete(asyncChassisHandle);
 

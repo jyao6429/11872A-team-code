@@ -396,11 +396,11 @@
             "-fdiagnostics-color",
             "-std=gnu99",
             "-o",
-            "bin/asyncChassisControl.c.o",
-            "src\\asyncChassisControl.c"
+            "bin/tests.c.o",
+            "src\\tests.c"
         ],
         "directory": "C:\\Users\\Lijing\\Documents\\Github\\11872A-team-code\\pros-cortex-fix",
-        "file": "src\\asyncChassisControl.c"
+        "file": "src\\tests.c"
     },
     {
         "arguments": [
@@ -427,10 +427,10 @@
             "-fdiagnostics-color",
             "-std=gnu99",
             "-o",
-            "bin/tests.c.o",
-            "src\\tests.c"
+            "bin/asyncChassisControl.c.o",
+            "src\\asyncChassisControl.c"
         ],
         "directory": "C:\\Users\\Lijing\\Documents\\Github\\11872A-team-code\\pros-cortex-fix",
-        "file": "src\\tests.c"
+        "file": "src\\asyncChassisControl.c"
     }
 ]
