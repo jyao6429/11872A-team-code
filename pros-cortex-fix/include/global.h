@@ -38,10 +38,9 @@ extern const int PORT_stopTestButton;
 enum MutexTypes
 {
   MUTEX_POSE,
-  MUTEX_VELOCITY,
-  MUTEX_TARGET_VELOCITY
+  MUTEX_ASYNC
 };
 // Mutexes
-Mutex mutexes[3];
+Mutex mutexes[2];
 
 #endif

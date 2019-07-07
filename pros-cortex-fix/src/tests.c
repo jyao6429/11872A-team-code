@@ -1,20 +1,13 @@
 #include "main.h"
 
-void testChassis(void *ignore)
+void testChassis()
 {
-	resetPositionFull(&globalPose, 0.0, 0.0, 0.0, false);
 	// Test turning PID
 	turnToAngle(90.0, 100, true, true);
 	turnToAngle(0.0, 100, true, false);
-
-	printf("Done Testing\n");
-	stopMotors();
 }
-void gatherVelocityData(void *ignore)
+void gatherVelocityData()
 {
-	resetPositionFull(&globalPose, 0.0, 0.0, 0.0, true);
-	resetVelocity(&globalVel, globalPose);
-
 	int powerDiff = -150;
 	unsigned long timer = millis();
 
@@ -37,13 +30,9 @@ void gatherVelocityData(void *ignore)
 		}
 		delay(40);
 	}
-	stopMotors();
 }
-void testNew(void *ignore)
+void testNewMotionAlgorithms()
 {
-	resetPositionFull(&globalPose, 0.0, 0.0, 0.0, true);
-	resetVelocity(&globalVel, globalPose);
-
 	//turnToTargetNew(-12, 0, TURN_CCW, 0.5, 25, 12, 0.0, true, true);
 
 	//sweepTurnToTarget(12.0, 12.0, 90.0, 12, TURN_CW, 127, true, true);
@@ -51,10 +40,63 @@ void testNew(void *ignore)
 	//moveToTargetSimple(0.0, 36.0, 0.0, 0.0, 127, 127, 1, 0, 0, 0, STOP_NONE, MTT_SIMPLE);
 	//moveToTargetSimple(-36, 72, 0, 36, 127, 127, 0.5, 0, 50, 0, STOP_HARSH, MTT_CASCADING);
 
+	moveToTargetSimpleAsync(0.0, 120.0, 0.0, 0.0, 127, 0, 1, 0, 0, 0, STOP_NONE, MTT_SIMPLE);
+	print("~~~1~~~\n");
+	delay(2000);
+	print("~~~2~~~\n");
+	turnToAngleNewAsync(-90, TURN_CCW, 0.9, 127, 0, false, true);
+	print("~~~3~~~\n");
+	waitUntilChassisMoveComplete();
+	print("~~~4~~~\n");
+	turnToTargetNewAsync(0.0, 0.0, TURN_CH, 0.7, 30, 12, 0, true, false);
+	print("~~~5~~~\n");
+	waitUntilChassisMoveComplete();
+	print("~~~6~~~\n");
+	moveToTargetSimpleAsync(0.0, 0.0, globalPose.x, globalPose.y, 127, 0, 0.5, 0, 20, 0, STOP_HARSH, MTT_CASCADING);
+	print("~~~7~~~\n");
+	waitUntilChassisMoveComplete();
+	print("~~~8~~~\n");
+}
+
+TaskHandle testHandler;
+
+void testTask(void *ignore)
+{
+	// Reset all positions
+	resetPositionFull(&globalPose, 0.0, 0.0, 0.0, true);
+	resetVelocity(&globalVel, globalPose);
+
+	// Call method for the test
+	testNewMotionAlgorithms();
+
+	stopMotors();
+
+	// Debug if wanted
 	while (false)
 	{
-		printf("X: %3.3f   Y: %3.3f   A: %3.3f\n", globalPose.x, globalPose.y, radToDeg(globalPose.angle));
+		printf("X: %3.3f   Y: %3.3f   A: %3.3f   XV: %3.3f   YV: %3.3f   AV: %3.3f\n", globalPose.x, globalPose.y, radToDeg(globalPose.angle), globalVel.x, globalVel.y, radToDeg(globalVel.angle));
 		delay(50);
 	}
 	printf("Done Testing\n");
+}
+void startTesting()
+{
+	// Don't run the test if it is already running
+	unsigned int testState = taskGetState(testHandler);
+  if (testHandler != NULL && (testState == TASK_RUNNING || testState == TASK_SLEEPING || testState == TASK_SUSPENDED))
+		return;
+
+	print("Starting test\n");
+	// Start the task
+	testHandler = taskCreate(testTask, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT + 1);
+}
+void stopTesting()
+{
+	// Stop task if needed
+  unsigned int testState = taskGetState(testHandler);
+  if (testHandler != NULL && (testState == TASK_RUNNING || testState == TASK_SLEEPING || testState == TASK_SUSPENDED))
+    taskDelete(testHandler);
+
+	stopMotors();
+	print("Stopped testing\n");
 }

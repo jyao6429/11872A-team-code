@@ -1,32 +1,70 @@
-#ifndef MOTION_ALGORITHMS_H
-#define MOTION_ALGORITHMS_H
+#ifndef ASYNC_CHASSIS_CONTROL_H
+#define ASYNC_CHASSIS_CONTROL_H
 
 #include "main.h"
 
-// Enums
-typedef enum TurnDir
+// Enums for each different type of motion
+typedef enum AsyncChassisOptions
 {
-  TURN_CW,
-  TURN_CCW,
-  TURN_CH
-} TurnDir;
+  ASYNC_NONE,
+  ASYNC_MTT_SIMPLE,
+  ASYNC_MTT_DIS,
+  ASYNC_TTT_SWEEP,
+  ASYNC_TTT_ANGLE,
+  ASYNC_TTT_TARGET
+} AsyncChassisOptions;
 
-typedef enum StopType
+// Structs as containers for motion parameters
+// Container for moveToTarget motions
+typedef struct MTTContainer
 {
-  STOP_NONE = 0b00000000,
-  STOP_SOFT = 0b00000001,
-  STOP_HARSH = 0b00000010
-} StopType;
-
-typedef enum MTTMode
+  double angle, distance, targetX, targetY, startX, startY, maxErrorX, decelEarly, dropEarly;
+  int power, startPower, decelPower;
+  StopType stopType;
+  MTTMode mode;
+  bool isDegrees;
+} MTTContainer;
+// Container for sweepTurnToTarget motion
+typedef struct TTTSweepContainer
 {
-  MTT_SIMPLE,
-  MTT_PROPORTIONAL,
-  MTT_CASCADING
-} MTTMode;
+  double targetX, targetY, targetAngle, targetRadius;
+  TurnDir turnDir;
+  int power;
+  bool isAccurate, isDegrees;
+} TTTSweepContainer;
+// Container for turnToAngleNew and turnToTargetNew motions
+typedef struct TTTRegularContainer
+{
+  double targetX, targetY, targetAngle, fullPowerRatio, stopPowerDiff, angleOffset;
+  TurnDir turnDir;
+  int coastPower;
+  bool harshStop, isDegrees;
+} TTTRegularContainer;
 
-// Coordinates of last target
-Cart lastTarget;
+// Variables for handling async tasks
+// Keeps track when the robot is performing a move
+bool isChassisMoving;
+// Handles the async task
+TaskHandle asyncChassisHandle;
+// The next move to be performed by the robot
+AsyncChassisOptions nextMove;
+// Container variables for each motion
+MTTContainer mttContainer;
+TTTSweepContainer sweepContainer;
+TTTRegularContainer turnContainer;
+
+/**
+ * Waits until the robot completes the current motion
+ */
+void waitUntilChassisMoveComplete();
+/**
+ * Initializes the async controller task
+ */
+void initializeAsyncChassisController();
+/**
+ * Stops the async controller and resets variables to defaults
+ */
+void stopAsyncChassisController();
 
 /**
  * Moves to a desired position along a line connecting the target and starting points
@@ -44,7 +82,7 @@ Cart lastTarget;
  * @param stopType - the StopType to use to park
  * @param mode - the MTTMode to use to travel the line
  */
-void moveToTargetSimple(double targetX, double targetY, double startX, double startY, int power, int startPower, double maxErrorX, double decelEarly, int decelPower, double dropEarly, StopType stopType, MTTMode mode);
+void moveToTargetSimpleAsync(double targetX, double targetY, double startX, double startY, int power, int startPower, double maxErrorX, double decelEarly, int decelPower, double dropEarly, StopType stopType, MTTMode mode);
 /**
  * Moves a desired distance along a line in the direction of the given angle
  *
@@ -62,7 +100,7 @@ void moveToTargetSimple(double targetX, double targetY, double startX, double st
  * @param mode - the MTTMode to use to travel the line
  * @param isDegrees - if the angle is given in degrees
  */
-void moveToTargetDisSimple(double angle, double distance, double startX, double startY, int power, int startPower, double maxErrorX, double decelEarly, int decelPower, double dropEarly, StopType stopType, MTTMode mode, bool isDegrees);
+void moveToTargetDisSimpleAsync(double angle, double distance, double startX, double startY, int power, int startPower, double maxErrorX, double decelEarly, int decelPower, double dropEarly, StopType stopType, MTTMode mode, bool isDegrees);
 /**
  * Turns to face a specific point with an offset if desired
  *
@@ -75,7 +113,7 @@ void moveToTargetDisSimple(double angle, double distance, double startX, double 
  * @param isAccurate - if the sweeps should be more accurate
  * @param isDegrees - if the targetAngle is given in degrees
  */
-void sweepTurnToTarget(double targetX, double targetY, double targetAngle, double targetRadius, TurnDir turnDir, int power, bool isAccurate, bool isDegrees);
+void sweepTurnToTargetAsync(double targetX, double targetY, double targetAngle, double targetRadius, TurnDir turnDir, int power, bool isAccurate, bool isDegrees);
 /**
  * Turns to a specified orientation
  *
@@ -87,7 +125,7 @@ void sweepTurnToTarget(double targetX, double targetY, double targetAngle, doubl
  * @param harshStop - if the robot should brake at the end of the turn
  * @param isDegrees - if the targetAngle is given in degrees
  */
-void turnToAngleNew(double targetAngle, TurnDir turnDir, double fullPowerRatio, int coastPower, double stopPowerDiff, bool harshStop, bool isDegrees);
+void turnToAngleNewAsync(double targetAngle, TurnDir turnDir, double fullPowerRatio, int coastPower, double stopPowerDiff, bool harshStop, bool isDegrees);
 /**
  * Turns to face a specific point with an offset if desired
  *
@@ -101,10 +139,6 @@ void turnToAngleNew(double targetAngle, TurnDir turnDir, double fullPowerRatio, 
  * @param harshStop - if the robot should brake at the end of the turn
  * @param isDegrees - if the angleOffset is given in degrees
  */
-void turnToTargetNew(double targetX, double targetY, TurnDir turnDir, double fullPowerRatio, int coastPower, double stopPowerDiff, double angleOffset, bool harshStop, bool isDegrees);
-/**
- * Harshly stops the robot
- */
-void applyHarshStop();
+void turnToTargetNewAsync(double targetX, double targetY, TurnDir turnDir, double fullPowerRatio, int coastPower, double stopPowerDiff, double angleOffset, bool harshStop, bool isDegrees);
 
 #endif

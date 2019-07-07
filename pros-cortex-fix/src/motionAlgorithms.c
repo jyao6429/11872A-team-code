@@ -185,7 +185,7 @@ void moveToTargetSimple(double targetX, double targetY, double startX, double st
     stopMotors();
 
   // log
-  printf("TX: %3.3f   TY: %3.3f   SX: %3.3f   SY: %3.3f   X: %3.3f   Y: %3.3f\n", targetX, targetY, startX, startY, globalPose.x, globalPose.y);
+  printf("(moveToTargetSimple) TX: %3.3f   TY: %3.3f   SX: %3.3f   SY: %3.3f   X: %3.3f   Y: %3.3f\n", targetX, targetY, startX, startY, globalPose.x, globalPose.y);
 }
 void moveToTargetDisSimple(double angle, double distance, double startX, double startY, int power, int startPower, double maxErrorX, double decelEarly, int decelPower, double dropEarly, StopType stopType, MTTMode mode, bool isDegrees)
 {
@@ -195,7 +195,7 @@ void moveToTargetDisSimple(double angle, double distance, double startX, double 
 
   moveToTargetSimple(startX + distance * sin(angle), startY + distance * cos(angle), startX, startY, power, startPower, maxErrorX, decelEarly, decelPower, dropEarly, stopType, mode);
 }
-void sweepTurnToTarget(double targetX, double targetY, double targetAngle, double targetRadius, TurnDir turnDir, int power, bool slowPark, bool isDegrees)
+void sweepTurnToTarget(double targetX, double targetY, double targetAngle, double targetRadius, TurnDir turnDir, int power, bool isAccurate, bool isDegrees)
 {
   // Convert targetAngle to radians if needed
   if (isDegrees)
@@ -325,7 +325,7 @@ void sweepTurnToTarget(double targetX, double targetY, double targetAngle, doubl
         taskDelayUntil(&cycleTime, dT);
 
         // Loop while angle error is greater than the target margin
-      } while ((power > 0 ? globalPose.angle : (globalPose.angle + M_PI)) - targetAngle < (slowPark ? -0.1 : -0.15));
+      } while ((power > 0 ? globalPose.angle : (globalPose.angle + M_PI)) - targetAngle < (isAccurate ? -0.1 : -0.15));
       break;
     case TURN_CCW:
       // Calculate the coordinates of the center of the circle
@@ -409,7 +409,7 @@ void sweepTurnToTarget(double targetX, double targetY, double targetAngle, doubl
         taskDelayUntil(&cycleTime, dT);
 
         // Loop while angle error is greater than the target margin
-      } while ((power > 0 ? globalPose.angle : (globalPose.angle + M_PI)) - targetAngle > (slowPark ? 0.1 : 0.15));
+      } while ((power > 0 ? globalPose.angle : (globalPose.angle + M_PI)) - targetAngle > (isAccurate ? 0.1 : 0.15));
       break;
   }
   stopMotors();
@@ -499,7 +499,7 @@ void turnToAngleNew(double targetAngle, TurnDir turnDir, double fullPowerRatio, 
       break;
   }
   // Log
-  printf("(turnToAngleNew)   TA: %3.3f   X: %3.3f   Y:%3.3f   A: %3.3f", radToDeg(targetAngle), globalPose.x, globalPose.y, radToDeg(globalPose.angle));
+  printf("(turnToAngleNew)   TA: %3.3f   X: %3.3f   Y:%3.3f   A: %3.3f\n", radToDeg(targetAngle), globalPose.x, globalPose.y, radToDeg(globalPose.angle));
 }
 void turnToTargetNew(double targetX, double targetY, TurnDir turnDir, double fullPowerRatio, int coastPower, double stopPowerDiff, double angleOffset, bool harshStop, bool isDegrees)
 {
@@ -583,7 +583,7 @@ void turnToTargetNew(double targetX, double targetY, TurnDir turnDir, double ful
       break;
   }
   // Log
-  printf("(turnToTargetNew)   TXF: %3.3f   TYF: %3.3f   TA: %3.3f   X: %3.3f   Y:%3.3f   A: %3.3f", targetX, targetY, radToDeg(targetAngle), globalPose.x, globalPose.y, radToDeg(globalPose.angle));
+  printf("(turnToTargetNew)   TXF: %3.3f   TYF: %3.3f   TA: %3.3f   X: %3.3f   Y:%3.3f   A: %3.3f\n", targetX, targetY, radToDeg(targetAngle), globalPose.x, globalPose.y, radToDeg(globalPose.angle));
 }
 void applyHarshStop()
 {

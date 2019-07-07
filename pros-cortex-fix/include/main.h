@@ -34,6 +34,7 @@
 #include "aps.h"
 #include "motionAlgorithms.h"
 #include "chassis.h"
+#include "asyncChassisControl.h"
 #include "tests.h"
 #include "global.h"
 #include "NERD_PID.h"
