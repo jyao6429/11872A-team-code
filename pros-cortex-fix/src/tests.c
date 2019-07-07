@@ -35,10 +35,27 @@ void testNewMotionAlgorithms()
 {
 	//turnToTargetNew(-12, 0, TURN_CCW, 0.5, 25, 12, 0.0, true, true);
 
-	sweepTurnToTarget(12.0, 12.0, 90.0, 12, TURN_CW, 127, true, true);
+	//sweepTurnToTarget(12.0, 12.0, 90.0, 12, TURN_CW, 127, true, true);
 
 	//moveToTargetSimple(0.0, 36.0, 0.0, 0.0, 127, 127, 1, 0, 0, 0, STOP_NONE, MTT_SIMPLE);
 	//moveToTargetSimple(-36, 72, 0, 36, 127, 127, 0.5, 0, 50, 0, STOP_HARSH, MTT_CASCADING);
+
+	moveToTargetSimpleAsync(0.0, 120.0, 0.0, 0.0, 127, 0, 1, 0, 0, 0, STOP_NONE, MTT_SIMPLE);
+	print("~~~1~~~\n");
+	delay(2000);
+	print("~~~2~~~\n");
+	turnToAngleNewAsync(-90, TURN_CCW, 0.9, 127, 0, false, true);
+	print("~~~3~~~\n");
+	waitUntilChassisMoveComplete();
+	print("~~~4~~~\n");
+	turnToTargetNewAsync(0.0, 0.0, TURN_CH, 0.7, 30, 12, 0, true, false);
+	print("~~~5~~~\n");
+	waitUntilChassisMoveComplete();
+	print("~~~6~~~\n");
+	moveToTargetSimpleAsync(0.0, 0.0, globalPose.x, globalPose.y, 127, 0, 0.5, 0, 20, 0, STOP_HARSH, MTT_CASCADING);
+	print("~~~7~~~\n");
+	waitUntilChassisMoveComplete();
+	print("~~~8~~~\n");
 }
 
 TaskHandle testHandler;
