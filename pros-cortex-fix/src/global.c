@@ -13,17 +13,16 @@ const int PORT_leftEncoder = 5;
 const int PORT_rightEncoder = 1;
 const int PORT_backEncoder = 3;
 
-// Encoders themselves
-Encoder leftEncoder;
-Encoder rightEncoder;
-Encoder backEncoder;
-
 // Sensor ports
 const int PORT_liftPot = 2;
 
-// Digital sensor ports
-const int PORT_startTestButton = 7;
-const int PORT_stopTestButton = 8;
+// Ultrasonic ports
+const int PORT_leftSonarOrange = 7;
+const int PORT_leftSonarYellow = 8;
+
+// Digital switches
+const int PORT_startTestButton = 11;
+const int PORT_stopTestButton = 12;
 
 // Mutexes
 Mutex mutexes[2];

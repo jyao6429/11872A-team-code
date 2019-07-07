@@ -31,7 +31,17 @@ extern Encoder backEncoder;
 // Potentiometer port
 extern const int PORT_liftPot;
 
+// Ultrasonic ECHO port
+extern const int PORT_leftSonarOrange;
+// Ultrasonic PING port
+extern const int PORT_leftSonarYellow;
+
+// Left-side ultrasonic sensor
+extern Ultrasonic leftSonar;
+
+// startTesting button
 extern const int PORT_startTestButton;
+// stopTesting limit switch
 extern const int PORT_stopTestButton;
 
 // Enum for different mutexes
