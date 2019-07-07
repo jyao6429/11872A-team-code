@@ -28,6 +28,7 @@
 #include <API.h>
 
 // User includes
+#include "global.h"
 #include "JINX.h"
 #include "debug.h"
 #include "mathUtils.h"
@@ -36,7 +37,6 @@
 #include "chassis.h"
 #include "asyncChassisControl.h"
 #include "tests.h"
-#include "global.h"
 #include "NERD_PID.h"
 
 // Other includes

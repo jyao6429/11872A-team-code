@@ -30,6 +30,14 @@ double radToDeg(double radians)
 {
   return radians * (180 / M_PI);
 }
+double inToCM(double inches)
+{
+  return inches * 2.54;
+}
+double cmToIN(double centimeters)
+{
+  return centimeters / 2.54;
+}
 void cartToPolar(Cart cartVector, Polar *polarVector)
 {
   if (cartVector.x != 0.0 || cartVector.y != 0.0)
