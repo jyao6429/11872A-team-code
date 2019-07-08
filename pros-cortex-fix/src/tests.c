@@ -57,6 +57,14 @@ void testNewMotionAlgorithms()
 	waitUntilChassisMoveComplete();
 	print("~~~8~~~\n");
 }
+void testSonar()
+{
+	while (true)
+	{
+		printf("SONAR: %3.3f\n", sonarReadFiltered(leftSonar, 0.0, 10000.0, 100, 500) + LEFT_SONAR_TO_CENTER);
+		delay(10);
+	}
+}
 
 TaskHandle testHandler;
 
@@ -67,7 +75,7 @@ void testTask(void *ignore)
 	resetVelocity(&globalVel, globalPose);
 
 	// Call method for the test
-	testNewMotionAlgorithms();
+	testSonar();
 
 	stopMotors();
 
