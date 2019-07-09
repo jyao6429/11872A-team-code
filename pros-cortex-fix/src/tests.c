@@ -59,7 +59,9 @@ void testNewMotionAlgorithms()
 }
 void testSonar()
 {
-	while (true)
+	resetAgainstWall(RESET_X_NEAR, 0, 100, 100, 500);
+
+	while (false)
 	{
 		printf("SONAR: %3.3f\n", sonarReadFiltered(leftSonar, 0.0, 10000.0, 100, 500) + LEFT_SONAR_TO_CENTER);
 		delay(10);
@@ -75,12 +77,12 @@ void testTask(void *ignore)
 	resetVelocity(&globalVel, globalPose);
 
 	// Call method for the test
-	testSonar();
+	//testSonar();
 
 	stopMotors();
 
 	// Debug if wanted
-	while (false)
+	while (true)
 	{
 		printf("X: %3.3f   Y: %3.3f   A: %3.3f   XV: %3.3f   YV: %3.3f   AV: %3.3f\n", globalPose.x, globalPose.y, radToDeg(globalPose.angle), globalVel.x, globalVel.y, radToDeg(globalVel.angle));
 		delay(50);

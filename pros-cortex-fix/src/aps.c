@@ -83,13 +83,6 @@ void trackPosition(Pose *position, int currentLeft, int currentRight, int curren
   position->prevRight = currentRight;
   position->prevBack = currentBack;
 
-  // Calculate total change since last reset
-  double totalLeftDistance = calculateTravelDistance(currentLeft, sideWheelDiameter, sideEncoderResolution);
-  double totalRightDistance = calculateTravelDistance(currentRight, sideWheelDiameter, sideEncoderResolution);
-
-  // Calculate new absolute orientation
-  double newAngle = resetAngle + (totalLeftDistance - totalRightDistance) / (sL + sR);
-
   // Calculate change in angle
   double deltaAngle = (deltaLeftDistance - deltaRightDistance) / (sL + sR);
 
@@ -109,7 +102,7 @@ void trackPosition(Pose *position, int currentLeft, int currentRight, int curren
   }
 
   // Calculate average angle
-  double avgAngle = newAngle - (deltaAngle / 2);
+  double avgAngle = position->angle + (deltaAngle / 2);
 
   // Calculate cosine and sine of avgAngle
   double cosAvg = cos(avgAngle);
@@ -118,7 +111,7 @@ void trackPosition(Pose *position, int currentLeft, int currentRight, int curren
   // Update the global position by incrementing by a shifted localOffset
   position->x += localOffset.x * cosAvg + localOffset.y * sinAvg;
   position->y += localOffset.x * -sinAvg + localOffset.y * cosAvg;
-  position->angle = newAngle;
+  position->angle += deltaAngle;
 }
 void trackVelocity(Vel *velocity, Pose position)
 {
@@ -155,7 +148,10 @@ void trackPoseTask(void *ignore)
     delay(1);
   }
 }
-
+bool isRobotStopped()
+{
+  return (fabs(globalVel.x) < 0.5) && (fabs(globalVel.y) < 0.5) && (fabs(globalVel.angle) < M_PI / 30);
+}
 double calculateTravelDistance(int encoderCount, double wheelDiameter, int encoderResolution)
 {
   return ((double) encoderCount * M_PI * wheelDiameter) / ((double) encoderResolution);

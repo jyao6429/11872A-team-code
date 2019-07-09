@@ -29,10 +29,10 @@ void asyncChassisTask(void *ignore)
       break;
   }
   // Reset variables
-  isChassisMoving = false;
   mutexTake(mutexes[MUTEX_ASYNC], 10);
   nextMove = ASYNC_NONE;
   mutexGive(mutexes[MUTEX_ASYNC]);
+  isChassisMoving = false;
 }
 void waitUntilChassisMoveComplete()
 {

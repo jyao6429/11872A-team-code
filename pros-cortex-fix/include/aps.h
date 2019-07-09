@@ -72,7 +72,12 @@ void resetVelocity(Vel *velocity, Pose position);
  * This shoud be started as a task
  */
 void trackPoseTask(void *ignore);
-
+/**
+ * Checks if the robot is moving or not
+ *
+ * @return if the robot is stopped or not, allowing some small movements
+ */
+bool isRobotStopped();
 /**
  * Calculates nearest equivalent angle in radians from current orientation
  *
