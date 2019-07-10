@@ -77,7 +77,7 @@ void testTask(void *ignore)
 	resetVelocity(&globalVel, globalPose);
 
 	// Call method for the test
-	//testSonar();
+	testSonar();
 
 	stopMotors();
 

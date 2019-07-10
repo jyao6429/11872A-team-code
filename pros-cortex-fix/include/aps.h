@@ -5,19 +5,19 @@
 
 // Physical parameters in inches
 // distance from center to left tracking wheel
-const double sL;
+#define SL 4.58142
 // distance from center to right tracking wheel
-const double sR;
+#define SR 4.58142
 // distance from center to back tracking wheel
-const double sB;
+#define SB 5.36208
 // diameter of side wheels
-const double sideWheelDiameter;
+#define SIDE_WHEEL_DIAMETER 2.7382
 // diameter of back wheel
-const double backWheelDiameter;
+#define BACK_WHEEL_DIAMETER 2.7382
 // side encoder ticks per 360 degrees of motion
-const int sideEncoderResolution;
+#define SIDE_ENCODER_RESOLUTION 360
 // back encoder ticks per 360 degrees of motion
-const int backEncoderResolution;
+#define BACK_ENCODER_RESOLUTION 360
 
 // Structs for pose and velocity
 // Container for position and orientation
