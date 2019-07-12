@@ -1,20 +1,5 @@
 #include "main.h"
 
-// distance from center to left tracking wheel
-const double sL = 4.65;
-// distance from center to right tracking wheel
-const double sR = 4.65;
-// distance from center to back tracking wheel
-const double sB = 4.77;
-// diameter of side wheels
-const double sideWheelDiameter = 2.783;
-// diameter of back wheel
-const double backWheelDiameter = 2.783;
-// side encoder ticks per 360 degrees of motion
-const int sideEncoderResolution = 360;
-// back encoder ticks per 360 degrees of motion
-const int backEncoderResolution = 360;
-
 void resetPositionFull(Pose *position, double startX, double startY, double startAngle, bool isDegrees)
 {
   // Convert to radians if needed
@@ -74,24 +59,17 @@ void resetVelocity(Vel *velocity, Pose position)
 void trackPosition(Pose *position, int currentLeft, int currentRight, int currentBack)
 {
   // Calculate traveled distance in inches
-  double deltaLeftDistance = calculateTravelDistance(currentLeft - position->prevLeft, sideWheelDiameter, sideEncoderResolution);
-  double deltaRightDistance = calculateTravelDistance(currentRight - position->prevRight, sideWheelDiameter, sideEncoderResolution);
-  double deltaBackDistance = calculateTravelDistance(currentBack - position->prevBack, backWheelDiameter, backEncoderResolution);
+  double deltaLeftDistance = calculateTravelDistance(currentLeft - position->prevLeft, SIDE_WHEEL_DIAMETER, SIDE_ENCODER_RESOLUTION);
+  double deltaRightDistance = calculateTravelDistance(currentRight - position->prevRight, SIDE_WHEEL_DIAMETER, SIDE_ENCODER_RESOLUTION);
+  double deltaBackDistance = calculateTravelDistance(currentBack - position->prevBack, BACK_WHEEL_DIAMETER, BACK_ENCODER_RESOLUTION);
 
   // Update prev values;
   position->prevLeft = currentLeft;
   position->prevRight = currentRight;
   position->prevBack = currentBack;
 
-  // Calculate total change since last reset
-  double totalLeftDistance = calculateTravelDistance(currentLeft, sideWheelDiameter, sideEncoderResolution);
-  double totalRightDistance = calculateTravelDistance(currentRight, sideWheelDiameter, sideEncoderResolution);
-
-  // Calculate new absolute orientation
-  double newAngle = resetAngle + (totalLeftDistance - totalRightDistance) / (sL + sR);
-
   // Calculate change in angle
-  double deltaAngle = (deltaLeftDistance - deltaRightDistance) / (sL + sR);
+  double deltaAngle = (deltaLeftDistance - deltaRightDistance) / (SL + SR);
 
   // Calculate local offset vector
   Cart localOffset;
@@ -104,12 +82,12 @@ void trackPosition(Pose *position, int currentLeft, int currentRight, int curren
   }
   else
   {
-    localOffset.x = 2.0 * sin(deltaAngle / 2.0) * ((deltaBackDistance / deltaAngle) + sB);
-    localOffset.y = 2.0 * sin(deltaAngle / 2.0) * ((deltaRightDistance / deltaAngle) + sR);
+    localOffset.x = 2.0 * sin(deltaAngle / 2.0) * ((deltaBackDistance / deltaAngle) + SB);
+    localOffset.y = 2.0 * sin(deltaAngle / 2.0) * ((deltaRightDistance / deltaAngle) + SR);
   }
 
   // Calculate average angle
-  double avgAngle = newAngle - (deltaAngle / 2);
+  double avgAngle = position->angle + (deltaAngle / 2);
 
   // Calculate cosine and sine of avgAngle
   double cosAvg = cos(avgAngle);
@@ -118,7 +96,7 @@ void trackPosition(Pose *position, int currentLeft, int currentRight, int curren
   // Update the global position by incrementing by a shifted localOffset
   position->x += localOffset.x * cosAvg + localOffset.y * sinAvg;
   position->y += localOffset.x * -sinAvg + localOffset.y * cosAvg;
-  position->angle = newAngle;
+  position->angle += deltaAngle;
 }
 void trackVelocity(Vel *velocity, Pose position)
 {
@@ -155,7 +133,10 @@ void trackPoseTask(void *ignore)
     delay(1);
   }
 }
-
+bool isRobotStopped()
+{
+  return (fabs(globalVel.x) < 0.5) && (fabs(globalVel.y) < 0.5) && (fabs(globalVel.angle) < M_PI / 30);
+}
 double calculateTravelDistance(int encoderCount, double wheelDiameter, int encoderResolution)
 {
   return ((double) encoderCount * M_PI * wheelDiameter) / ((double) encoderResolution);

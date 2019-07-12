@@ -58,9 +58,9 @@ TTTRegularContainer turnContainer;
  */
 void waitUntilChassisMoveComplete();
 /**
- * Initializes the async controller task
+ * Queues the async controller task
  */
-void initializeAsyncChassisController();
+void queueAsyncChassisController(AsyncChassisOptions moveToQueue);
 /**
  * Stops the async controller and resets variables to defaults
  */

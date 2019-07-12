@@ -31,4 +31,8 @@ void initialize()
   leftEncoder = encoderInit(PORT_leftEncoder, PORT_leftEncoder + 1, false);
   rightEncoder = encoderInit(PORT_rightEncoder, PORT_rightEncoder + 1, true);
   backEncoder = encoderInit(PORT_backEncoder, PORT_backEncoder + 1, true);
+
+  // Initialize sonar
+  leftSonar = ultrasonicInit(PORT_leftSonarOrange, PORT_leftSonarYellow);
+
 }

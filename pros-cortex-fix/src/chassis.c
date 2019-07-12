@@ -26,26 +26,26 @@ const unsigned int TrueSpeed[128] =
  88, 89, 89, 90, 90,127,127,127
 };
 
-void powerMotors(int leftPower, int rightPower)
+void setDrive(int leftPower, int rightPower)
 {
-  motorSet(PORT_leftBackMotor, leftPower);
-  motorSet(PORT_leftFrontMotor, leftPower);
-  motorSet(PORT_rightBackMotor, -rightPower);
-  motorSet(PORT_rightFrontMotor, -rightPower);
+  motorSet(PORT_leftMotor0, -leftPower);
+  motorSet(PORT_leftMotor1, leftPower);
+  motorSet(PORT_rightMotor0, rightPower);
+  motorSet(PORT_rightMotor1, -rightPower);
 }
-void powerMotorsLinear(int leftPower, int rightPower)
+void setDriveLinear(int leftPower, int rightPower)
 {
   // Clamping fucntion, as well as looking up proper speed in the array
   leftPower = ((leftPower < 0) ? -1 : 1) * ((abs(leftPower) > 127) ? 127 : TrueSpeed[abs(leftPower)]);
   rightPower = ((rightPower < 0) ? -1 : 1) * ((abs(rightPower) > 127) ? 127 : TrueSpeed[abs(rightPower)]);
-  powerMotors(leftPower, rightPower);
+  setDrive(leftPower, rightPower);
 }
-void stopMotors()
+void stopDrive()
 {
-  motorStop(PORT_leftBackMotor);
-  motorStop(PORT_leftFrontMotor);
-  motorStop(PORT_rightBackMotor);
-  motorStop(PORT_rightFrontMotor);
+  motorStop(PORT_leftMotor0);
+  motorStop(PORT_leftMotor1);
+  motorStop(PORT_rightMotor0);
+  motorStop(PORT_rightMotor1);
 }
 
 // Enums for the various PID controllers

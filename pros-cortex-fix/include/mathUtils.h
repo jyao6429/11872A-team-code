@@ -83,6 +83,22 @@ double degToRad(double degrees);
  */
 double radToDeg(double radians);
 /**
+ * Converts inches to centimeters
+ *
+ * @param inches - the length to convert in inches
+ *
+ * @return the converted length in centimeters
+ */
+double inToCM(double inches);
+/**
+ * Converts centimeters to inches
+ *
+ * @param centimeters - the length to convert in centimeters
+ *
+ * @return the converted length in inches
+ */
+double cmToIN(double centimeters);
+/**
  * Converts cartesian coordinates into polar
  *
  * @param cartVector - the cartesian vector to convert from

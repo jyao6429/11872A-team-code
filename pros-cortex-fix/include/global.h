@@ -4,13 +4,13 @@
 #include "main.h"
 
 // Left-back motor port
-extern const int PORT_leftBackMotor;
+extern const int PORT_leftMotor0;
 // Left-front motor port
-extern const int PORT_leftFrontMotor;
+extern const int PORT_leftMotor1;
 // Right-back motor port
-extern const int PORT_rightBackMotor;
+extern const int PORT_rightMotor0;
 // Right-front motor port
-extern const int PORT_rightFrontMotor;
+extern const int PORT_rightMotor1;
 
 // Other motor ports
 
@@ -31,7 +31,17 @@ extern Encoder backEncoder;
 // Potentiometer port
 extern const int PORT_liftPot;
 
+// Ultrasonic ECHO port
+extern const int PORT_leftSonarOrange;
+// Ultrasonic PING port
+extern const int PORT_leftSonarYellow;
+
+// Left-side ultrasonic sensor
+extern Ultrasonic leftSonar;
+
+// startTesting button
 extern const int PORT_startTestButton;
+// stopTesting limit switch
 extern const int PORT_stopTestButton;
 
 // Enum for different mutexes

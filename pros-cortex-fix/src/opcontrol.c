@@ -15,6 +15,7 @@ void operatorControl()
 
 	while (true)
 	{
+
 		if (digitalRead(PORT_startTestButton) == LOW)
 		{
 			startTesting();
@@ -29,13 +30,7 @@ void operatorControl()
 		int leftPower = joystickGetAnalog(1, 3);
 		int rightPower = joystickGetAnalog(1, 2);
 
-		// Deadband for joysticks
-		if (abs(leftPower) < 15)
-			leftPower = 0;
-		if (abs(rightPower) < 15)
-			rightPower = 0;
-
-		//powerMotors(leftPower, rightPower);
+		//setDriveLinear(leftPower, rightPower);
 
 		delay(20);
 	}

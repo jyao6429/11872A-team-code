@@ -1,7 +1,7 @@
 #include "main.h"
 
 // Maxiumum achievable linear velocity by the robot in inches per second
-#define MAX_LINEAR_VEL 26.0
+#define MAX_LINEAR_VEL 40.0
 
 void moveToTargetSimple(double targetX, double targetY, double startX, double startY, int power, int startPower, double maxErrorX, double decelEarly, int decelPower, double dropEarly, StopType stopType, MTTMode mode)
 {
@@ -42,7 +42,7 @@ void moveToTargetSimple(double targetX, double targetY, double startX, double st
 
   // Just start driving if mode is simple
   if (mode == MTT_SIMPLE)
-    powerMotorsLinear(power, power);
+    setDriveLinear(power, power);
 
   // The final power applied to the wheels after all calculations
   int finalPower = power;
@@ -91,13 +91,13 @@ void moveToTargetSimple(double targetX, double targetY, double startX, double st
           double kB, kP;
           if (false)
           {
-            kB = 6.0;
-            kP = 3.5;
+            kB = 5.0;
+            kP = 3.2;
           }
           else
           {
-            kB = 5.5;
-            kP = 3.0;
+            kB = 4.5;
+            kP = 2.5;
           }
 
           // Calculate target velocity (what does this mean?)
@@ -123,13 +123,13 @@ void moveToTargetSimple(double targetX, double targetY, double startX, double st
     switch ((int) copysign(1.01, angleCorrection))
     {
       case 0:
-        powerMotorsLinear(finalPower, finalPower);
+        setDriveLinear(finalPower, finalPower);
         break;
       case 1:
-        powerMotorsLinear(finalPower, finalPower * exp(-angleCorrection));
+        setDriveLinear(finalPower, finalPower * exp(-angleCorrection));
         break;
       case -1:
-        powerMotorsLinear(finalPower * exp(angleCorrection), finalPower);
+        setDriveLinear(finalPower * exp(angleCorrection), finalPower);
         break;
     }
 
@@ -140,7 +140,7 @@ void moveToTargetSimple(double targetX, double targetY, double startX, double st
   } while(currentPosCart.y < -dropEarly - fmax((currentVel * ((stopType & STOP_SOFT) ? 0.175 : 0.098)), decelEarly));
 
   // Start decelerating
-  powerMotorsLinear(decelPower, decelPower);
+  setDriveLinear(decelPower, decelPower);
 
   do
   {
@@ -161,7 +161,7 @@ void moveToTargetSimple(double targetX, double targetY, double startX, double st
   // Stop with given parameters
   if (stopType & STOP_SOFT)
   {
-    powerMotors(-6 * copysign(1.0, power), -6 * copysign(1.0, power));
+    setDrive(-6 * copysign(1.0, power), -6 * copysign(1.0, power));
     do
     {
       // Calculate relative position to ending point
@@ -182,7 +182,7 @@ void moveToTargetSimple(double targetX, double targetY, double startX, double st
   if (stopType & STOP_HARSH)
     applyHarshStop();
   else
-    stopMotors();
+    stopDrive();
 
   // log
   printf("(moveToTargetSimple) TX: %3.3f   TY: %3.3f   SX: %3.3f   SY: %3.3f   X: %3.3f   Y: %3.3f\n", targetX, targetY, startX, startY, globalPose.x, globalPose.y);
@@ -305,9 +305,9 @@ void sweepTurnToTarget(double targetX, double targetY, double targetAngle, doubl
 
         // Depends on if driving forward or backwards, power the motors
         if (power > 0)
-          powerMotorsLinear(power, power - turnPowerDiff);
+          setDriveLinear(power, power - turnPowerDiff);
         else
-          powerMotorsLinear(power + turnPowerDiff, power);
+          setDriveLinear(power + turnPowerDiff, power);
 
         // Debug
         //printf("CAV: %3.3f   CLV: %3.3f   TAV: %3.3f   TPD: %d   LR: %3.3f   LA: %3.3f   TR: %3.3f   GA: %3.3f   TA: %3.3f\n", radToDeg(angularV), linearV, radToDeg(targetOmega), turnPowerDiff, localRadius, radToDeg(localAngle), targetRadius, radToDeg(globalAngle), radToDeg(targetAngle));
@@ -389,9 +389,9 @@ void sweepTurnToTarget(double targetX, double targetY, double targetAngle, doubl
 
         // Depends on if driving forward or backwards, power the motors
         if (power > 0)
-          powerMotorsLinear(power + turnPowerDiff, power);
+          setDriveLinear(power + turnPowerDiff, power);
         else
-          powerMotorsLinear(power, power - turnPowerDiff);
+          setDriveLinear(power, power - turnPowerDiff);
 
         // Debug
         //printf("CAV: %3.3f   CLV: %3.3f   TAV: %3.3f   TPD: %d   LR: %3.3f   LA: %3.3f   TR: %3.3f   GA: %3.3f   TA: %3.3f\n", radToDeg(angularV), linearV, radToDeg(targetOmega), turnPowerDiff, localRadius, radToDeg(localAngle - M_PI / 2), targetRadius, radToDeg(globalAngle), radToDeg(targetAngle));
@@ -412,7 +412,7 @@ void sweepTurnToTarget(double targetX, double targetY, double targetAngle, doubl
       } while ((power > 0 ? globalPose.angle : (globalPose.angle + M_PI)) - targetAngle > (isAccurate ? 0.1 : 0.15));
       break;
   }
-  stopMotors();
+  stopDrive();
   // Log
   printf("(sweepTurnToTarget)   TX: %3.3f   TY: %3.3f   TA: %3.3f   X: %3.3f   Y: %3.3f   A: %3.3f\n", targetX, targetY, radToDeg(targetAngle), globalPose.x, globalPose.y, radToDeg(globalPose.angle));
 }
@@ -443,7 +443,7 @@ void turnToAngleNew(double targetAngle, TurnDir turnDir, double fullPowerRatio, 
       // Calculate angle to stop going at full power
       endFullPower = globalPose.angle * (1 - fullPowerRatio) + targetAngle * fullPowerRatio;
       // Set motors to full power
-      powerMotors(127, -127);
+      setDrive(127, -127);
 
       // Wait until past endFullPower
       while (globalPose.angle < endFullPower)
@@ -451,7 +451,7 @@ void turnToAngleNew(double targetAngle, TurnDir turnDir, double fullPowerRatio, 
         delay(10);
       }
       // Now set to coastPower
-      powerMotors(coastPower, -coastPower);
+      setDrive(coastPower, -coastPower);
 
       // Wait until within error range
       while (globalPose.angle < targetAngle - degToRad(stopPowerDiff))
@@ -462,10 +462,10 @@ void turnToAngleNew(double targetAngle, TurnDir turnDir, double fullPowerRatio, 
       // Now stop the robot according to parameters
       if (harshStop)
       {
-        powerMotors(-20, 20);
+        setDrive(-20, 20);
         delay(150);
       }
-      stopMotors();
+      stopDrive();
       break;
     case TURN_CCW:
       // Convert targetAngle to be nearest equivalent less than the current robot orientation
@@ -473,7 +473,7 @@ void turnToAngleNew(double targetAngle, TurnDir turnDir, double fullPowerRatio, 
       // Calculate angle to stop going at full power
       endFullPower = globalPose.angle * (1 - fullPowerRatio) + targetAngle * fullPowerRatio;
       // Set motors to full power
-      powerMotors(-127, 127);
+      setDrive(-127, 127);
 
       // Wait until past endFullPower
       while (globalPose.angle > endFullPower)
@@ -481,7 +481,7 @@ void turnToAngleNew(double targetAngle, TurnDir turnDir, double fullPowerRatio, 
         delay(10);
       }
       // Now set to coastPower
-      powerMotors(-coastPower, coastPower);
+      setDrive(-coastPower, coastPower);
 
       // Wait until within error range
       while (globalPose.angle > targetAngle + degToRad(stopPowerDiff))
@@ -492,10 +492,10 @@ void turnToAngleNew(double targetAngle, TurnDir turnDir, double fullPowerRatio, 
       // Now stop the robot according to parameters
       if (harshStop)
       {
-        powerMotors(20, -20);
+        setDrive(20, -20);
         delay(150);
       }
-      stopMotors();
+      stopDrive();
       break;
   }
   // Log
@@ -527,7 +527,7 @@ void turnToTargetNew(double targetX, double targetY, TurnDir turnDir, double ful
       // Calculate angle to stop going at full power
       endFullPower = globalPose.angle * (1 - fullPowerRatio) + targetAngle * fullPowerRatio;
       // Set motors to full power
-      powerMotors(127, -127);
+      setDrive(127, -127);
 
       // Wait until past endFullPower
       while (globalPose.angle < endFullPower)
@@ -535,7 +535,7 @@ void turnToTargetNew(double targetX, double targetY, TurnDir turnDir, double ful
         delay(10);
       }
       // Now set to coastPower
-      powerMotors(coastPower, -coastPower);
+      setDrive(coastPower, -coastPower);
 
       // Wait until within error range
       while (globalPose.angle < nearestEquivalentAngle(atan2(targetX - globalPose.x, targetY - globalPose.y) + angleOffset, targetAngle) - degToRad(stopPowerDiff))
@@ -546,10 +546,10 @@ void turnToTargetNew(double targetX, double targetY, TurnDir turnDir, double ful
       // Now stop the robot according to parameters
       if (harshStop)
       {
-        powerMotors(-20, 20);
+        setDrive(-20, 20);
         delay(150);
       }
-      stopMotors();
+      stopDrive();
       break;
     case TURN_CCW:
       // Calculate targetAngle to be nearest equivalent angle less than the current robot orientation
@@ -557,7 +557,7 @@ void turnToTargetNew(double targetX, double targetY, TurnDir turnDir, double ful
       // Calculate angle to stop going at full power
       endFullPower = globalPose.angle * (1 - fullPowerRatio) + targetAngle * fullPowerRatio;
       // Set motors to full power
-      powerMotors(-127, 127);
+      setDrive(-127, 127);
 
       // Wait until past endFullPower
       while (globalPose.angle > endFullPower)
@@ -565,7 +565,7 @@ void turnToTargetNew(double targetX, double targetY, TurnDir turnDir, double ful
         delay(10);
       }
       // Now set to coastPower
-      powerMotors(-coastPower, coastPower);
+      setDrive(-coastPower, coastPower);
 
       // Wait until within error range
       while (globalPose.angle > nearestEquivalentAngle(atan2(targetX - globalPose.x, targetY - globalPose.y) + angleOffset, targetAngle) + degToRad(stopPowerDiff))
@@ -576,10 +576,10 @@ void turnToTargetNew(double targetX, double targetY, TurnDir turnDir, double ful
       // Now stop the robot according to parameters
       if (harshStop)
       {
-        powerMotors(20, -20);
+        setDrive(20, -20);
         delay(150);
       }
-      stopMotors();
+      stopDrive();
       break;
   }
   // Log
@@ -626,7 +626,7 @@ void applyHarshStop()
   printf("Applying harsh stop: LP: %d   RP: %d\n", leftPowInt, rightPowInt);
 
   // Drive the motors
-  powerMotors(leftPowInt, rightPowInt);
+  setDrive(leftPowInt, rightPowInt);
   delay(150);
-  stopMotors();
+  stopDrive();
 }
