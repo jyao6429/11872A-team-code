@@ -16,6 +16,6 @@ typedef enum ResetType
 } ResetType;
 
 double sonarReadFiltered(Ultrasonic sonar, double minValue, double maxValue, unsigned long minTime, unsigned long maxTime);
-void resetAgainstWall(ResetType resetType, double minDisFromWall, double maxDisFromWall, unsigned long minTime, unsigned long maxTime);
+void resetLeftAgainstWall(ResetType resetType, double minDisFromWall, double maxDisFromWall, unsigned long minTime, unsigned long maxTime);
 
 #endif

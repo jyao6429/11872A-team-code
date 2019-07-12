@@ -29,29 +29,33 @@ void asyncChassisTask(void *ignore)
       break;
   }
   // Reset variables
-  mutexTake(mutexes[MUTEX_ASYNC], 10);
+  mutexTake(mutexes[MUTEX_ASYNC], -1);
   nextMove = ASYNC_NONE;
-  mutexGive(mutexes[MUTEX_ASYNC]);
   isChassisMoving = false;
+  mutexGive(mutexes[MUTEX_ASYNC]);
 }
 void waitUntilChassisMoveComplete()
 {
   while (isChassisMoving) { delay(40); }
 }
-void initializeAsyncChassisController()
+void queueAsyncChassisController(AsyncChassisOptions moveToQueue)
 {
-  // Checks if there is an actual motion to do
-  if (nextMove == ASYNC_NONE)
-    return;
-
   // Stop task if needed
   unsigned int asyncState = taskGetState(asyncChassisHandle);
   if (asyncChassisHandle != NULL && (asyncState == TASK_RUNNING || asyncState == TASK_SLEEPING || asyncState == TASK_SUSPENDED))
     taskDelete(asyncChassisHandle);
+  stopDrive();
 
+  // Checks if there is an actual motion to do
+  if (moveToQueue == ASYNC_NONE)
+    return;
+  
   // Start the task
+  mutexTake(mutexes[MUTEX_ASYNC], -1);
+  nextMove = moveToQueue;
   isChassisMoving = true;
   asyncChassisHandle = taskCreate(asyncChassisTask, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT + 1);
+  mutexGive(mutexes[MUTEX_ASYNC]);
 }
 void stopAsyncChassisController()
 {
@@ -63,8 +67,8 @@ void stopAsyncChassisController()
   // Reset variables
   mutexTake(mutexes[MUTEX_ASYNC], -1);
   nextMove = ASYNC_NONE;
-  mutexGive(mutexes[MUTEX_ASYNC]);
   isChassisMoving = false;
+  mutexGive(mutexes[MUTEX_ASYNC]);
 }
 void moveToTargetSimpleAsync(double targetX, double targetY, double startX, double startY, int power, int startPower, double maxErrorX, double decelEarly, int decelPower, double dropEarly, StopType stopType, MTTMode mode)
 {
@@ -81,11 +85,8 @@ void moveToTargetSimpleAsync(double targetX, double targetY, double startX, doub
   mttContainer.dropEarly = dropEarly;
   mttContainer.stopType = stopType;
   mttContainer.mode = mode;
-  // Set nextMove and run the controller
-  mutexTake(mutexes[MUTEX_ASYNC], -1);
-  nextMove = ASYNC_MTT_SIMPLE;
-  initializeAsyncChassisController();
-  mutexGive(mutexes[MUTEX_ASYNC]);
+  // Queue the next move
+  queueAsyncChassisController(ASYNC_MTT_SIMPLE);
 }
 void moveToTargetDisSimpleAsync(double angle, double distance, double startX, double startY, int power, int startPower, double maxErrorX, double decelEarly, int decelPower, double dropEarly, StopType stopType, MTTMode mode, bool isDegrees)
 {
@@ -103,11 +104,8 @@ void moveToTargetDisSimpleAsync(double angle, double distance, double startX, do
   mttContainer.stopType = stopType;
   mttContainer.mode = mode;
   mttContainer.isDegrees = isDegrees;
-  // Set nextMove and run the controller
-  mutexTake(mutexes[MUTEX_ASYNC], -1);
-  nextMove = ASYNC_MTT_DIS;
-  initializeAsyncChassisController();
-  mutexGive(mutexes[MUTEX_ASYNC]);
+  // Queue the next move
+  queueAsyncChassisController(ASYNC_MTT_DIS);
 }
 void sweepTurnToTargetAsync(double targetX, double targetY, double targetAngle, double targetRadius, TurnDir turnDir, int power, bool isAccurate, bool isDegrees)
 {
@@ -120,11 +118,8 @@ void sweepTurnToTargetAsync(double targetX, double targetY, double targetAngle, 
   sweepContainer.power = power;
   sweepContainer.isAccurate = isAccurate;
   sweepContainer.isDegrees = isDegrees;
-  // Set nextMove and run the controller
-  mutexTake(mutexes[MUTEX_ASYNC], -1);
-  nextMove = ASYNC_TTT_SWEEP;
-  initializeAsyncChassisController();
-  mutexGive(mutexes[MUTEX_ASYNC]);
+  // Queue the next move
+  queueAsyncChassisController(ASYNC_TTT_SWEEP);
 }
 void turnToAngleNewAsync(double targetAngle, TurnDir turnDir, double fullPowerRatio, int coastPower, double stopPowerDiff, bool harshStop, bool isDegrees)
 {
@@ -136,11 +131,8 @@ void turnToAngleNewAsync(double targetAngle, TurnDir turnDir, double fullPowerRa
   turnContainer.stopPowerDiff = stopPowerDiff;
   turnContainer.harshStop = harshStop;
   turnContainer.isDegrees = isDegrees;
-  // Set nextMove and run the controller
-  mutexTake(mutexes[MUTEX_ASYNC], -1);
-  nextMove = ASYNC_TTT_ANGLE;
-  initializeAsyncChassisController();
-  mutexGive(mutexes[MUTEX_ASYNC]);
+  // Queue the next move
+  queueAsyncChassisController(ASYNC_TTT_ANGLE);
 }
 void turnToTargetNewAsync(double targetX, double targetY, TurnDir turnDir, double fullPowerRatio, int coastPower, double stopPowerDiff, double angleOffset, bool harshStop, bool isDegrees)
 {
@@ -154,9 +146,6 @@ void turnToTargetNewAsync(double targetX, double targetY, TurnDir turnDir, doubl
   turnContainer.angleOffset = angleOffset;
   turnContainer.harshStop = harshStop;
   turnContainer.isDegrees = isDegrees;
-  // Set nextMove and run the controller
-  mutexTake(mutexes[MUTEX_ASYNC], -1);
-  nextMove = ASYNC_TTT_TARGET;
-  initializeAsyncChassisController();
-  mutexGive(mutexes[MUTEX_ASYNC]);
+  // Queue the next move
+  queueAsyncChassisController(ASYNC_TTT_TARGET);
 }

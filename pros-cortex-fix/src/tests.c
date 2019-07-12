@@ -11,9 +11,26 @@ void gatherVelocityData()
 	int powerDiff = -150;
 	unsigned long timer = millis();
 
-	while (powerDiff <= 0)
+	// Gather max linear velocity
+	while (millis() - timer < 2500 && false)
 	{
-		powerMotorsLinear(127 + powerDiff, 127);
+		setDrive(127, 127);
+		logDataDouble("linearV", sqrt(pow(globalVel.x, 2) + pow(globalVel.y, 2)));
+		delay(50);
+	}
+
+	// Gather max angular velocity
+	while (millis() - timer < 2500 && true)
+	{
+		setDrive(-127, 127);
+		logDataDouble("angularV", globalVel.angle);
+		logDataDouble("angularVDeg", radToDeg(globalVel.angle));
+		delay(50);
+	}
+
+	while (powerDiff <= 0 && false)
+	{
+		setDriveLinear(127 + powerDiff, 127);
 
 		double angularV = globalVel.angle;
 
@@ -21,6 +38,8 @@ void gatherVelocityData()
 		logDataInt("powerDiff", powerDiff);
 		logDataDouble("angularV80", angularV * 80);
 		logDataDouble("angularV70", angularV * 70);
+		logDataDouble("angularV60", angularV * 60);
+		logDataDouble("angularV50", angularV * 50);
 		logDataDouble("angularVDeg", radToDeg(angularV));
 
 		if (millis() - timer > 500)
@@ -59,7 +78,7 @@ void testNewMotionAlgorithms()
 }
 void testSonar()
 {
-	resetAgainstWall(RESET_X_NEAR, 0, 100, 100, 500);
+	resetLeftAgainstWall(RESET_X_NEAR, 0, 100, 100, 500);
 
 	while (false)
 	{
@@ -77,9 +96,10 @@ void testTask(void *ignore)
 	resetVelocity(&globalVel, globalPose);
 
 	// Call method for the test
-	testSonar();
+	//gatherVelocityData();
+	testNewMotionAlgorithms();
 
-	stopMotors();
+	stopDrive();
 
 	// Debug if wanted
 	while (true)
@@ -107,6 +127,6 @@ void stopTesting()
   if (testHandler != NULL && (testState == TASK_RUNNING || testState == TASK_SLEEPING || testState == TASK_SUSPENDED))
     taskDelete(testHandler);
 
-	stopMotors();
+	stopDrive();
 	print("Stopped testing\n");
 }

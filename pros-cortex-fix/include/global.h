@@ -4,13 +4,13 @@
 #include "main.h"
 
 // Left-back motor port
-extern const int PORT_leftBackMotor;
+extern const int PORT_leftMotor0;
 // Left-front motor port
-extern const int PORT_leftFrontMotor;
+extern const int PORT_leftMotor1;
 // Right-back motor port
-extern const int PORT_rightBackMotor;
+extern const int PORT_rightMotor0;
 // Right-front motor port
-extern const int PORT_rightFrontMotor;
+extern const int PORT_rightMotor1;
 
 // Other motor ports
 

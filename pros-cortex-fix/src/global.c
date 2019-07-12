@@ -1,10 +1,10 @@
 #include "main.h"
 
 // Drive motor ports
-const int PORT_leftBackMotor = 9;
-const int PORT_leftFrontMotor = 8;
-const int PORT_rightBackMotor = 2;
-const int PORT_rightFrontMotor = 3;
+const int PORT_leftMotor0 = 9;
+const int PORT_leftMotor1 = 8;
+const int PORT_rightMotor0 = 2;
+const int PORT_rightMotor1 = 3;
 
 // Other motor ports
 
