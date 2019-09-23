@@ -42,14 +42,14 @@ void queueAsyncChassisController(AsyncChassisOptions moveToQueue)
 {
   // Stop task if needed
   unsigned int asyncState = taskGetState(asyncChassisHandle);
-  if (asyncChassisHandle != NULL && (asyncState == TASK_RUNNING || asyncState == TASK_SLEEPING || asyncState == TASK_SUSPENDED))
+  if (asyncChassisHandle != NULL && (asyncState != TASK_DEAD))
     taskDelete(asyncChassisHandle);
   stopDrive();
 
   // Checks if there is an actual motion to do
   if (moveToQueue == ASYNC_NONE)
     return;
-  
+
   // Start the task
   mutexTake(mutexes[MUTEX_ASYNC], -1);
   nextMove = moveToQueue;
@@ -61,7 +61,7 @@ void stopAsyncChassisController()
 {
   // Stop task if needed
   unsigned int asyncState = taskGetState(asyncChassisHandle);
-  if (asyncChassisHandle != NULL && (asyncState == TASK_RUNNING || asyncState == TASK_SLEEPING || asyncState == TASK_SUSPENDED))
+  if (asyncChassisHandle != NULL && (asyncState != TASK_DEAD))
     taskDelete(asyncChassisHandle);
 
   // Reset variables

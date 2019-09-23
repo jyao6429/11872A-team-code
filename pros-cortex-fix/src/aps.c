@@ -10,7 +10,7 @@ void resetPositionFull(Pose *position, double startX, double startY, double star
 
   // Stop task
   unsigned int APSState = taskGetState(APSTask);
-  if (APSTask != NULL && (APSState == TASK_RUNNING || APSState == TASK_SLEEPING || APSState == TASK_SUSPENDED))
+  if (APSTask != NULL && (APSState != TASK_DEAD))
     taskDelete(APSTask);
 
 //print("Deleted task if needed\n");

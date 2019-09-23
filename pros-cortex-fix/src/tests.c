@@ -59,9 +59,9 @@ void testNewMotionAlgorithms()
 	//moveToTargetSimple(0.0, 36.0, 0.0, 0.0, 127, 127, 1, 0, 0, 0, STOP_NONE, MTT_SIMPLE);
 	//moveToTargetSimple(-36, 72, 0, 36, 127, 127, 0.5, 0, 50, 0, STOP_HARSH, MTT_CASCADING);
 
-	moveToTargetSimpleAsync(0.0, 120.0, 0.0, 0.0, 127, 0, 1, 0, 0, 0, STOP_NONE, MTT_SIMPLE);
+	moveToTargetSimpleAsync(0.0, 60.0, 0.0, 0.0, 127, 0, 1, 0, 0, 0, STOP_NONE, MTT_SIMPLE);
 	print("~~~1~~~\n");
-	delay(2000);
+	delay(1500);
 	print("~~~2~~~\n");
 	turnToAngleNewAsync(-90, TURN_CCW, 0.9, 127, 0, false, true);
 	print("~~~3~~~\n");
@@ -71,10 +71,18 @@ void testNewMotionAlgorithms()
 	print("~~~5~~~\n");
 	waitUntilChassisMoveComplete();
 	print("~~~6~~~\n");
-	moveToTargetSimpleAsync(0.0, 0.0, globalPose.x, globalPose.y, 127, 0, 0.5, 0, 20, 0, STOP_HARSH, MTT_CASCADING);
+	moveToTargetSimpleAsync(0.0, 0.0, 0.0, globalPose.y, 127, 0, 0.5, 0, 20, 0, STOP_HARSH, MTT_CASCADING);
 	print("~~~7~~~\n");
 	waitUntilChassisMoveComplete();
 	print("~~~8~~~\n");
+}
+void testAsyncNew()
+{
+	print("~~~1~~~\n");
+	turnToAngleNewAsync(-90, TURN_CCW, 0.9, 127, 0, false, true);
+	print("~~~2~~~\n");
+	waitUntilChassisMoveComplete();
+	print("~~~3~~~\n");
 }
 void testSonar()
 {
@@ -98,11 +106,12 @@ void testTask(void *ignore)
 	// Call method for the test
 	//gatherVelocityData();
 	testNewMotionAlgorithms();
+	//testAsyncNew();
 
 	stopDrive();
 
 	// Debug if wanted
-	while (true)
+	while (false)
 	{
 		printf("X: %3.3f   Y: %3.3f   A: %3.3f   XV: %3.3f   YV: %3.3f   AV: %3.3f\n", globalPose.x, globalPose.y, radToDeg(globalPose.angle), globalVel.x, globalVel.y, radToDeg(globalVel.angle));
 		delay(50);
@@ -124,8 +133,10 @@ void stopTesting()
 {
 	// Stop task if needed
   unsigned int testState = taskGetState(testHandler);
-  if (testHandler != NULL && (testState == TASK_RUNNING || testState == TASK_SLEEPING || testState == TASK_SUSPENDED))
+  if (testHandler != NULL && (testState != TASK_DEAD))
     taskDelete(testHandler);
+
+	stopAsyncChassisController();
 
 	stopDrive();
 	print("Stopped testing\n");
