@@ -13,6 +13,11 @@ extern const int PORT_rightMotor0;
 extern const int PORT_rightMotor1;
 
 // Other motor ports
+extern const int PORT_tilter;
+extern const int PORT_leftArm;
+extern const int PORT_rightArm;
+extern const int PORT_leftRollers;
+extern const int PORT_rightRollers;
 
 // Left encoder port
 extern const int PORT_leftEncoder;
@@ -43,6 +48,11 @@ extern Ultrasonic leftSonar;
 extern const int PORT_startTestButton;
 // stopTesting limit switch
 extern const int PORT_stopTestButton;
+
+// Limit switch when tray is vertical
+extern const int PORT_verticalTilterLimit;
+// Limit switch when tray is at maximum angle
+extern const int PORT_angledTilterLimit;
 
 // Enum for different mutexes
 enum MutexTypes
