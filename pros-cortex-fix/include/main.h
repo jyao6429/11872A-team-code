@@ -37,6 +37,7 @@
 #include "chassis.h"
 #include "sonar.h"
 #include "asyncChassisControl.h"
+#include "tilter.h"
 #include "tests.h"
 #include "NERD_PID.h"
 
