@@ -1,5 +1,12 @@
 #include "main.h"
 
+void stopAPS()
+{
+  // Stop task
+  unsigned int APSState = taskGetState(APSTask);
+  if (APSTask != NULL && (APSState != TASK_DEAD))
+    taskDelete(APSTask);
+}
 void resetPositionFull(Pose *position, double startX, double startY, double startAngle, bool isDegrees)
 {
   // Convert to radians if needed
@@ -8,10 +15,7 @@ void resetPositionFull(Pose *position, double startX, double startY, double star
 
   printf("(resetPositionFull) X: %3.3f   Y: %3.3f   A: %3.3f\n", startX, startY, radToDeg(startAngle));
 
-  // Stop task
-  unsigned int APSState = taskGetState(APSTask);
-  if (APSTask != NULL && (APSState != TASK_DEAD))
-    taskDelete(APSTask);
+  stopAPS();
 
 //print("Deleted task if needed\n");
 

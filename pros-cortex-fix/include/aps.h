@@ -43,7 +43,10 @@ double resetAngle;
 
 // handles the tracking task
 TaskHandle APSTask;
-
+/**
+ * Stops position and velocity tracking
+ */
+void stopAPS();
 /**
  * Resets the position to given parameters, and restarts the APS
  *

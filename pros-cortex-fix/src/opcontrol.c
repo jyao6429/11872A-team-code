@@ -17,6 +17,7 @@ void operatorControl()
 
 	while (true)
 	{
+		/*
 		if (digitalRead(PORT_startTestButton) == LOW)
 		{
 			startTesting();
@@ -27,16 +28,11 @@ void operatorControl()
 			stopTesting();
 			delay(500);
 		}
-
+		*/
 		int leftPower = joystickGetAnalog(1, 3);
 		int rightPower = joystickGetAnalog(1, 2);
 
 		setDriveLinear(leftPower, rightPower);
-
-		if (joystickGetDigital(1, 8, JOY_UP) == 1)
-		{
-			moveToTargetSimple(0.0, 0.0, globalPose.x, globalPose.y, 127, 0, 1, 0, 30, 0, STOP_HARSH, MTT_PROPORTIONAL);
-		}
 
 		delay(20);
 	}
