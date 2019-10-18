@@ -3,9 +3,9 @@
 void asyncChassisTask(void *ignore)
 {
   // Store the current move
-  mutexTake(mutexes[MUTEX_ASYNC], -1);
+  mutexTake(mutexes[MUTEX_ASYNC_CHASSIS], -1);
   AsyncChassisOptions currentMove = nextMove;
-  mutexGive(mutexes[MUTEX_ASYNC]);
+  mutexGive(mutexes[MUTEX_ASYNC_CHASSIS]);
 
   // Switch between each motion type
   switch (currentMove)
@@ -29,10 +29,10 @@ void asyncChassisTask(void *ignore)
       break;
   }
   // Reset variables
-  mutexTake(mutexes[MUTEX_ASYNC], -1);
+  mutexTake(mutexes[MUTEX_ASYNC_CHASSIS], -1);
   nextMove = ASYNC_NONE;
   isChassisMoving = false;
-  mutexGive(mutexes[MUTEX_ASYNC]);
+  mutexGive(mutexes[MUTEX_ASYNC_CHASSIS]);
 }
 void waitUntilChassisMoveComplete()
 {
@@ -51,11 +51,11 @@ void queueAsyncChassisController(AsyncChassisOptions moveToQueue)
     return;
 
   // Start the task
-  mutexTake(mutexes[MUTEX_ASYNC], -1);
+  mutexTake(mutexes[MUTEX_ASYNC_CHASSIS], -1);
   nextMove = moveToQueue;
   isChassisMoving = true;
   asyncChassisHandle = taskCreate(asyncChassisTask, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT + 1);
-  mutexGive(mutexes[MUTEX_ASYNC]);
+  mutexGive(mutexes[MUTEX_ASYNC_CHASSIS]);
 }
 void stopAsyncChassisController()
 {
@@ -65,10 +65,10 @@ void stopAsyncChassisController()
     taskDelete(asyncChassisHandle);
 
   // Reset variables
-  mutexTake(mutexes[MUTEX_ASYNC], -1);
+  mutexTake(mutexes[MUTEX_ASYNC_CHASSIS], -1);
   nextMove = ASYNC_NONE;
   isChassisMoving = false;
-  mutexGive(mutexes[MUTEX_ASYNC]);
+  mutexGive(mutexes[MUTEX_ASYNC_CHASSIS]);
 }
 void moveToTargetSimpleAsync(double targetX, double targetY, double startX, double startY, int power, int startPower, double maxErrorX, double decelEarly, int decelPower, double dropEarly, StopType stopType, MTTMode mode)
 {

@@ -12,8 +12,8 @@
 void operatorControl()
 {
 	printf("Starting operatorControl\n");
-	resetPositionFull(&globalPose, 0.0, 0.0, 0.0, true);
-	resetVelocity(&globalVel, globalPose);
+	//resetPositionFull(&globalPose, 0.0, 0.0, 0.0, true);
+	//resetVelocity(&globalVel, globalPose);
 
 	while (true)
 	{

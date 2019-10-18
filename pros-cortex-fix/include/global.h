@@ -34,7 +34,7 @@ extern Encoder rightEncoder;
 extern Encoder backEncoder;
 
 // Potentiometer port
-extern const int PORT_liftPot;
+extern const int PORT_armPot;
 
 // Ultrasonic ECHO port
 extern const int PORT_leftSonarOrange;
@@ -58,7 +58,7 @@ extern const int PORT_angledTilterLimit;
 enum MutexTypes
 {
   MUTEX_POSE,
-  MUTEX_ASYNC
+  MUTEX_ASYNC_CHASSIS
 };
 // Mutexes
 Mutex mutexes[2];
