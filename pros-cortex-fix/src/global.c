@@ -10,8 +10,8 @@ const int PORT_rightMotor1 = 3;
 const int PORT_tilter = -1;
 const int PORT_leftArm = -1;
 const int PORT_rightArm = -1;
-const int PORT_leftRollers = -1;
-const int PORT_rightRollers = -1;
+const int PORT_leftRoller = -1;
+const int PORT_rightRoller = -1;
 
 // Encoder ports
 const int PORT_leftEncoder = 5;

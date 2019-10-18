@@ -16,8 +16,8 @@ extern const int PORT_rightMotor1;
 extern const int PORT_tilter;
 extern const int PORT_leftArm;
 extern const int PORT_rightArm;
-extern const int PORT_leftRollers;
-extern const int PORT_rightRollers;
+extern const int PORT_leftRoller;
+extern const int PORT_rightRoller;
 
 // Left encoder port
 extern const int PORT_leftEncoder;
