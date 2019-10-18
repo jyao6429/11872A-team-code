@@ -94,7 +94,16 @@ void testSonar()
 		delay(10);
 	}
 }
+void testTilter()
+{
+	moveTilterVertical();
+	delay(1000);
+	moveTilterAngled();
+}
 
+/***************************************************************
+ *                   Tasks to handle tests                     *
+ ***************************************************************/
 TaskHandle testHandler;
 
 void testTask(void *ignore)
@@ -105,10 +114,11 @@ void testTask(void *ignore)
 
 	// Call method for the test
 	//gatherVelocityData();
-	testNewMotionAlgorithms();
+	//testNewMotionAlgorithms();
 	//testAsyncNew();
 
 	stopDrive();
+	stopTilter();
 
 	// Debug if wanted
 	while (false)
@@ -139,5 +149,6 @@ void stopTesting()
 	stopAsyncChassisController();
 
 	stopDrive();
+	stopTilter();
 	print("Stopped testing\n");
 }
