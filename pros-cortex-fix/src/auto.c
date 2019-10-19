@@ -105,6 +105,7 @@ void autoChooser()
       digitalWrite(PORT_smallGoalLED, HIGH);
       break;
     case AUTO_SKILLS:
+      // Flash both LEDs for 1 sec
       for (int i = 0; i < 5; i++)
       {
         digitalWrite(PORT_redAllianceLED, LOW);
@@ -116,6 +117,7 @@ void autoChooser()
       }
       break;
     case AUTO_NONE:
+      // Flash 1 LED for 1 sec
       for (int i = 0; i < 5; i++)
       {
         digitalWrite(PORT_redAllianceLED, LOW);

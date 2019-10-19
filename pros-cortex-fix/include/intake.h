@@ -26,7 +26,7 @@ void moveArmsZero();
 /**
  * Gets a normalized value from the arm potentiometer
  *
- * @returns - the normalized value from the arm pot
+ * @returns the normalized value from the arm pot
  */
 int getArmPot();
 /**

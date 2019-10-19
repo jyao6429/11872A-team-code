@@ -42,6 +42,7 @@ void initialize()
   // Initialize sonar
   leftSonar = ultrasonicInit(PORT_leftSonarOrange, PORT_leftSonarYellow);
 
+  // Finally, initialize the autonomous choosing procedure
   chosenAuto = AUTO_NONE;
   autoChooser();
 }

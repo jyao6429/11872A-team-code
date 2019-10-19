@@ -23,6 +23,7 @@ double sonarReadFiltered(Ultrasonic sonar, double minValue, double maxValue, uns
     // Get the current readout and check if it is a valid response
     int currentRead = ultrasonicGet(sonar);
 
+    // Add to good readings if within range
     if (currentRead < maxValue && currentRead > minValue && currentRead != ULTRA_BAD_RESPONSE)
     {
       totalGoodSum += currentRead;
@@ -34,10 +35,12 @@ double sonarReadFiltered(Ultrasonic sonar, double minValue, double maxValue, uns
 }
 void resetLeftAgainstWall(ResetType resetType, double minDisFromWall, double maxDisFromWall, unsigned long minTime, unsigned long maxTime)
 {
+  // Variables to make sure robot is fully against wall
   unsigned long resetTimer = millis();
   unsigned long stopTimer = millis();
   bool isStopped = false;
 
+  // Keep driving backwards until robot is still for 350 milliseconds
   while (!isStopped)
   {
     setDriveLinear(-30, -30);
@@ -52,13 +55,16 @@ void resetLeftAgainstWall(ResetType resetType, double minDisFromWall, double max
     }
   }
 
+  // Get a filtered value
   double filteredRead = sonarReadFiltered(leftSonar, minDisFromWall, maxDisFromWall, minTime, maxTime);
 
+  // Add on distance to center of the robot
   if (filteredRead > 0)
     filteredRead += LEFT_SONAR_TO_CENTER;
 
   printf("filteredRead: %3.3f\n", filteredRead);
 
+  // Switch between the different walls
   switch (resetType)
   {
     case RESET_X_NEAR:
@@ -86,6 +92,7 @@ void resetLeftAgainstWall(ResetType resetType, double minDisFromWall, double max
         resetPositionFull(&globalPose, FIELD_WIDTH - BACK_TO_CENTER, globalPose.y, -M_PI / 2, false);
       break;
   }
+  // Reset the velocity as well
   resetVelocity(&globalVel, globalPose);
   stopDrive();
 
