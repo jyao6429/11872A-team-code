@@ -9,8 +9,49 @@
 
 #include "main.h"
 
+void autoSkills()
+{
+
+}
+void autoBlueSmall()
+{
+
+}
+void autoBlueLarge()
+{
+
+}
+void autoRedSmall()
+{
+
+}
+void autoRedLarge()
+{
+
+}
 void autonomous()
 {
+  // Choose the correct autonomous
+  switch (chosenAuto)
+  {
+    case AUTO_BLUE_SMALL:
+      autoBlueSmall();
+      break;
+    case AUTO_BLUE_LARGE:
+      autoBlueLarge();
+      break;
+    case AUTO_RED_SMALL:
+      autoRedSmall();
+      break;
+    case AUTO_RED_LARGE:
+      autoRedLarge();
+      break;
+    case AUTO_SKILLS:
+      autoSkills();
+      break;
+    case AUTO_NONE:
+      break;
+  }
 }
 
 void autoChooser()
@@ -41,7 +82,47 @@ void autoChooser()
       delay(500);
       notChosen = digitalRead(PORT_interactButton) == HIGH;
     }
-
     delay(20);
+  }
+
+  // Light the correct LED indicators
+  switch (chosenAuto)
+  {
+    case AUTO_BLUE_SMALL:
+      digitalWrite(PORT_redAllianceLED, HIGH);
+      digitalWrite(PORT_smallGoalLED, LOW);
+      break;
+    case AUTO_BLUE_LARGE:
+      digitalWrite(PORT_redAllianceLED, HIGH);
+      digitalWrite(PORT_smallGoalLED, HIGH);
+      break;
+    case AUTO_RED_SMALL:
+      digitalWrite(PORT_redAllianceLED, LOW);
+      digitalWrite(PORT_smallGoalLED, LOW);
+      break;
+    case AUTO_RED_LARGE:
+      digitalWrite(PORT_redAllianceLED, LOW);
+      digitalWrite(PORT_smallGoalLED, HIGH);
+      break;
+    case AUTO_SKILLS:
+      for (int i = 0; i < 5; i++)
+      {
+        digitalWrite(PORT_redAllianceLED, LOW);
+        digitalWrite(PORT_smallGoalLED, LOW);
+        delay(100);
+        digitalWrite(PORT_redAllianceLED, HIGH);
+        digitalWrite(PORT_smallGoalLED, HIGH);
+        delay(100);
+      }
+      break;
+    case AUTO_NONE:
+      for (int i = 0; i < 5; i++)
+      {
+        digitalWrite(PORT_redAllianceLED, LOW);
+        delay(100);
+        digitalWrite(PORT_redAllianceLED, HIGH);
+        delay(100);
+      }
+      break;
   }
 }

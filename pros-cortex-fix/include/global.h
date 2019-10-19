@@ -54,6 +54,11 @@ extern const int PORT_interactButton;
 // Limit switch when tray is at maximum angle
 //extern const int PORT_angledTrayLimit;
 
+// If on, robot is on red alliance
+extern const int PORT_redAllianceLED;
+// If on, robot is near the small goal
+extern const int PORT_smallGoalLED;
+
 // Enum for different mutexes
 enum MutexTypes
 {

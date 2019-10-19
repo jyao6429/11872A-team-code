@@ -39,5 +39,9 @@ const int PORT_interactButton = 11;
 //const int PORT_verticalTrayLimit = -1;
 //const int PORT_angledTrayLimit = -1;
 
+// Led ports
+const int PORT_redAllianceLED = 9;
+const int PORT_smallGoalLED = 10;
+
 // Mutexes
 Mutex mutexes[4];
