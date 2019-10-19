@@ -105,6 +105,7 @@ void testTray()
  *                   Tasks to handle tests                     *
  ***************************************************************/
 TaskHandle testHandler;
+bool isTesting = false;
 
 void testTask(void *ignore)
 {
@@ -117,8 +118,11 @@ void testTask(void *ignore)
 	//testNewMotionAlgorithms();
 	//testAsyncNew();
 
+	// Stop everything
 	stopDrive();
 	stopTray();
+	stopArms();
+	stopRollers();
 
 	// Debug if wanted
 	while (false)
@@ -146,9 +150,14 @@ void stopTesting()
   if (testHandler != NULL && (testState != TASK_DEAD))
     taskDelete(testHandler);
 
+	// Stop all motors and controllers
 	stopAsyncChassisController();
-
+	stopAsyncArmController();
+	stopAsyncTrayController();
 	stopDrive();
 	stopTray();
+	stopArms();
+	stopRollers();
+
 	print("Stopped testing\n");
 }

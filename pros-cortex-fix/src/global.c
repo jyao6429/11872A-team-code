@@ -34,10 +34,9 @@ const int PORT_leftSonarYellow = 8;
 Ultrasonic leftSonar;
 
 // Digital switches
-const int PORT_startTestButton = 11;
-const int PORT_stopTestButton = 12;
-const int PORT_verticalTrayLimit = -1;
-const int PORT_angledTrayLimit = -1;
+const int PORT_interactButton = 11;
+//const int PORT_verticalTrayLimit = -1;
+//const int PORT_angledTrayLimit = -1;
 
 // Mutexes
 Mutex mutexes[4];

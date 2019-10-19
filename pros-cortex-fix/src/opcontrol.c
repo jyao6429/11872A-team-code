@@ -12,23 +12,26 @@
 void operatorControl()
 {
 	printf("Starting operatorControl\n");
-	//resetPositionFull(&globalPose, 0.0, 0.0, 0.0, true);
-	//resetVelocity(&globalVel, globalPose);
+	isTesting = false;
 
 	while (true)
 	{
-		/*
-		if (digitalRead(PORT_startTestButton) == LOW)
+		// Using interactive button for testing
+		if (digitalRead(PORT_interactButton) == LOW)
 		{
-			startTesting();
-			delay(500);
+			if (!isTesting)
+			{
+				startTesting();
+				delay(500);
+			}
+			else
+			{
+				stopTesting();
+				delay(500);
+			}
 		}
-		if (digitalRead(PORT_stopTestButton) == LOW)
-		{
-			stopTesting();
-			delay(500);
-		}
-		*/
+
+
 		int leftPower = joystickGetAnalog(1, 3);
 		int rightPower = joystickGetAnalog(1, 2);
 

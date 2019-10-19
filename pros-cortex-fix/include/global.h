@@ -45,14 +45,12 @@ extern const int PORT_leftSonarYellow;
 extern Ultrasonic leftSonar;
 
 // startTesting button
-extern const int PORT_startTestButton;
-// stopTesting limit switch
-extern const int PORT_stopTestButton;
+extern const int PORT_interactButton;
 
 // Limit switch when tray is vertical
-extern const int PORT_verticalTrayLimit;
+//extern const int PORT_verticalTrayLimit;
 // Limit switch when tray is at maximum angle
-extern const int PORT_angledTrayLimit;
+//extern const int PORT_angledTrayLimit;
 
 // Enum for different mutexes
 enum MutexTypes

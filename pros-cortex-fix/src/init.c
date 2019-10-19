@@ -11,7 +11,7 @@
 
 void initializeIO()
 {
-  //pinMode(PORT_startTestButton, INPUT);
+  pinMode(PORT_interactButton, INPUT);
   //pinMode(PORT_stopTestButton, INPUT);
   //pinMode(PORT_verticalTilterLimit, INPUT);
   //pinMode(PORT_angledTilterLimit, INPUT);
@@ -26,6 +26,7 @@ void initialize()
   taskCreate(JINXRun, TASK_DEFAULT_STACK_SIZE, NULL, (TASK_PRIORITY_DEFAULT + 3));
   delay(100);
   */
+
   // Create mutexes
   mutexes[MUTEX_POSE] = mutexCreate();
   mutexes[MUTEX_ASYNC_CHASSIS] = mutexCreate();
