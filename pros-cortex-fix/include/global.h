@@ -33,8 +33,10 @@ extern Encoder rightEncoder;
 // Back encoder
 extern Encoder backEncoder;
 
-// Potentiometer port
+// Potentiometer port for arm
 extern const int PORT_armPot;
+// Potentiometer port for autonomous choosing dial
+extern const int PORT_dialPot;
 
 // Ultrasonic ECHO port
 extern const int PORT_leftSonarOrange;
