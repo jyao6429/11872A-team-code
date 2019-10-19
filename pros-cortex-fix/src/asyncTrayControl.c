@@ -31,6 +31,9 @@ void waitUntilTrayMoveComplete()
 }
 void queueAsyncTrayController(AsyncTrayOptions moveToQueue)
 {
+  // Wait until tray finishes move, since currently not using PID
+  waitUntilTrayMoveComplete();
+
   // Stop task if needed
   unsigned int asyncState = taskGetState(asyncTrayHandle);
   if (asyncTrayHandle != NULL && (asyncState != TASK_DEAD))

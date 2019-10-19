@@ -9,10 +9,15 @@
 
 #include "main.h"
 
+bool isTrayVertical;
+
 void operatorControl()
 {
-	printf("Starting operatorControl\n");
+	print("Starting operatorControl\n");
+
+	// Initialize toggle variables
 	isTesting = false;
+	isTrayVertical = false;
 
 	while (true)
 	{
@@ -31,10 +36,53 @@ void operatorControl()
 			}
 		}
 
+		// Hold buttons to set roller speed
+		if (joystickGetDigital(1, 5, JOY_UP))
+			setRollers(127);
+		else if (joystickGetDigital(1, 5, JOY_DOWN))
+			setRollers(-127);
+		else if (joystickGetDigital(1, 7, JOY_UP))
+			setRollers(60);
+		else
+			setRollers(0);
 
+		// Press buttons to set arm position
+		if (joystickGetDigital(1, 6, JOY_DOWN))
+			moveArmsZeroAsync();
+		else if (joystickGetDigital(1, 6, JOY_UP))
+			moveArmsLowAsync();
+		else if (joystickGetDigital(1, 8, JOY_UP))
+			moveArmsMedAsync();
+		else if (joystickGetDigital(1, 8, JOY_DOWN))
+		{
+			stopAsyncArmController();
+			stopArms();
+		}
+
+		// Toggle button for angling the tray
+		if (joystickGetDigital(1, 7, JOY_DOWN))
+		{
+			if (isTrayVertical)
+			{
+				moveTrayAngledAsync();
+				isTrayVertical = false;
+			}
+			else
+			{
+				moveTrayVerticalAsync();
+				isTrayVertical = true;
+			}
+			delay(250);
+		}
+		else if (joystickGetDigital(1, 7, JOY_LEFT))
+		{
+			stopAsyncTrayController();
+			stopTray();
+		}
+
+		// Get and set power for drivetrain
 		int leftPower = joystickGetAnalog(1, 3);
 		int rightPower = joystickGetAnalog(1, 2);
-
 		setDriveLinear(leftPower, rightPower);
 
 		delay(20);
