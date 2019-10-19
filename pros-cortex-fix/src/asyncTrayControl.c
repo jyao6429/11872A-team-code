@@ -54,6 +54,7 @@ void stopAsyncTrayController()
   unsigned int asyncState = taskGetState(asyncTrayHandle);
   if (asyncTrayHandle != NULL && (asyncState != TASK_DEAD))
     taskDelete(asyncTrayHandle);
+  stopTray();
 
   // Reset variables
   mutexTake(mutexes[MUTEX_ASYNC_TRAY], -1);

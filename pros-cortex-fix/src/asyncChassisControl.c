@@ -63,6 +63,7 @@ void stopAsyncChassisController()
   unsigned int asyncState = taskGetState(asyncChassisHandle);
   if (asyncChassisHandle != NULL && (asyncState != TASK_DEAD))
     taskDelete(asyncChassisHandle);
+  stopDrive();
 
   // Reset variables
   mutexTake(mutexes[MUTEX_ASYNC_CHASSIS], -1);

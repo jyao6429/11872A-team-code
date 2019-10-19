@@ -38,6 +38,7 @@
 #include "sonar.h"
 #include "asyncChassisControl.h"
 #include "asyncTrayControl.h"
+#include "asyncArmControl.h"
 #include "tray.h"
 #include "intake.h"
 #include "tests.h"

@@ -19,6 +19,7 @@ void moveArmsMed(bool hold)
 
     delay(20);
   }
+  stopArms();
 }
 void moveArmsLow(bool hold)
 {
@@ -37,6 +38,7 @@ void moveArmsLow(bool hold)
 
     delay(20);
   }
+  stopArms();
 }
 void moveArmsZero()
 {
@@ -55,6 +57,7 @@ void moveArmsZero()
 
     delay(20);
   }
+  stopArms();
 }
 int getArmPot()
 {
@@ -69,4 +72,14 @@ void setRollers(int power)
 {
   motorSet(PORT_leftRoller, power);
   motorSet(PORT_rightRoller, -power);
+}
+void stopArms()
+{
+  motorStop(PORT_leftArm);
+  motorStop(PORT_rightArm);
+}
+void stopRollers()
+{
+  motorStop(PORT_leftRoller);
+  motorStop(PORT_rightRoller);
 }

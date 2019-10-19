@@ -8,7 +8,7 @@
 #define ARM_MED_DIFF 2500
 
 /**
- * Moves intake arms to score/descore low towers
+ * Moves intake arms to score/descore medium towers
  *
  * @param hold - if the arm should be held in that position
  */
@@ -41,5 +41,13 @@ void setArms(int power);
  * @param power - the power for the rollers, positive values intake cubes
  */
 void setRollers(int power);
+/**
+ * Stops the intake arms
+ */
+void stopArms();
+/**
+ * Stops the intake rollers
+ */
+void stopRollers();
 
 #endif
