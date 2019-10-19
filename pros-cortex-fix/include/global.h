@@ -13,7 +13,7 @@ extern const int PORT_rightMotor0;
 extern const int PORT_rightMotor1;
 
 // Other motor ports
-extern const int PORT_tilter;
+extern const int PORT_tray;
 extern const int PORT_leftArm;
 extern const int PORT_rightArm;
 extern const int PORT_leftRoller;
@@ -50,17 +50,19 @@ extern const int PORT_startTestButton;
 extern const int PORT_stopTestButton;
 
 // Limit switch when tray is vertical
-extern const int PORT_verticalTilterLimit;
+extern const int PORT_verticalTrayLimit;
 // Limit switch when tray is at maximum angle
-extern const int PORT_angledTilterLimit;
+extern const int PORT_angledTrayLimit;
 
 // Enum for different mutexes
 enum MutexTypes
 {
   MUTEX_POSE,
-  MUTEX_ASYNC_CHASSIS
+  MUTEX_ASYNC_CHASSIS,
+  MUTEX_ASYNC_TRAY,
+  MUTEX_ASYNC_ARM
 };
 // Mutexes
-Mutex mutexes[2];
+Mutex mutexes[4];
 
 #endif

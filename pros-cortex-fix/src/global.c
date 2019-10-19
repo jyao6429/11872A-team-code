@@ -7,7 +7,7 @@ const int PORT_rightMotor0 = 2;
 const int PORT_rightMotor1 = 3;
 
 // Other motor ports
-const int PORT_tilter = -1;
+const int PORT_tray = -1;
 const int PORT_leftArm = -1;
 const int PORT_rightArm = -1;
 const int PORT_leftRoller = -1;
@@ -36,8 +36,8 @@ Ultrasonic leftSonar;
 // Digital switches
 const int PORT_startTestButton = 11;
 const int PORT_stopTestButton = 12;
-const int PORT_verticalTilterLimit = -1;
-const int PORT_angledTilterLimit = -1;
+const int PORT_verticalTrayLimit = -1;
+const int PORT_angledTrayLimit = -1;
 
 // Mutexes
-Mutex mutexes[2];
+Mutex mutexes[4];

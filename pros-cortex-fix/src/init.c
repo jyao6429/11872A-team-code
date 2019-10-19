@@ -29,6 +29,8 @@ void initialize()
   // Create mutexes
   mutexes[MUTEX_POSE] = mutexCreate();
   mutexes[MUTEX_ASYNC_CHASSIS] = mutexCreate();
+  mutexes[MUTEX_ASYNC_TRAY] = mutexCreate();
+  mutexes[MUTEX_ASYNC_ARM] = mutexCreate();
 
   // Initialize encoders
   leftEncoder = encoderInit(PORT_leftEncoder, PORT_leftEncoder + 1, false);

@@ -94,11 +94,11 @@ void testSonar()
 		delay(10);
 	}
 }
-void testTilter()
+void testTray()
 {
-	moveTilterVertical();
+	moveTrayVertical();
 	delay(1000);
-	moveTilterAngled();
+	moveTrayAngled();
 }
 
 /***************************************************************
@@ -118,7 +118,7 @@ void testTask(void *ignore)
 	//testAsyncNew();
 
 	stopDrive();
-	stopTilter();
+	stopTray();
 
 	// Debug if wanted
 	while (false)
@@ -149,6 +149,6 @@ void stopTesting()
 	stopAsyncChassisController();
 
 	stopDrive();
-	stopTilter();
+	stopTray();
 	print("Stopped testing\n");
 }

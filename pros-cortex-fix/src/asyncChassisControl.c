@@ -4,11 +4,11 @@ void asyncChassisTask(void *ignore)
 {
   // Store the current move
   mutexTake(mutexes[MUTEX_ASYNC_CHASSIS], -1);
-  AsyncChassisOptions currentMove = nextMove;
+  AsyncChassisOptions currentChassisMove = nextChassisMove;
   mutexGive(mutexes[MUTEX_ASYNC_CHASSIS]);
 
   // Switch between each motion type
-  switch (currentMove)
+  switch (currentChassisMove)
   {
     case ASYNC_MTT_SIMPLE:
       moveToTargetSimple(mttContainer.targetX, mttContainer.targetY, mttContainer.startX, mttContainer.startY, mttContainer.power, mttContainer.startPower, mttContainer.maxErrorX, mttContainer.decelEarly, mttContainer.decelPower, mttContainer.dropEarly, mttContainer.stopType, mttContainer.mode);
@@ -25,12 +25,12 @@ void asyncChassisTask(void *ignore)
     case ASYNC_TTT_TARGET:
       turnToTargetNew(turnContainer.targetX, turnContainer.targetY, turnContainer.turnDir, turnContainer.fullPowerRatio, turnContainer.coastPower, turnContainer.stopPowerDiff, turnContainer.angleOffset, turnContainer.harshStop, turnContainer.isDegrees);
       break;
-    case ASYNC_NONE:
+    case ASYNC_CHASSIS_NONE:
       break;
   }
   // Reset variables
   mutexTake(mutexes[MUTEX_ASYNC_CHASSIS], -1);
-  nextMove = ASYNC_NONE;
+  nextChassisMove = ASYNC_CHASSIS_NONE;
   isChassisMoving = false;
   mutexGive(mutexes[MUTEX_ASYNC_CHASSIS]);
 }
@@ -47,12 +47,12 @@ void queueAsyncChassisController(AsyncChassisOptions moveToQueue)
   stopDrive();
 
   // Checks if there is an actual motion to do
-  if (moveToQueue == ASYNC_NONE)
+  if (moveToQueue == ASYNC_CHASSIS_NONE)
     return;
 
   // Start the task
   mutexTake(mutexes[MUTEX_ASYNC_CHASSIS], -1);
-  nextMove = moveToQueue;
+  nextChassisMove = moveToQueue;
   isChassisMoving = true;
   asyncChassisHandle = taskCreate(asyncChassisTask, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT + 1);
   mutexGive(mutexes[MUTEX_ASYNC_CHASSIS]);
@@ -66,7 +66,7 @@ void stopAsyncChassisController()
 
   // Reset variables
   mutexTake(mutexes[MUTEX_ASYNC_CHASSIS], -1);
-  nextMove = ASYNC_NONE;
+  nextChassisMove = ASYNC_CHASSIS_NONE;
   isChassisMoving = false;
   mutexGive(mutexes[MUTEX_ASYNC_CHASSIS]);
 }

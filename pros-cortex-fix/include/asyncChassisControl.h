@@ -6,7 +6,7 @@
 // Enums for each different type of motion
 typedef enum AsyncChassisOptions
 {
-  ASYNC_NONE,
+  ASYNC_CHASSIS_NONE,
   ASYNC_MTT_SIMPLE,
   ASYNC_MTT_DIS,
   ASYNC_TTT_SWEEP,
@@ -47,7 +47,7 @@ bool isChassisMoving;
 // Handles the async task
 TaskHandle asyncChassisHandle;
 // The next move to be performed by the robot
-AsyncChassisOptions nextMove;
+AsyncChassisOptions nextChassisMove;
 // Container variables for each motion
 MTTContainer mttContainer;
 TTTSweepContainer sweepContainer;
