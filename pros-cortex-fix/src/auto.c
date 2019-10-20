@@ -9,25 +9,98 @@
 
 #include "main.h"
 
+void deploy()
+{
+  moveArmsMed(false);
+  moveArmsZero();
+}
+void score()
+{
+  // Variables to make sure robot is against wall
+  unsigned long stopTimer = millis();
+  bool isStopped = false;
+
+  // Keep driving forwards until robot is still for 350 milliseconds
+  while (!isStopped)
+  {
+    setDriveLinear(40, 40);
+
+    if (!isRobotStopped())
+      stopTimer = millis();
+
+    if (millis() - stopTimer > 350)
+    {
+      isStopped = true;
+      setDrive(5, 5);
+    }
+  }
+
+  // Tilt the stack vertical for scoring
+  moveTrayVertical();
+}
 void autoSkills()
 {
-
+  // Reset to proper pose on the field and deploy
+  resetPositionFull(&globalPose, 0.0, 0.0, 0.0, true);
+	resetVelocity(&globalVel, globalPose);
+  deploy();
 }
-void autoBlueSmall()
+void autoBlueSmallSafe()
 {
+  // 0. Reset to proper pose on the field and deploy
+  resetPositionFull(&globalPose, 26.4, BACK_TO_CENTER, 0.0, true);
+	resetVelocity(&globalVel, globalPose);
+  deploy();
 
+  // 1. Start rollers and drive forward to collect preload and 4 cubes
+  setRollers(127);
+  moveToTargetSimpleAsync(26.4, 50.0, 26.4, BACK_TO_CENTER, 127, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_PROPORTIONAL);
+  waitUntilChassisMoveComplete();
+
+  // 2. Stop rollers and turn 180 degrees around
+  setRollers(0);
+  turnToAngleNewAsync(-180.0, TURN_CCW, 0.6, 25, 10, true, true);
+  waitUntilChassisMoveComplete();
+
+  // 3. Drive to diagonal for scoring
+  moveToTargetSimpleAsync(26.4, 26.4, 26.4, globalPose.y, 127, 0, 0.5, 0, 20, 0, STOP_SOFT, MTT_CASCADING);
+  waitUntilChassisMoveComplete();
+
+  // 4. Turn towards small goal
+  turnToTargetNewAsync(0.0, 0.0, TURN_CW, 0.6, 25, 10, 0.0, true, true);
+  waitUntilChassisMoveComplete();
+
+  // 5. Drive towards goal, and score the stack
+  moveToTargetSimpleAsync(15.0, 15.0, 26.4, 26.4, 100, 0, 0.5, 0, 0, 0, STOP_NONE, MTT_PROPORTIONAL);
+  waitUntilChassisMoveComplete();
+  score();
+
+  // 6. Back away from the stack and tilt the tray back
+  moveToTargetDisSimpleAsync(45.0, 6.0, 12.0, 12.0, -30, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_PROPORTIONAL, true);
+  delay(1000);
+  moveTrayAngled();
+  waitUntilChassisMoveComplete();
 }
 void autoBlueLarge()
 {
-
+  // Reset to proper pose on the field
+  resetPositionFull(&globalPose, 0.0, 0.0, 0.0, true);
+	resetVelocity(&globalVel, globalPose);
+  deploy();
 }
-void autoRedSmall()
+void autoRedSmallSafe()
 {
-
+  // Reset to proper pose on the field
+  resetPositionFull(&globalPose, 0.0, 0.0, 0.0, true);
+	resetVelocity(&globalVel, globalPose);
+  deploy();
 }
 void autoRedLarge()
 {
-
+  // Reset to proper pose on the field
+  resetPositionFull(&globalPose, 0.0, 0.0, 0.0, true);
+	resetVelocity(&globalVel, globalPose);
+  deploy();
 }
 void autonomous()
 {
@@ -35,13 +108,13 @@ void autonomous()
   switch (chosenAuto)
   {
     case AUTO_BLUE_SMALL:
-      autoBlueSmall();
+      autoBlueSmallSafe();
       break;
     case AUTO_BLUE_LARGE:
       autoBlueLarge();
       break;
     case AUTO_RED_SMALL:
-      autoRedSmall();
+      autoRedSmallSafe();
       break;
     case AUTO_RED_LARGE:
       autoRedLarge();
