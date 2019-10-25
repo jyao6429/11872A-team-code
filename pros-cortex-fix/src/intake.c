@@ -20,7 +20,7 @@ void moveArmsMed(bool hold)
     printf("armPot: %d\tpower: %d\ttarget: %d\n", getArmPot(), power, ARM_MED_DIFF);
 
     // Disengages if arm is within 300 ticks, and only if not holding the arm
-    isAtTarget = fabs(getArmPot() - ARM_MED_DIFF) < 300 && !hold;
+    isAtTarget = abs(getArmPot() - ARM_MED_DIFF) < 50 && !hold;
 
     delay(20);
   }
@@ -42,7 +42,7 @@ void moveArmsLow(bool hold)
     printf("armPot: %d\tpower: %d\ttarget: %d\n", getArmPot(), power, ARM_LOW_DIFF);
 
     // Disengages if arm is within 300 ticks, and only if not holding the arm
-    isAtTarget = fabs(getArmPot() - ARM_LOW_DIFF) < 300 && !hold;
+    isAtTarget = abs(getArmPot() - ARM_LOW_DIFF) < 50 && !hold;
 
     delay(20);
   }
@@ -64,7 +64,7 @@ void moveArmsScore(bool hold)
     printf("armPot: %d\tpower: %d\ttarget: %d\n", getArmPot(), power, ARM_SCORE_DIFF);
 
     // Disengages if arm is within 300 ticks, and only if not holding the arm
-    isAtTarget = fabs(getArmPot() - ARM_SCORE_DIFF) < 300 && !hold;
+    isAtTarget = abs(getArmPot() - ARM_SCORE_DIFF) < 50 && !hold;
 
     delay(20);
   }
@@ -86,7 +86,7 @@ void moveArmsZero()
     printf("armPot: %d\tpower: %d\ttarget: %d\n", getArmPot(), power, 0);
 
     // Disengages if arm is within 300 ticks
-    isAtTarget = getArmPot() - ARM_ZERO < 300;
+    isAtTarget = getArmPot() - ARM_ZERO < 50;
 
     delay(20);
   }

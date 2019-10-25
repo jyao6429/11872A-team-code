@@ -3,8 +3,8 @@
 
 #include "main.h"
 
-#define ARM_ZERO 2700
-#define ARM_SCORE_DIFF 300
+#define ARM_ZERO 2090
+#define ARM_SCORE_DIFF 350
 #define ARM_LOW_DIFF 700
 #define ARM_MED_DIFF 1300
 

@@ -1,6 +1,8 @@
 #ifndef TRAY_H
 #define TRAY_H
 
+#define TRAY_ANGLED 1000
+#define TRAY_VERTICAL 1400
 /**
  * Sets the motor power for the tray
  *
@@ -19,5 +21,11 @@ void moveTrayVertical();
  * Moves the tray to the angled position for cube intake
  */
 void moveTrayAngled();
+/**
+ * Gets the value from the tray potentiometer
+ *
+ * @returns the value from the tray pot
+ */
+int getTrayPot();
 
 #endif

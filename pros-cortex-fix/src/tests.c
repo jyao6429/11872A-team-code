@@ -129,7 +129,7 @@ void testTask(void *ignore)
 	//testNewMotionAlgorithms();
 	//testAsyncNew();
 	//testTray();
-	testArms();
+	//testArms();
 
 
 	// Stop everything

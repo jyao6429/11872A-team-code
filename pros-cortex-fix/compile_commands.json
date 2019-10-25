@@ -24,11 +24,11 @@
             "-fdiagnostics-color",
             "-std=gnu99",
             "-o",
-            "bin/tests.c.o",
-            "src\\tests.c"
+            "bin/asyncArmControl.c.o",
+            "src\\asyncArmControl.c"
         ],
         "directory": "C:\\Users\\Lijing\\Documents\\Github\\11872A-team-code\\pros-cortex-fix",
-        "file": "src\\tests.c"
+        "file": "src\\asyncArmControl.c"
     },
     {
         "arguments": [
@@ -55,11 +55,42 @@
             "-fdiagnostics-color",
             "-std=gnu99",
             "-o",
-            "bin/tray.c.o",
-            "src\\tray.c"
+            "bin/auto.c.o",
+            "src\\auto.c"
         ],
         "directory": "C:\\Users\\Lijing\\Documents\\Github\\11872A-team-code\\pros-cortex-fix",
-        "file": "src\\tray.c"
+        "file": "src\\auto.c"
+    },
+    {
+        "arguments": [
+            "clang++",
+            "-c",
+            "-target",
+            "armv7ar-none-none-eabi",
+            "-fno-ms-extensions",
+            "-fno-ms-compatibility",
+            "-fno-delayed-template-parsing",
+            "-isystemc:\\program files\\pros\\toolchain\\usr\\bin\\../lib/gcc/arm-none-eabi/7.2.1/include",
+            "-isystemc:\\program files\\pros\\toolchain\\usr\\bin\\../lib/gcc/arm-none-eabi/7.2.1/include-fixed",
+            "-isystemc:\\program files\\pros\\toolchain\\usr\\bin\\../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/include",
+            "-isystem./include",
+            "-iquote./include/./",
+            "-mthumb",
+            "-mcpu=cortex-m3",
+            "-mlittle-endian",
+            "-Os",
+            "-ffunction-sections",
+            "-fsigned-char",
+            "-fomit-frame-pointer",
+            "-fsingle-precision-constant",
+            "-fdiagnostics-color",
+            "-std=gnu99",
+            "-o",
+            "bin/tests.c.o",
+            "src\\tests.c"
+        ],
+        "directory": "C:\\Users\\Lijing\\Documents\\Github\\11872A-team-code\\pros-cortex-fix",
+        "file": "src\\tests.c"
     },
     {
         "arguments": [
@@ -117,10 +148,10 @@
             "-fdiagnostics-color",
             "-std=gnu99",
             "-o",
-            "bin/asyncArmControl.c.o",
-            "src\\asyncArmControl.c"
+            "bin/tray.c.o",
+            "src\\tray.c"
         ],
         "directory": "C:\\Users\\Lijing\\Documents\\Github\\11872A-team-code\\pros-cortex-fix",
-        "file": "src\\asyncArmControl.c"
+        "file": "src\\tray.c"
     }
 ]
