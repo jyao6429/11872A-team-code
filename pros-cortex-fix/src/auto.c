@@ -166,40 +166,33 @@ void autoChooser()
     case AUTO_BLUE_SMALL:
       digitalWrite(PORT_redAllianceLED, HIGH);
       digitalWrite(PORT_smallGoalLED, LOW);
+      digitalWrite(PORT_skillsLED, HIGH);
       break;
     case AUTO_BLUE_LARGE:
       digitalWrite(PORT_redAllianceLED, HIGH);
       digitalWrite(PORT_smallGoalLED, HIGH);
+      digitalWrite(PORT_skillsLED, HIGH);
       break;
     case AUTO_RED_SMALL:
       digitalWrite(PORT_redAllianceLED, LOW);
       digitalWrite(PORT_smallGoalLED, LOW);
+      digitalWrite(PORT_skillsLED, HIGH);
       break;
     case AUTO_RED_LARGE:
       digitalWrite(PORT_redAllianceLED, LOW);
       digitalWrite(PORT_smallGoalLED, HIGH);
+      digitalWrite(PORT_skillsLED, HIGH);
       break;
     case AUTO_SKILLS:
-      // Flash both LEDs for 1 sec
-      for (int i = 0; i < 5; i++)
-      {
-        digitalWrite(PORT_redAllianceLED, LOW);
-        digitalWrite(PORT_smallGoalLED, LOW);
-        delay(100);
-        digitalWrite(PORT_redAllianceLED, HIGH);
-        digitalWrite(PORT_smallGoalLED, HIGH);
-        delay(100);
-      }
+      digitalWrite(PORT_redAllianceLED, HIGH);
+      digitalWrite(PORT_smallGoalLED, HIGH);
+      digitalWrite(PORT_skillsLED, LOW);
       break;
     case AUTO_NONE:
-      // Flash 1 LED for 1 sec
-      for (int i = 0; i < 5; i++)
-      {
-        digitalWrite(PORT_redAllianceLED, LOW);
-        delay(100);
-        digitalWrite(PORT_redAllianceLED, HIGH);
-        delay(100);
-      }
+      digitalWrite(PORT_redAllianceLED, LOW);
+      digitalWrite(PORT_smallGoalLED, LOW);
+      digitalWrite(PORT_skillsLED, LOW);
       break;
   }
+  delay(500);
 }

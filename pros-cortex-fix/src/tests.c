@@ -100,6 +100,17 @@ void testTray()
 	delay(1000);
 	moveTrayAngled();
 }
+void testArms()
+{
+	moveArmsLowAsync();
+	waitUntilArmMoveComplete();
+	delay(1000);
+	moveArmsMedAsync();
+	waitUntilArmMoveComplete();
+	delay(1000);
+	moveArmsZeroAsync();
+	waitUntilArmMoveComplete();
+}
 
 /***************************************************************
  *                   Tasks to handle tests                     *
@@ -117,10 +128,8 @@ void testTask(void *ignore)
 	//gatherVelocityData();
 	//testNewMotionAlgorithms();
 	//testAsyncNew();
-	moveArmsLowAsync();
-	waitUntilArmMoveComplete();
-	moveArmsZeroAsync();
-	waitUntilArmMoveComplete();
+	testTray();
+	testArms();
 
 
 	// Stop everything
@@ -130,9 +139,11 @@ void testTask(void *ignore)
 	stopRollers();
 
 	// Debug if wanted
-	while (false)
+	while (true)
 	{
-		printf("X: %3.3f   Y: %3.3f   A: %3.3f   XV: %3.3f   YV: %3.3f   AV: %3.3f\n", globalPose.x, globalPose.y, radToDeg(globalPose.angle), globalVel.x, globalVel.y, radToDeg(globalVel.angle));
+		// Debug pots
+		printf("armPot: %d\tdialPot: %d\ttrayPot: %d\n", analogRead(PORT_armPot), analogRead(PORT_dialPot), analogRead(PORT_trayPot));
+		//printf("X: %3.3f   Y: %3.3f   A: %3.3f   XV: %3.3f   YV: %3.3f   AV: %3.3f\n", globalPose.x, globalPose.y, radToDeg(globalPose.angle), globalVel.x, globalVel.y, radToDeg(globalVel.angle));
 		delay(50);
 	}
 	printf("Done Testing\n");
@@ -141,7 +152,7 @@ void startTesting()
 {
 	// Don't run the test if it is already running
 	unsigned int testState = taskGetState(testHandler);
-  if (testHandler != NULL && (testState == TASK_RUNNING || testState == TASK_SLEEPING || testState == TASK_SUSPENDED))
+  if (testHandler != NULL && (testState != TASK_DEAD))
 		return;
 
 	print("Starting test\n");

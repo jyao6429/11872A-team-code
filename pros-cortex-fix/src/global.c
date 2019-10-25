@@ -26,6 +26,7 @@ Encoder backEncoder;
 // Sensor ports
 const int PORT_armPot = 1;
 const int PORT_dialPot = 2;
+const int PORT_trayPot = 3;
 
 // Ultrasonic ports
 const int PORT_leftSonarOrange = 7;

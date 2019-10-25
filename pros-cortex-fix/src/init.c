@@ -16,6 +16,7 @@ void initializeIO()
   //pinMode(PORT_angledTilterLimit, INPUT);
   pinMode(PORT_redAllianceLED, OUTPUT);
   pinMode(PORT_smallGoalLED, OUTPUT);
+  pinMode(PORT_skillsLED, OUTPUT);
 }
 
 void initialize()

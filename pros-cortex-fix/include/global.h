@@ -37,6 +37,8 @@ extern Encoder backEncoder;
 extern const int PORT_armPot;
 // Potentiometer port for autonomous choosing dial
 extern const int PORT_dialPot;
+// Potentiometer port for the tray
+extern const int PORT_trayPot;
 
 // Ultrasonic ECHO port
 extern const int PORT_leftSonarOrange;
@@ -58,7 +60,8 @@ extern const int PORT_interactButton;
 extern const int PORT_redAllianceLED;
 // If on, robot is near the small goal
 extern const int PORT_smallGoalLED;
-
+// IF on, robot is doing skills
+extern const int PORT_skillsLED;
 // Enum for different mutexes
 enum MutexTypes
 {

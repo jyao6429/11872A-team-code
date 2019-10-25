@@ -4,15 +4,20 @@ PID armPID;
 
 void moveArmsMed(bool hold)
 {
-  pidInit(&armPID, 0.05, 0.0, 0.0);
+  pidInit(&armPID, 0.2, 0.0, 0.0);
 
   bool isAtTarget = false;
+
+  print("Starting moveArmsMed\n");
 
   while (!isAtTarget)
   {
     // Calculate and set power for arms
     int power = pidCalculate(&armPID, ARM_MED_DIFF, getArmPot());
     setArms(power);
+
+    // Debug
+    printf("armPot: %d\tpower: %d\ttarget: %d\n", getArmPot(), power, ARM_MED_DIFF);
 
     // Disengages if arm is within 300 ticks, and only if not holding the arm
     isAtTarget = getArmPot() - ARM_ZERO < 300 && !hold;
@@ -23,7 +28,7 @@ void moveArmsMed(bool hold)
 }
 void moveArmsLow(bool hold)
 {
-  pidInit(&armPID, 0.05, 0.0, 0.0);
+  pidInit(&armPID, 0.2, 0.0, 0.0);
 
   bool isAtTarget = false;
 
@@ -32,6 +37,9 @@ void moveArmsLow(bool hold)
     // Calculate and set power for arms
     int power = pidCalculate(&armPID, ARM_LOW_DIFF, getArmPot());
     setArms(power);
+
+    // Debug
+    printf("armPot: %d\tpower: %d\ttarget: %d\n", getArmPot(), power, ARM_LOW_DIFF);
 
     // Disengages if arm is within 300 ticks, and only if not holding the arm
     isAtTarget = getArmPot() - ARM_ZERO < 300 && !hold;
@@ -42,7 +50,7 @@ void moveArmsLow(bool hold)
 }
 void moveArmsZero()
 {
-  pidInit(&armPID, 0.02, 0.0, 0.0);
+  pidInit(&armPID, 0.1, 0.0, 0.0);
 
   bool isAtTarget = false;
 
@@ -51,6 +59,9 @@ void moveArmsZero()
     // Calculate and set power for arms
     int power = pidCalculate(&armPID, ARM_ZERO, getArmPot());
     setArms(power);
+
+    // Debug
+    printf("armPot: %d\tpower: %d\ttarget: %d\n", getArmPot(), power, 0);
 
     // Disengages if arm is within 300 ticks
     isAtTarget = getArmPot() - ARM_ZERO < 300;

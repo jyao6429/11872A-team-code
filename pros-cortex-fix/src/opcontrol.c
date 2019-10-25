@@ -85,8 +85,6 @@ void operatorControl()
 		int rightPower = joystickGetAnalog(1, 2);
 		setDriveLinear(leftPower, rightPower);
 
-		printf("pot: %d", analogRead(PORT_armPot));
-
 		delay(20);
 	}
 }
