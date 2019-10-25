@@ -10,6 +10,7 @@ void stopTray()
 }
 void moveTrayVertical()
 {
+  print("Starting moveTrayVertical");
   /*
   while (digitalRead(PORT_verticalTrayLimit) != LOW)
   {
@@ -25,9 +26,11 @@ void moveTrayVertical()
   setTray(50);
   delay(800);
   setTray(10);
+  print("Finished moveTrayVertical");
 }
 void moveTrayAngled()
 {
+  print("Starting moveTrayAngled");
   /*
   while (digitalRead(PORT_angledTrayLimit) != LOW)
   {
@@ -44,4 +47,5 @@ void moveTrayAngled()
   setTray(-5);
   delay(500);
   stopTray();
+  print("Finished moveTrayAngled");
 }

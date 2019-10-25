@@ -128,7 +128,7 @@ void testTask(void *ignore)
 	//gatherVelocityData();
 	//testNewMotionAlgorithms();
 	//testAsyncNew();
-	testTray();
+	//testTray();
 	testArms();
 
 
