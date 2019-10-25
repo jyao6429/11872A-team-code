@@ -54,10 +54,7 @@ void operatorControl()
 		else if (joystickGetDigital(1, 8, JOY_UP))
 			moveArmsMedAsync();
 		else if (joystickGetDigital(1, 8, JOY_DOWN))
-		{
 			stopAsyncArmController();
-			stopArms();
-		}
 
 		// Toggle button for angling the tray
 		if (joystickGetDigital(1, 7, JOY_DOWN))
@@ -78,6 +75,35 @@ void operatorControl()
 		{
 			stopAsyncTrayController();
 			stopTray();
+		}
+
+		// Partner controls for overriding tray
+		if (joystickGetDigital(2, 5, JOY_UP))
+		{
+			// Kill asyncTrayController if needed
+			mutexTake(mutexes[MUTEX_ASYNC_TRAY], -1);
+			if (isTrayMoving)
+				stopAsyncTrayController();
+			mutexGive(mutexes[MUTEX_ASYNC_TRAY]);
+
+			// Set tray power
+			setTray(joystickGetAnalog(2, 3));
+		}
+
+		// Partner controls for overriding intake arms
+		if (joystickGetDigital(2, 6, JOY_UP))
+		{
+			// Kill asyncArmController if needed
+			mutexTake(mutexes[MUTEX_ASYNC_ARM], -1);
+			if (isArmMoving)
+				stopAsyncArmController();
+			mutexGive(mutexes[MUTEX_ASYNC_ARM]);
+
+			// Set arm power, depending if holding or not
+			if (joystickGetDigital(2, 6, JOY_DOWN))
+				setArms(20);
+			else
+				setArms(joystickGetAnalog(2, 2));
 		}
 
 		// Get and set power for drivetrains
