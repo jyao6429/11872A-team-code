@@ -21,6 +21,12 @@ void moveArmsMed(bool hold);
  */
 void moveArmsLow(bool hold);
 /**
+ * Moves intake arms to clear the intake lock in order to score in the goal zones
+ *
+ * @param hold - if the arm should be held in that position
+ */
+void moveArmsScore(bool hold);
+/**
  * Moves intake arms to the down position for cube intake
  */
 void moveArmsZero();

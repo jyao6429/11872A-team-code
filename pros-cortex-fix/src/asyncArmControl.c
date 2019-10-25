@@ -13,6 +13,9 @@ void asyncArmTask(void *ignore)
     case ASYNC_ARM_ZERO:
       moveArmsZero();
       break;
+    case ASYNC_ARM_SCORE:
+      moveArmsScore(true);
+      break;
     case ASYNC_ARM_LOW:
       moveArmsLow(true);
       break;
@@ -69,6 +72,11 @@ void moveArmsZeroAsync()
 {
   // Queue the next move
   queueAsyncArmController(ASYNC_ARM_ZERO);
+}
+void moveArmsScoreAsync()
+{
+  // Queue the next move
+  queueAsyncArmController(ASYNC_ARM_SCORE);
 }
 void moveArmsLowAsync()
 {

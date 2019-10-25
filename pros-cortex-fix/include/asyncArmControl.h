@@ -8,6 +8,7 @@ typedef enum AsyncArmOptions
 {
   ASYNC_ARM_NONE,
   ASYNC_ARM_ZERO,
+  ASYNC_ARM_SCORE,
   ASYNC_ARM_LOW,
   ASYNC_ARM_MED
 } AsyncArmOptions;
@@ -36,6 +37,10 @@ void stopAsyncArmController();
  * Moves intake arms to the down position for cube intake
  */
 void moveArmsZeroAsync();
+/**
+ * Holds intake arms to clear the intake lock in order to score in the goal zones
+ */
+void moveArmsScoreAsync();
 /**
  * Holds intake arms to score/descore low towers
  */
