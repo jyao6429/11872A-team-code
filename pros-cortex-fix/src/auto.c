@@ -59,15 +59,17 @@ void autoBlueSmallSafe()
 
   // 2. Stop rollers and turn 180 degrees around
   setRollers(0);
+  /* No need, just go backwards
   turnToAngleNewAsync(-180.0, TURN_CCW, 0.6, 25, 10, true, true);
   waitUntilChassisMoveComplete();
+  */
 
   // 3. Drive to diagonal for scoring
-  moveToTargetSimpleAsync(26.4, 26.4, 26.4, globalPose.y, 127, 0, 0.5, 0, 20, 0, STOP_SOFT, MTT_CASCADING);
+  moveToTargetSimpleAsync(26.4, 26.4, 26.4, globalPose.y, -127, 0, 0.5, 0, 20, 0, STOP_SOFT, MTT_CASCADING);
   waitUntilChassisMoveComplete();
 
   // 4. Turn towards small goal
-  turnToTargetNewAsync(0.0, 0.0, TURN_CW, 0.6, 25, 10, 0.0, true, true);
+  turnToTargetNewAsync(0.0, 0.0, TURN_CCW, 0.6, 25, 10, 0.0, true, true);
   waitUntilChassisMoveComplete();
 
   // 5. Drive towards goal, and score the stack

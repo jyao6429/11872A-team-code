@@ -80,10 +80,12 @@ void operatorControl()
 			stopTray();
 		}
 
-		// Get and set power for drivetrain
+		// Get and set power for drivetrains
 		int leftPower = joystickGetAnalog(1, 3);
 		int rightPower = joystickGetAnalog(1, 2);
 		setDriveLinear(leftPower, rightPower);
+
+		printf("pot: %d", analogRead(PORT_armPot));
 
 		delay(20);
 	}

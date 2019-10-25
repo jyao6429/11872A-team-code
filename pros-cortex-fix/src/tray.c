@@ -23,8 +23,8 @@ void moveTrayVertical()
   setTray(100);
   delay(400);
   setTray(50);
-  delay(400);
-  setTray(5);
+  delay(800);
+  setTray(10);
 }
 void moveTrayAngled()
 {
@@ -38,8 +38,10 @@ void moveTrayAngled()
   stopTray();
   */
   setTray(-127);
-  delay(200);
+  delay(400);
+  setTray(-20);
+  delay(400);
   setTray(-5);
-  delay(200);
+  delay(500);
   stopTray();
 }

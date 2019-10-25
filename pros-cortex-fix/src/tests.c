@@ -117,6 +117,11 @@ void testTask(void *ignore)
 	//gatherVelocityData();
 	//testNewMotionAlgorithms();
 	//testAsyncNew();
+	moveArmsLowAsync();
+	waitUntilArmMoveComplete();
+	moveArmsZeroAsync();
+	waitUntilArmMoveComplete();
+
 
 	// Stop everything
 	stopDrive();
