@@ -103,13 +103,12 @@ void testTray()
 void testArms()
 {
 	moveArmsLowAsync();
-	waitUntilArmMoveComplete();
-	delay(1000);
+	delay(2000);
 	moveArmsMedAsync();
-	waitUntilArmMoveComplete();
-	delay(1000);
+	delay(2000);
 	moveArmsZeroAsync();
 	waitUntilArmMoveComplete();
+	moveArmsScoreAsync();
 }
 
 /***************************************************************
@@ -129,7 +128,7 @@ void testTask(void *ignore)
 	//testNewMotionAlgorithms();
 	//testAsyncNew();
 	//testTray();
-	//testArms();
+	testArms();
 
 
 	// Stop everything
@@ -139,7 +138,7 @@ void testTask(void *ignore)
 	stopRollers();
 
 	// Debug if wanted
-	while (true)
+	while (false)
 	{
 		// Debug pots
 		printf("armPot: %d\tdialPot: %d\ttrayPot: %d\n", analogRead(PORT_armPot), analogRead(PORT_dialPot), analogRead(PORT_trayPot));

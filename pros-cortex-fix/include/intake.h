@@ -3,10 +3,10 @@
 
 #include "main.h"
 
-#define ARM_ZERO 2090
-#define ARM_SCORE_DIFF 350
-#define ARM_LOW_DIFF 700
-#define ARM_MED_DIFF 1300
+#define ARM_ZERO 2200
+#define ARM_SCORE_DIFF 200
+#define ARM_LOW_DIFF 550
+#define ARM_MED_DIFF 850
 
 /**
  * Moves intake arms to score/descore medium towers

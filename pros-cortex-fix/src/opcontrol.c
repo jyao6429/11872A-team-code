@@ -27,11 +27,13 @@ void operatorControl()
 			if (!isTesting)
 			{
 				startTesting();
+				isTesting = true;
 				delay(500);
 			}
 			else
 			{
 				stopTesting();
+				isTesting = false;
 				delay(500);
 			}
 		}
