@@ -20,7 +20,6 @@ void score()
   unsigned long stopTimer = millis();
   bool isStopped = false;
 
-  moveArmsScoreAsync();
   // Keep driving forwards until robot is still for 350 milliseconds
   while (!isStopped)
   {

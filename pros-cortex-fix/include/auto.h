@@ -15,6 +15,10 @@ typedef enum AutoOptions
 AutoOptions chosenAuto;
 
 /**
+ * Action in the beginning to deploy
+ */
+void deploy();
+/**
  * Chooses the autonomous program to run based on the potentiometer knob
  */
 void autoChooser();
