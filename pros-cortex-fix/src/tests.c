@@ -97,7 +97,7 @@ void testSonar()
 void testTray()
 {
 	moveTrayVertical();
-	delay(1000);
+	delay(2000);
 	moveTrayAngled();
 }
 void testArms()
@@ -127,8 +127,8 @@ void testTask(void *ignore)
 	//gatherVelocityData();
 	//testNewMotionAlgorithms();
 	//testAsyncNew();
-	//testTray();
-	testArms();
+	testTray();
+	//testArms();
 
 
 	// Stop everything

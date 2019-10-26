@@ -68,7 +68,7 @@ void moveArmsScore(bool hold)
     setArms(power);
 
     // Debug
-    printf("armPot: %d\tpower: %d\ttarget: %d\n", getArmPot(), power, ARM_SCORE_DIFF);
+    //printf("armPot: %d\tpower: %d\ttarget: %d\n", getArmPot(), power, ARM_SCORE_DIFF);
 
     // Disengages if arm is within 50 ticks, and only if not holding the arm
     isAtTarget = abs(getArmPot() - ARM_SCORE_DIFF) < 50 && !hold;
