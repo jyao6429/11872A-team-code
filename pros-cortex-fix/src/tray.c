@@ -14,7 +14,7 @@ void moveTrayVertical()
   while (!isAtTarget)
   {
     // Calculate and set power for arms
-    int power = pidCalculate(&trayPID, TRAY_VERTICAL, getTrayPot()) * 100 + 25;
+    int power = pidCalculate(&trayPID, TRAY_VERTICAL, getTrayPot()) * 100 + 40;
     setTray(power);
 
     // Debug

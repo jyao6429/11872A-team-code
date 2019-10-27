@@ -22,6 +22,12 @@ void asyncArmTask(void *ignore)
     case ASYNC_ARM_MED:
       moveArmsMed(true);
       break;
+    case ASYNC_ARM_PUSH_DOWN:
+      while (true)
+      {
+        pushArmsDown();
+        delay(50);
+      }
     case ASYNC_ARM_NONE:
       break;
   }
@@ -87,4 +93,8 @@ void moveArmsMedAsync()
 {
   // Queue the next move
   queueAsyncArmController(ASYNC_ARM_MED);
+}
+void pushArmsDownLoop()
+{
+  queueAsyncArmController(ASYNC_ARM_PUSH_DOWN);
 }

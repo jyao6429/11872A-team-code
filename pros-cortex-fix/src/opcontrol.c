@@ -21,6 +21,8 @@ void operatorControl()
 
 	while (true)
 	{
+
+		/*
 		// Using interactive button for testing
 		if (digitalRead(PORT_interactButton) == LOW)
 		{
@@ -37,10 +39,15 @@ void operatorControl()
 				delay(500);
 			}
 		}
+		*/
+
 
 		// Hold buttons to set roller speed
 		if (joystickGetDigital(1, 5, JOY_UP))
+		{
 			setRollers(127);
+			pushArmsDown();
+		}
 		else if (joystickGetDigital(1, 5, JOY_DOWN))
 			setRollers(-127);
 		else if (joystickGetDigital(1, 7, JOY_UP))
@@ -71,7 +78,7 @@ void operatorControl()
 				moveTrayVerticalAsync();
 				isTrayVertical = true;
 			}
-			delay(250);
+			delay(500);
 		}
 		else if (joystickGetDigital(1, 7, JOY_LEFT))
 		{
@@ -82,11 +89,8 @@ void operatorControl()
 		// Partner controls for overriding tray
 		if (joystickGetDigital(2, 5, JOY_UP))
 		{
-			// Kill asyncTrayController if needed
-			mutexTake(mutexes[MUTEX_ASYNC_TRAY], -1);
-			if (isTrayMoving)
-				stopAsyncTrayController();
-			mutexGive(mutexes[MUTEX_ASYNC_TRAY]);
+			// Kill asyncTrayController
+			stopAsyncTrayController();
 
 			// Set tray power
 			setTray(joystickGetAnalog(2, 3));
@@ -95,11 +99,8 @@ void operatorControl()
 		// Partner controls for overriding intake arms
 		if (joystickGetDigital(2, 6, JOY_UP))
 		{
-			// Kill asyncArmController if needed
-			mutexTake(mutexes[MUTEX_ASYNC_ARM], -1);
-			if (isArmMoving)
-				stopAsyncArmController();
-			mutexGive(mutexes[MUTEX_ASYNC_ARM]);
+			// Kill asyncArmController
+			stopAsyncArmController();
 
 			// Set arm power, depending if holding or not
 			if (joystickGetDigital(2, 6, JOY_DOWN))

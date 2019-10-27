@@ -10,7 +10,8 @@ typedef enum AsyncArmOptions
   ASYNC_ARM_ZERO,
   ASYNC_ARM_SCORE,
   ASYNC_ARM_LOW,
-  ASYNC_ARM_MED
+  ASYNC_ARM_MED,
+  ASYNC_ARM_PUSH_DOWN
 } AsyncArmOptions;
 
 // Variables for handling async tasks
@@ -49,5 +50,6 @@ void moveArmsLowAsync();
  * Holds intake arms to score/descore medium towers
  */
 void moveArmsMedAsync();
+void pushArmsDownLoop();
 
 #endif

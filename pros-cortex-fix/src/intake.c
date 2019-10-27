@@ -100,6 +100,14 @@ void moveArmsZero()
   }
   stopArms();
 }
+void pushArmsDown()
+{
+  pidInit(&armPID, 0.01, 0.0, 0.0);
+
+  // Calculate and set power for arms
+  int power = pidCalculate(&armPID, 0, getArmPot()) * 20 - 50;
+  setArms(power);
+}
 int getArmPot()
 {
   return analogRead(PORT_armPot) - ARM_ZERO;

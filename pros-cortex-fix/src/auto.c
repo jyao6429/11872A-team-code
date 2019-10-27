@@ -12,7 +12,8 @@
 void deploy()
 {
   moveArmsMed(false);
-  moveArmsZero();
+  moveArmsZeroAsync();
+  delay(1000);
 }
 void score()
 {
@@ -36,7 +37,9 @@ void score()
   }
 
   // Tilt the stack vertical for scoring
-  moveTrayVertical();
+  moveTrayVerticalAsync();
+  delay(2000);
+  setRollers(-40);
 }
 void autoSkills()
 {
@@ -54,12 +57,14 @@ void autoBlueSmallSafe()
 
   // 1. Start rollers and drive forward to collect preload and 4 cubes
   setRollers(127);
-  moveToTargetSimpleAsync(26.4, 50.0, 26.4, BACK_TO_CENTER, 127, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_PROPORTIONAL);
+  pushArmsDownLoop();
+  moveToTargetSimpleAsync(26.4, 50.0, 26.4, BACK_TO_CENTER, 60, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_PROPORTIONAL);
   waitUntilChassisMoveComplete();
 
   // 2. Stop rollers and drive backwards to diagonal for scoring
-  setRollers(0);
-  moveToTargetSimpleAsync(26.4, 26.4, 26.4, globalPose.y, -127, 0, 0.5, 0, 20, 0, STOP_SOFT, MTT_CASCADING);
+  setRollers(60);
+  stopAsyncArmController();
+  moveToTargetSimpleAsync(26.4, 26.4, 26.4, globalPose.y, -80, 0, 0.5, 0, 20, 0, STOP_SOFT, MTT_CASCADING);
   waitUntilChassisMoveComplete();
 
   // 3. Turn towards small goal
@@ -72,17 +77,38 @@ void autoBlueSmallSafe()
   score();
 
   // 5. Back away from the stack and tilt the tray back and return the arms down
-  moveToTargetDisSimpleAsync(45.0, 6.0, 12.0, 12.0, -30, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_PROPORTIONAL, true);
+  moveToTargetDisSimpleAsync(45.0, 18.0, 12.0, 12.0, -50, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_PROPORTIONAL, true);
   delay(1000);
-  moveTrayAngled();
-  moveArmsZero();
+  moveTrayAngledAsync();
+  moveArmsZeroAsync();
   waitUntilChassisMoveComplete();
+}
+void autoBlueSmallSuperSafe()
+{
+  // 0. Reset to proper pose on the field
+  resetPositionFull(&globalPose, 0, 0, 0.0, true);
+	resetVelocity(&globalVel, globalPose);
+
+  // 1.
+  moveToTargetDisSimpleAsync(180.0, 8.0, 0.0, 0.0, -127, 80, 2.0, 0, 0, 0, STOP_SOFT, MTT_SIMPLE, true);
+
+  // 2.
+  moveToTargetDisSimple(0.0, 24.0, 0.0, 0.0, 127, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_SIMPLE, true);
+  turnToAngleNew(-90, TURN_CCW, 0.7, 20, 10, false, true);
+  deploy();
 }
 void autoBlueLarge()
 {
-  // Reset to proper pose on the field
-  resetPositionFull(&globalPose, 0.0, 0.0, 0.0, true);
+  // 0. Reset to proper pose on the field
+  resetPositionFull(&globalPose, 0, 0, 0.0, true);
 	resetVelocity(&globalVel, globalPose);
+
+  // 1.
+  moveToTargetDisSimpleAsync(180.0, 8.0, 0.0, 0.0, -127, 80, 2.0, 0, 0, 0, STOP_SOFT, MTT_SIMPLE, true);
+
+  // 2.
+  moveToTargetDisSimple(0.0, 24.0, 0.0, 0.0, 127, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_SIMPLE, true);
+  turnToAngleNew(90, TURN_CW, 0.7, 20, 10, false, true);
   deploy();
 }
 void autoRedSmallSafe()
@@ -94,7 +120,7 @@ void autoRedSmallSafe()
 
   // 1. Start rollers and drive forward to collect preload and 4 cubes
   setRollers(127);
-  moveToTargetSimpleAsync(FIELD_WIDTH - 26.4, 50.0, FIELD_WIDTH - 26.4, BACK_TO_CENTER, 127, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_PROPORTIONAL);
+  moveToTargetSimpleAsync(FIELD_WIDTH - 26.4, 50.0, FIELD_WIDTH - 26.4, BACK_TO_CENTER, 60, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_PROPORTIONAL);
   waitUntilChassisMoveComplete();
 
   // 2. Stop rollers and drive backwards to diagonal for scoring
@@ -112,17 +138,38 @@ void autoRedSmallSafe()
   score();
 
   // 5. Back away from the stack and tilt the tray back and return the arms down
-  moveToTargetDisSimpleAsync(-45.0, 6.0, FIELD_WIDTH - 12.0, 12.0, -30, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_PROPORTIONAL, true);
+  moveToTargetDisSimpleAsync(-45.0, 12.0, FIELD_WIDTH - 12.0, 12.0, -30, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_PROPORTIONAL, true);
   delay(1000);
   moveTrayAngled();
   moveArmsZero();
   waitUntilChassisMoveComplete();
 }
+void autoRedSmallSuperSafe()
+{
+  // 0. Reset to proper pose on the field
+  resetPositionFull(&globalPose, 0, 0, 0.0, true);
+	resetVelocity(&globalVel, globalPose);
+
+  // 1.
+  moveToTargetDisSimpleAsync(180.0, 8.0, 0.0, 0.0, -127, 80, 2.0, 0, 0, 0, STOP_SOFT, MTT_SIMPLE, true);
+
+  // 2.
+  moveToTargetDisSimple(0.0, 24.0, 0.0, 0.0, 127, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_SIMPLE, true);
+  turnToAngleNew(90, TURN_CW, 0.7, 20, 10, false, true);
+  deploy();
+}
 void autoRedLarge()
 {
-  // Reset to proper pose on the field
-  resetPositionFull(&globalPose, 0.0, 0.0, 0.0, true);
+  // 0. Reset to proper pose on the field
+  resetPositionFull(&globalPose, 0, 0, 0.0, true);
 	resetVelocity(&globalVel, globalPose);
+
+  // 1.
+  moveToTargetDisSimpleAsync(180.0, 8.0, 0.0, 0.0, -127, 80, 2.0, 0, 0, 0, STOP_SOFT, MTT_SIMPLE, true);
+
+  // 2.
+  moveToTargetDisSimple(0.0, 18.0, 0.0, 0.0, 127, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_SIMPLE, true);
+  turnToAngleNew(-90, TURN_CCW, 0.7, 20, 10, false, true);
   deploy();
 }
 void autonomous()
@@ -131,13 +178,13 @@ void autonomous()
   switch (chosenAuto)
   {
     case AUTO_BLUE_SMALL:
-      autoBlueSmallSafe();
+      autoBlueSmallSuperSafe();
       break;
     case AUTO_BLUE_LARGE:
       autoBlueLarge();
       break;
     case AUTO_RED_SMALL:
-      autoRedSmallSafe();
+      autoRedSmallSuperSafe();
       break;
     case AUTO_RED_LARGE:
       autoRedLarge();
