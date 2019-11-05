@@ -4,7 +4,7 @@
 #include "main.h"
 
 // Variables for handling async tasks
-// Keeps track when the tray is moving
+// Keeps track if the tray is at the target
 bool isTrayAtTarget;
 // Handles the async task
 TaskHandle asyncTrayHandle;

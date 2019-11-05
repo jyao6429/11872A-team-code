@@ -7,7 +7,7 @@ const int PORT_rightMotor0 = 9;
 const int PORT_rightMotor1 = 8;
 
 // Other motor ports
-const int PORT_tray = 6;
+const int PORT_tray = 5;
 const int PORT_leftArm = 1;
 const int PORT_rightArm = 10;
 const int PORT_leftRoller = 4;

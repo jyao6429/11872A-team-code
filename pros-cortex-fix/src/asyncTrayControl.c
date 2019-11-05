@@ -86,7 +86,7 @@ void stopAsyncTrayController()
   mutexGive(mutexes[MUTEX_ASYNC_TRAY]);
 
   // Stop the tray
-  nextTrayTarget = -1;
+  stopTray();
 }
 void moveTrayVerticalAsync()
 {

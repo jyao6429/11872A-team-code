@@ -41,12 +41,17 @@ void score()
   delay(2000);
   setRollers(-40);
 }
-void autoSkills()
+void autoSkillsSuperSafe()
 {
   // Reset to proper pose on the field and deploy
   resetPositionFull(&globalPose, 0.0, 0.0, 0.0, true);
 	resetVelocity(&globalVel, globalPose);
-  deploy();
+
+  // 1.
+  moveToTargetSimpleAsync(0.0, -8.0, 0.0, 0.0, -127, 0, 2.0, 0, 0, 0, STOP_SOFT, MTT_SIMPLE);
+
+  // 2.
+  moveToTargetSimple(0.0, 0.0, 0.0, -8.0, 127, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_PROPORTIONAL);
 }
 void autoBlueSmallSafe()
 {
@@ -89,25 +94,23 @@ void autoBlueSmallSuperSafe()
 	resetVelocity(&globalVel, globalPose);
 
   // 1.
-  moveToTargetDisSimpleAsync(180.0, 8.0, 0.0, 0.0, -127, 80, 2.0, 0, 0, 0, STOP_SOFT, MTT_SIMPLE, true);
+  moveToTargetSimpleAsync(0.0, -8.0, 0.0, 0.0, -127, 0, 2.0, 0, 0, 0, STOP_SOFT, MTT_SIMPLE);
 
   // 2.
-  moveToTargetDisSimple(0.0, 24.0, 0.0, 0.0, 127, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_SIMPLE, true);
-  turnToAngleNew(-90, TURN_CCW, 0.7, 20, 10, false, true);
+  moveToTargetSimple(-24.0, 16.0, 0.0, -8.0, 127, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_PROPORTIONAL);
   deploy();
 }
-void autoBlueLarge()
+void autoBlueLargeSuperSafe()
 {
   // 0. Reset to proper pose on the field
   resetPositionFull(&globalPose, 0, 0, 0.0, true);
 	resetVelocity(&globalVel, globalPose);
 
   // 1.
-  moveToTargetDisSimpleAsync(180.0, 8.0, 0.0, 0.0, -127, 80, 2.0, 0, 0, 0, STOP_SOFT, MTT_SIMPLE, true);
+  moveToTargetSimpleAsync(0.0, -8.0, 0.0, 0.0, -127, 0, 2.0, 0, 0, 0, STOP_SOFT, MTT_SIMPLE);
 
   // 2.
-  moveToTargetDisSimple(0.0, 24.0, 0.0, 0.0, 127, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_SIMPLE, true);
-  turnToAngleNew(90, TURN_CW, 0.7, 20, 10, false, true);
+  moveToTargetSimple(24.0, 16.0, 0.0, -8.0, 127, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_PROPORTIONAL);
   deploy();
 }
 void autoRedSmallSafe()
@@ -150,25 +153,23 @@ void autoRedSmallSuperSafe()
 	resetVelocity(&globalVel, globalPose);
 
   // 1.
-  moveToTargetDisSimpleAsync(180.0, 8.0, 0.0, 0.0, -127, 80, 2.0, 0, 0, 0, STOP_SOFT, MTT_SIMPLE, true);
+  moveToTargetSimpleAsync(0.0, -8.0, 0.0, 0.0, -127, 0, 2.0, 0, 0, 0, STOP_SOFT, MTT_SIMPLE);
 
   // 2.
-  moveToTargetDisSimple(0.0, 24.0, 0.0, 0.0, 127, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_SIMPLE, true);
-  turnToAngleNew(90, TURN_CW, 0.7, 20, 10, false, true);
+  moveToTargetSimple(24.0, 16.0, 0.0, -8.0, 127, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_PROPORTIONAL);
   deploy();
 }
-void autoRedLarge()
+void autoRedLargeSuperSafe()
 {
   // 0. Reset to proper pose on the field
   resetPositionFull(&globalPose, 0, 0, 0.0, true);
 	resetVelocity(&globalVel, globalPose);
 
   // 1.
-  moveToTargetDisSimpleAsync(180.0, 8.0, 0.0, 0.0, -127, 80, 2.0, 0, 0, 0, STOP_SOFT, MTT_SIMPLE, true);
+  moveToTargetSimpleAsync(0.0, -8.0, 0.0, 0.0, -127, 0, 2.0, 0, 0, 0, STOP_SOFT, MTT_SIMPLE);
 
   // 2.
-  moveToTargetDisSimple(0.0, 18.0, 0.0, 0.0, 127, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_SIMPLE, true);
-  turnToAngleNew(-90, TURN_CCW, 0.7, 20, 10, false, true);
+  moveToTargetSimple(-24.0, 16.0, 0.0, -8.0, 127, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_PROPORTIONAL);
   deploy();
 }
 void autonomous()
@@ -180,16 +181,16 @@ void autonomous()
       autoBlueSmallSuperSafe();
       break;
     case AUTO_BLUE_LARGE:
-      autoBlueLarge();
+      autoBlueLargeSuperSafe();
       break;
     case AUTO_RED_SMALL:
       autoRedSmallSuperSafe();
       break;
     case AUTO_RED_LARGE:
-      autoRedLarge();
+      autoRedLargeSuperSafe();
       break;
     case AUTO_SKILLS:
-      autoSkills();
+      autoSkillsSuperSafe();
       break;
     case AUTO_NONE:
       break;

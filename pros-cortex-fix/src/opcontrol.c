@@ -80,7 +80,6 @@ void operatorControl()
 		else if (joystickGetDigital(1, 7, JOY_LEFT))
 		{
 			stopAsyncTrayController();
-			stopTray();
 		}
 
 		// Partner controls for overriding tray

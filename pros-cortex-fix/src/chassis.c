@@ -28,9 +28,9 @@ const unsigned int TrueSpeed[128] =
 
 void setDrive(int leftPower, int rightPower)
 {
-  motorSet(PORT_leftMotor0, -leftPower);
+  motorSet(PORT_leftMotor0, leftPower);
   motorSet(PORT_leftMotor1, leftPower);
-  motorSet(PORT_rightMotor0, rightPower);
+  motorSet(PORT_rightMotor0, -rightPower);
   motorSet(PORT_rightMotor1, -rightPower);
 }
 void setDriveLinear(int leftPower, int rightPower)
@@ -47,7 +47,7 @@ void stopDrive()
   motorStop(PORT_rightMotor0);
   motorStop(PORT_rightMotor1);
 }
-
+/*
 // Enums for the various PID controllers
 enum PIDControllers
 {
@@ -60,7 +60,7 @@ enum PIDControllers
 // Array of PID controllers for various motions
 PID controllers[5];
 
-/*
+
 void turnToAngle(double targetAngle, int maxSpeed, bool isAccurate, bool isDegrees)
 {
   // Convert targetAngle into radians (if needed) and find nearest angle
