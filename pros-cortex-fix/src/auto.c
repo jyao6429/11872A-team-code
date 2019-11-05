@@ -57,7 +57,6 @@ void autoBlueSmallSafe()
 
   // 1. Start rollers and drive forward to collect preload and 4 cubes
   setRollers(127);
-  pushArmsDownLoop();
   moveToTargetSimpleAsync(26.4, 50.0, 26.4, BACK_TO_CENTER, 60, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_PROPORTIONAL);
   waitUntilChassisMoveComplete();
 

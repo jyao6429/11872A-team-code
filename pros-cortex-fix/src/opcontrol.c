@@ -44,7 +44,6 @@ void operatorControl()
 		if (joystickGetDigital(1, 5, JOY_UP))
 		{
 			setRollers(127);
-			pushArmsDown();
 		}
 		else if (joystickGetDigital(1, 5, JOY_DOWN))
 			setRollers(-127);

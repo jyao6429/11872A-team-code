@@ -4,9 +4,9 @@
 #include "main.h"
 
 #define ARM_ZERO 2170
-#define ARM_SCORE_DIFF 100
-#define ARM_LOW_DIFF 650
-#define ARM_MED_DIFF 850
+#define ARM_SCORE 2270
+#define ARM_LOW 2800
+#define ARM_MED 3000
 
 /**
  * Moves intake arms to score/descore medium towers
@@ -30,7 +30,6 @@ void moveArmsScore(bool hold);
  * Moves intake arms to the down position for cube intake
  */
 void moveArmsZero();
-void pushArmsDown();
 /**
  * Gets a normalized value from the arm potentiometer
  *

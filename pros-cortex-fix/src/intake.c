@@ -12,16 +12,16 @@ void moveArmsMed(bool hold)
   while (!isAtTarget)
   {
     // Calculate and set power for arms
-    int power = pidCalculate(&armPID, ARM_MED_DIFF, getArmPot()) * 127 + 20;
+    int power = pidCalculate(&armPID, ARM_MED, getArmPot()) * 127 + 20;
     if (power < 0)
       power = 0;
     setArms(power);
 
     // Debug
-    printf("armPot: %d\tpower: %d\ttarget: %d\n", getArmPot(), power, ARM_MED_DIFF);
+    printf("armPot: %d\tpower: %d\ttarget: %d\n", getArmPot(), power, ARM_MED);
 
     // Disengages if arm is within 50 ticks, and only if not holding the arm
-    isAtTarget = abs(getArmPot() - ARM_MED_DIFF) < 20 && !hold;
+    isAtTarget = abs(getArmPot() - ARM_MED) < 20 && !hold;
 
     delay(20);
   }
@@ -37,16 +37,16 @@ void moveArmsLow(bool hold)
   while (!isAtTarget)
   {
     // Calculate and set power for arms
-    int power = pidCalculate(&armPID, ARM_LOW_DIFF, getArmPot()) * 127 + 20;
+    int power = pidCalculate(&armPID, ARM_LOW, getArmPot()) * 127 + 20;
     if (power < 0)
       power = 0;
     setArms(power);
 
     // Debug
-    printf("armPot: %d\tpower: %d\ttarget: %d\n", getArmPot(), power, ARM_LOW_DIFF);
+    printf("armPot: %d\tpower: %d\ttarget: %d\n", getArmPot(), power, ARM_LOW);
 
     // Disengages if arm is within 50 ticks, and only if not holding the arm
-    isAtTarget = abs(getArmPot() - ARM_LOW_DIFF) < 20 && !hold;
+    isAtTarget = abs(getArmPot() - ARM_LOW) < 20 && !hold;
 
     delay(20);
   }
@@ -62,7 +62,7 @@ void moveArmsScore(bool hold)
   while (!isAtTarget)
   {
     // Calculate and set power for arms
-    int power = pidCalculate(&armPID, ARM_SCORE_DIFF, getArmPot()) * 127 + 20;
+    int power = pidCalculate(&armPID, ARM_SCORE, getArmPot()) * 127 + 20;
     if (power < 0)
       power = 0;
     setArms(power);
@@ -71,7 +71,7 @@ void moveArmsScore(bool hold)
     //printf("armPot: %d\tpower: %d\ttarget: %d\n", getArmPot(), power, ARM_SCORE_DIFF);
 
     // Disengages if arm is within 50 ticks, and only if not holding the arm
-    isAtTarget = abs(getArmPot() - ARM_SCORE_DIFF) < 50 && !hold;
+    isAtTarget = abs(getArmPot() - ARM_SCORE) < 50 && !hold;
 
     delay(20);
   }
@@ -87,11 +87,11 @@ void moveArmsZero()
   while (!isAtTarget)
   {
     // Calculate and set power for arms
-    int power = pidCalculate(&armPID, 0, getArmPot()) * 20 + 20;
+    int power = pidCalculate(&armPID, ARM_ZERO, getArmPot()) * 20 + 20;
     setArms(power);
 
     // Debug
-    printf("armPot: %d\tpower: %d\ttarget: %d\n", getArmPot(), power, 0);
+    printf("armPot: %d\tpower: %d\ttarget: %d\n", getArmPot(), power, ARM_ZERO);
 
     // Disengages if arm is within 50 ticks
     isAtTarget = getArmPot() < 100;
@@ -100,17 +100,9 @@ void moveArmsZero()
   }
   stopArms();
 }
-void pushArmsDown()
-{
-  pidInit(&armPID, 0.01, 0.0, 0.0);
-
-  // Calculate and set power for arms
-  int power = pidCalculate(&armPID, 0, getArmPot()) * 20 - 50;
-  setArms(power);
-}
 int getArmPot()
 {
-  return analogRead(PORT_armPot) - ARM_ZERO;
+  return analogRead(PORT_armPot);
 }
 void setArms(int power)
 {

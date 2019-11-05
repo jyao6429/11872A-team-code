@@ -1,64 +1,76 @@
 #include "main.h"
 
+PID armPID;
+
 void asyncArmTask(void *ignore)
 {
-  // Store the current move
-  mutexTake(mutexes[MUTEX_ASYNC_ARM], -1);
-  AsyncArmOptions currentArmMove = nextArmMove;
-  mutexGive(mutexes[MUTEX_ASYNC_ARM]);
+  int prevArmTarget = -1;
+  pidInit(&armPID, 0.01, 0.002, 0.003);
 
-  // Switch between each motion type
-  switch (currentArmMove)
+  while (true)
   {
-    case ASYNC_ARM_ZERO:
-      moveArmsZero();
-      break;
-    case ASYNC_ARM_SCORE:
-      moveArmsScore(true);
-      break;
-    case ASYNC_ARM_LOW:
-      moveArmsLow(true);
-      break;
-    case ASYNC_ARM_MED:
-      moveArmsMed(true);
-      break;
-    case ASYNC_ARM_PUSH_DOWN:
-      while (true)
-      {
-        pushArmsDown();
-        delay(50);
-      }
-    case ASYNC_ARM_NONE:
-      break;
+    // Precaution in case mutex is taken
+    int currentArmTarget = prevArmTarget;
+    int currentArmPot = getArmPot();
+
+    // Take mutexes and set proper variables
+    mutexTake(mutexes[MUTEX_ASYNC_ARM], 200);
+    currentArmTarget = nextArmTarget;
+    mutexGive(mutexes[MUTEX_ASYNC_ARM]);
+
+    // Disengage if no target set
+    if (currentArmTarget < 0)
+      continue;
+
+    // Calculate and set power for arm
+    int power = pidCalculate(&armPID, currentArmTarget, currentArmPot) * 127;
+    setArms(power);
+
+    // Debug
+    printf("armPot: %d\tpower: %d\ttarget: %d\n", currentArmPot, power, currentArmTarget);
+
+    // Set prev variables
+    prevArmTarget = currentArmTarget;
+
+    // Sets if arm is within target
+    if (abs(currentArmTarget - currentArmPot) < 50)
+    {
+      mutexTake(mutexes[MUTEX_ASYNC_ARM], 200);
+      isArmAtTarget = true;
+      mutexGive(mutexes[MUTEX_ASYNC_ARM]);
+    }
+    else
+    {
+      mutexTake(mutexes[MUTEX_ASYNC_ARM], 200);
+      isArmAtTarget = false;
+      mutexGive(mutexes[MUTEX_ASYNC_ARM]);
+    }
+
+    delay(20);
   }
-  // Reset variables
-  mutexTake(mutexes[MUTEX_ASYNC_ARM], -1);
-  nextArmMove = ASYNC_ARM_NONE;
-  isArmMoving = false;
-  mutexGive(mutexes[MUTEX_ASYNC_ARM]);
 }
 void waitUntilArmMoveComplete()
 {
-  while (isArmMoving) { delay(40); }
+  while (!isArmAtTarget) { delay(40); }
 }
-void queueAsyncArmController(AsyncArmOptions moveToQueue)
+void startAsyncArmController()
 {
-  // Stop task if needed
+  // Only if task is not already running
   unsigned int asyncState = taskGetState(asyncArmHandle);
-  if (asyncArmHandle != NULL && (asyncState != TASK_DEAD))
-    taskDelete(asyncArmHandle);
-  stopArms();
+  if (asyncArmHandle == NULL || (asyncState == TASK_DEAD))
+  {
+    // Reset variables
+    mutexTake(mutexes[MUTEX_ASYNC_ARM], 200);
+    nextArmTarget = -1;
+    isArmAtTarget = true;
+    mutexGive(mutexes[MUTEX_ASYNC_ARM]);
 
-  // Checks if there is an actual motion to do
-  if (moveToQueue == ASYNC_ARM_NONE)
-    return;
+    // Stop the arm
+    stopArms();
 
-  // Start the task
-  mutexTake(mutexes[MUTEX_ASYNC_ARM], -1);
-  nextArmMove = moveToQueue;
-  isArmMoving = true;
-  asyncArmHandle = taskCreate(asyncArmTask, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT + 1);
-  mutexGive(mutexes[MUTEX_ASYNC_ARM]);
+    // Create the task
+    asyncArmHandle = taskCreate(asyncArmTask, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT + 1);
+  }
 }
 void stopAsyncArmController()
 {
@@ -66,35 +78,53 @@ void stopAsyncArmController()
   unsigned int asyncState = taskGetState(asyncArmHandle);
   if (asyncArmHandle != NULL && (asyncState != TASK_DEAD))
     taskDelete(asyncArmHandle);
-  stopArms();
 
   // Reset variables
-  mutexTake(mutexes[MUTEX_ASYNC_ARM], -1);
-  nextArmMove = ASYNC_ARM_NONE;
-  isArmMoving = false;
+  mutexTake(mutexes[MUTEX_ASYNC_ARM], 500);
+  nextArmTarget = -1;
+  isArmAtTarget = true;
   mutexGive(mutexes[MUTEX_ASYNC_ARM]);
+
+  // Stop the arms
+  stopArms();
 }
 void moveArmsZeroAsync()
 {
-  // Queue the next move
-  queueAsyncArmController(ASYNC_ARM_ZERO);
+  // Start asyncArmController if needed
+  startAsyncArmController();
+  // Set the proper target
+  mutexTake(mutexes[MUTEX_ASYNC_ARM], 1000);
+  nextArmTarget = ARM_ZERO;
+  isArmAtTarget = false;
+  mutexGive(mutexes[MUTEX_ASYNC_ARM]);
 }
 void moveArmsScoreAsync()
 {
-  // Queue the next move
-  queueAsyncArmController(ASYNC_ARM_SCORE);
+  // Start asyncArmController if needed
+  startAsyncArmController();
+  // Set the proper target
+  mutexTake(mutexes[MUTEX_ASYNC_ARM], 1000);
+  nextArmTarget = ARM_SCORE;
+  isArmAtTarget = false;
+  mutexGive(mutexes[MUTEX_ASYNC_ARM]);
 }
 void moveArmsLowAsync()
 {
-  // Queue the next move
-  queueAsyncArmController(ASYNC_ARM_LOW);
+  // Start asyncArmController if needed
+  startAsyncArmController();
+  // Set the proper target
+  mutexTake(mutexes[MUTEX_ASYNC_ARM], 1000);
+  nextArmTarget = ARM_LOW;
+  isArmAtTarget = false;
+  mutexGive(mutexes[MUTEX_ASYNC_ARM]);
 }
 void moveArmsMedAsync()
 {
-  // Queue the next move
-  queueAsyncArmController(ASYNC_ARM_MED);
-}
-void pushArmsDownLoop()
-{
-  queueAsyncArmController(ASYNC_ARM_PUSH_DOWN);
+  // Start asyncArmController if needed
+  startAsyncArmController();
+  // Set the proper target
+  mutexTake(mutexes[MUTEX_ASYNC_ARM], 1000);
+  nextArmTarget = ARM_MED;
+  isArmAtTarget = false;
+  mutexGive(mutexes[MUTEX_ASYNC_ARM]);
 }
