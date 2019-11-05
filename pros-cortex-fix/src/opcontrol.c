@@ -21,7 +21,6 @@ void operatorControl()
 
 	while (true)
 	{
-
 		/*
 		// Using interactive button for testing
 		if (digitalRead(PORT_interactButton) == LOW)
@@ -40,7 +39,6 @@ void operatorControl()
 			}
 		}
 		*/
-
 
 		// Hold buttons to set roller speed
 		if (joystickGetDigital(1, 5, JOY_UP))

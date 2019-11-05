@@ -3,30 +3,22 @@
 
 #include "main.h"
 
-// Enums for each different type of motion
-typedef enum AsyncTrayOptions
-{
-  ASYNC_TRAY_NONE,
-  ASYNC_TRAY_VERTICAL,
-  ASYNC_TRAY_ANGLED
-} AsyncTrayOptions;
-
 // Variables for handling async tasks
 // Keeps track when the tray is moving
-bool isTrayMoving;
+bool isTrayAtTarget;
 // Handles the async task
 TaskHandle asyncTrayHandle;
-// The next move to be performed by the robot
-AsyncTrayOptions nextTrayMove;
+// The next target pot value for the tray
+int nextTrayTarget;
 
 /**
  * Waits until the tray completes the current motion
  */
 void waitUntilTrayMoveComplete();
 /**
- * Queues the async controller task
+ * Starts the async controller and resets variables to defaults
  */
-void queueAsyncTrayController(AsyncTrayOptions moveToQueue);
+void startAsyncTrayController();
 /**
  * Stops the async controller and resets variables to defaults
  */
