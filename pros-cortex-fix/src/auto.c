@@ -11,7 +11,8 @@
 
 void deploy()
 {
-  moveArmsMed(false);
+  moveArmsMedAsync();
+  waitUntilArmMoveComplete();
   moveArmsZeroAsync();
   delay(1000);
 }

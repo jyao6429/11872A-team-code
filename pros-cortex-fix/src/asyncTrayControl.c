@@ -18,6 +18,11 @@ void asyncTrayTask(void *ignore)
     currentTrayTarget = nextTrayTarget;
     mutexGive(mutexes[MUTEX_ASYNC_TRAY]);
 
+    mutexTake(mutexes[MUTEX_ASYNC_ARM], 500);
+    if (nextArmTarget > 0 && nextArmTarget != ARM_ZERO && !isArmAtTarget)
+      currentTrayPot = TRAY_ARM;
+    mutexGive(mutexes[MUTEX_ASYNC_ARM]);
+
     // Disengage if no target set
     if (currentTrayTarget < 0)
       continue;

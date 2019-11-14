@@ -13,7 +13,8 @@ extern const int PORT_rightMotor0;
 extern const int PORT_rightMotor1;
 
 // Other motor ports
-extern const int PORT_tray;
+extern const int PORT_leftTray;
+extern const int PORT_rightTray;
 extern const int PORT_leftArm;
 extern const int PORT_rightArm;
 extern const int PORT_leftRoller;

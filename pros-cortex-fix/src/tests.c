@@ -96,19 +96,22 @@ void testSonar()
 }
 void testTray()
 {
-	moveTrayVertical();
+	moveTrayVerticalAsync();
+	waitUntilTrayMoveComplete();
 	delay(2000);
 	moveTrayAngled();
+	waitUntilTrayMoveComplete();
 }
 void testArms()
 {
 	moveArmsLowAsync();
+	waitUntilArmMoveComplete();
 	delay(2000);
 	moveArmsMedAsync();
+	waitUntilArmMoveComplete();
 	delay(2000);
 	moveArmsZeroAsync();
 	waitUntilArmMoveComplete();
-	moveArmsScoreAsync();
 }
 
 /***************************************************************
@@ -170,9 +173,6 @@ void stopTesting()
 	stopAsyncChassisController();
 	stopAsyncArmController();
 	stopAsyncTrayController();
-	stopDrive();
-	stopTray();
-	stopArms();
 	stopRollers();
 
 	print("Stopped testing\n");

@@ -57,9 +57,11 @@ int getTrayPot()
 }
 void setTray(int power)
 {
-  motorSet(PORT_tray, power);
+  motorSet(PORT_leftTray, power);
+  motorSet(PORT_rightTray, -power);
 }
 void stopTray()
 {
-  motorStop(PORT_tray);
+  motorStop(PORT_leftTray);
+  motorStop(PORT_rightTray);
 }
