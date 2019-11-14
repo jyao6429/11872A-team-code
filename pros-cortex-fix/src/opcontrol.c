@@ -40,26 +40,41 @@ void operatorControl()
 		}
 		*/
 
-		// Hold buttons to set roller speed
-		if (joystickGetDigital(1, 5, JOY_UP))
-		{
-			setRollers(127);
-		}
-		else if (joystickGetDigital(1, 5, JOY_DOWN))
-			setRollers(-127);
-		else if (joystickGetDigital(1, 7, JOY_UP))
-			setRollers(60);
-		else
-			setRollers(0);
+		// Get power for drivetrains, match to cubic function for more precision in slow movements
+		int leftPower = joystickGetAnalog(1, 3);
+		int rightPower = joystickGetAnalog(1, 2);
 
-		// Press buttons to set arm position
+		leftPower = pow((double) leftPower / 127.0, 3) * 127;
+		rightPower = pow((double) rightPower / 127.0, 3) * 127;
+
+		// Create variables for roller power
+		int rollerPower = 0;
+
+		// Handle the arm shift
+		if (joystickGetDigital(1, 6, JOY_UP))
+		{
+			// Press buttons to set arm position
+			if (joystickGetDigital(1, 6, JOY_DOWN))
+				moveArmsZeroAsync();
+			else if (joystickGetDigital(1, 5, JOY_DOWN))
+				moveArmsLowAsync();
+			else if (joystickGetDigital(1, 5, JOY_UP))
+				moveArmsMedAsync();
+		}
+		else
+		{
+			if (joystickGetDigital(1, 5, JOY_UP))
+				rollerPower = 127;
+			else if (joystickGetDigital(1, 5, JOY_DOWN))
+				rollerPower = -127;
+		}
+
+		// Shift for rollers (slows down by half)
 		if (joystickGetDigital(1, 6, JOY_DOWN))
-			moveArmsZeroAsync();
-		else if (joystickGetDigital(1, 6, JOY_UP))
-			moveArmsLowAsync();
-		else if (joystickGetDigital(1, 8, JOY_UP))
-			moveArmsMedAsync();
-		else if (joystickGetDigital(1, 8, JOY_DOWN))
+			rollerPower /= 2;
+
+		// Button for killing arm movement
+		if (joystickGetDigital(1, 8, JOY_DOWN))
 			stopAsyncArmController();
 
 		// Toggle button for angling the tray
@@ -77,7 +92,7 @@ void operatorControl()
 			}
 			delay(500);
 		}
-		else if (joystickGetDigital(1, 7, JOY_LEFT))
+		else if (joystickGetDigital(1, 7, JOY_UP))
 		{
 			stopAsyncTrayController();
 		}
@@ -105,9 +120,6 @@ void operatorControl()
 				setArms(joystickGetAnalog(2, 2));
 		}
 
-		// Get and set power for drivetrains
-		int leftPower = joystickGetAnalog(1, 3);
-		int rightPower = joystickGetAnalog(1, 2);
 		setDriveLinear(leftPower, rightPower);
 
 		delay(20);

@@ -21,6 +21,8 @@ void initializeIO()
 
 void initialize()
 {
+  setTeamName("11872A");
+
   // initialize JINX
   /*
   initJINX(stdout);
