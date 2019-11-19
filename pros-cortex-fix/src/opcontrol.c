@@ -74,7 +74,7 @@ void operatorControl()
 			rollerPower /= 2;
 
 		// Button for killing arm movement
-		if (joystickGetDigital(1, 8, JOY_DOWN))
+		if (joystickGetDigital(1, 8, JOY_UP))
 			stopAsyncArmController();
 
 		// Toggle button for angling the tray
@@ -121,6 +121,7 @@ void operatorControl()
 		}
 
 		setDriveLinear(leftPower, rightPower);
+		setRollers(rollerPower);
 
 		delay(20);
 	}

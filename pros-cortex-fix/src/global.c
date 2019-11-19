@@ -38,8 +38,6 @@ Ultrasonic leftSonar;
 
 // Digital switches
 const int PORT_interactButton = 9;
-//const int PORT_verticalTrayLimit = -1;
-//const int PORT_angledTrayLimit = -1;
 
 // Led ports
 const int PORT_redAllianceLED = 10;

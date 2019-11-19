@@ -35,7 +35,7 @@ void setDrive(int leftPower, int rightPower)
 }
 void setDriveLinear(int leftPower, int rightPower)
 {
-  // Clamping fucntion, as well as looking up proper speed in the array
+  // Clamping function, as well as looking up proper speed in the array
   leftPower = ((leftPower < 0) ? -1 : 1) * ((abs(leftPower) > 127) ? 127 : TrueSpeed[abs(leftPower)]);
   rightPower = ((rightPower < 0) ? -1 : 1) * ((abs(rightPower) > 127) ? 127 : TrueSpeed[abs(rightPower)]);
   setDrive(leftPower, rightPower);

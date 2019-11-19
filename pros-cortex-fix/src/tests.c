@@ -94,6 +94,25 @@ void testSonar()
 		delay(10);
 	}
 }
+void tuneWheelDiameter()
+{
+	moveToTargetSimpleAsync(0.0, 120.0, 0.0, 0.0, 127, 0, 0.5, 0, 0, 0, STOP_NONE, MTT_PROPORTIONAL);
+	waitUntilChassisMoveComplete();
+}
+void tuneWheelbase()
+{
+	while (globalPose.angle < 1980)
+	{
+		setDriveLinear(127, -127);
+		delay(50);
+	}
+	turnToAngleNewAsync(0.0, TURN_CCW, 0.7, 20, 10, true, true);
+	waitUntilChassisMoveComplete();
+
+	setDriveLinear(-30, -30);
+	delay(2000);
+	stopDrive();
+}
 void testTray()
 {
 	moveTrayVerticalAsync();
@@ -133,6 +152,8 @@ void testTask(void *ignore)
 	//testTray();
 	//testArms();
 	//deploy();
+	//tuneWheelDiameter();
+	//tuneWheelbase();
 
 
 	// Stop everything

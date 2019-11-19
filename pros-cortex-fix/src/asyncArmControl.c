@@ -5,7 +5,7 @@ PID armPID;
 void asyncArmTask(void *ignore)
 {
   int prevArmTarget = -1;
-  pidInit(&armPID, 0.01, 0.002, 0.003);
+  pidInit(&armPID, 0.01, 0.003, 0.002);
 
   while (true)
   {
@@ -55,6 +55,7 @@ void waitUntilArmMoveComplete()
 }
 void startAsyncArmController()
 {
+  startAsyncTrayController();
   // Only if task is not already running
   unsigned int asyncState = taskGetState(asyncArmHandle);
   if (asyncArmHandle == NULL || (asyncState == TASK_DEAD))

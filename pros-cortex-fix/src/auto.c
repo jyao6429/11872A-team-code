@@ -200,6 +200,11 @@ void autonomous()
 
 void autoChooser()
 {
+  // Turn on all LEDS
+  digitalWrite(PORT_redAllianceLED, LOW);
+  digitalWrite(PORT_smallGoalLED, LOW);
+  digitalWrite(PORT_skillsLED, LOW);
+
   unsigned long timer = millis();
   bool notChosen = true;
 
