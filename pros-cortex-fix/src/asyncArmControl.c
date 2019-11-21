@@ -5,7 +5,7 @@ PID armPID;
 void asyncArmTask(void *ignore)
 {
   int prevArmTarget = -1;
-  pidInit(&armPID, 0.01, 0.003, 0.002);
+  pidInit(&armPID, 0.005, 0.001, 0.0);
 
   while (true)
   {
@@ -27,7 +27,7 @@ void asyncArmTask(void *ignore)
     setArms(power);
 
     // Debug
-    printf("armPot: %d\tpower: %d\ttarget: %d\n", currentArmPot, power, currentArmTarget);
+    //printf("armPot: %d\tpower: %d\ttarget: %d\n", currentArmPot, power, currentArmTarget);
 
     // Set prev variables
     prevArmTarget = currentArmTarget;
@@ -43,6 +43,19 @@ void asyncArmTask(void *ignore)
     {
       mutexTake(mutexes[MUTEX_ASYNC_ARM], 200);
       isArmAtTarget = false;
+      mutexGive(mutexes[MUTEX_ASYNC_ARM]);
+    }
+
+    if (abs(currentArmTarget - currentArmPot) < 1000)
+    {
+      mutexTake(mutexes[MUTEX_ASYNC_ARM], 200);
+      isArmAtTargetTray = true;
+      mutexGive(mutexes[MUTEX_ASYNC_ARM]);
+    }
+    else
+    {
+      mutexTake(mutexes[MUTEX_ASYNC_ARM], 200);
+      isArmAtTargetTray = false;
       mutexGive(mutexes[MUTEX_ASYNC_ARM]);
     }
 

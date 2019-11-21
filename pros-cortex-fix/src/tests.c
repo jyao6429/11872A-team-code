@@ -115,22 +115,34 @@ void tuneWheelbase()
 }
 void testTray()
 {
+	print("~~~1~~~\n");
 	moveTrayVerticalAsync();
+	print("~~~2~~~\n");
 	waitUntilTrayMoveComplete();
 	delay(2000);
-	moveTrayAngled();
+	print("~~~3~~~\n");
+	moveTrayAngledAsync();
+	print("~~~4~~~\n");
 	waitUntilTrayMoveComplete();
 }
 void testArms()
 {
+	moveTrayAngledAsync();
+	print("~~~1~~~\n");
 	moveArmsLowAsync();
+	print("~~~2~~~\n");
 	waitUntilArmMoveComplete();
 	delay(2000);
+	print("~~~3~~~\n");
 	moveArmsMedAsync();
+	print("~~~4~~~\n");
 	waitUntilArmMoveComplete();
 	delay(2000);
+	print("~~~5~~~\n");
 	moveArmsZeroAsync();
 	waitUntilArmMoveComplete();
+	print("~~~6~~~\n");
+	waitUntilTrayMoveComplete();
 }
 
 /***************************************************************
@@ -150,20 +162,20 @@ void testTask(void *ignore)
 	//testNewMotionAlgorithms();
 	//testAsyncNew();
 	//testTray();
-	//testArms();
+	testArms();
 	//deploy();
 	//tuneWheelDiameter();
 	//tuneWheelbase();
 
 
 	// Stop everything
-	stopDrive();
-	stopTray();
-	stopArms();
+	stopAsyncChassisController();
+	stopAsyncTrayController();
+	stopAsyncArmController();
 	stopRollers();
 
 	// Debug if wanted
-	while (true)
+	while (false)
 	{
 		// Debug pots
 		printf("armPot: %d\tdialPot: %d\ttrayPot: %d\n", analogRead(PORT_armPot), analogRead(PORT_dialPot), analogRead(PORT_trayPot));

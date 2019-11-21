@@ -1,9 +1,9 @@
 #ifndef TRAY_H
 #define TRAY_H
 
-#define TRAY_ANGLED 10
-#define TRAY_VERTICAL 1100
-#define TRAY_ARM 300
+#define TRAY_ANGLED 40
+#define TRAY_VERTICAL 1450
+#define TRAY_ARM 700
 
 /**
  * Sets the motor power for the tray

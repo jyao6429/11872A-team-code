@@ -6,6 +6,7 @@
 // Variables for handling async tasks
 // Keeps track when the Arm is moving
 bool isArmAtTarget;
+bool isArmAtTargetTray;
 // Handles the async task
 TaskHandle asyncArmHandle;
 // The next move to be performed by the robot

@@ -5,7 +5,7 @@ PID trayPID;
 void asyncTrayTask(void *ignore)
 {
   int prevTrayTarget = -1;
-  pidInit(&trayPID, 0.0007, 0.0, 0.0);
+  pidInit(&trayPID, 0.0005, 0.0003, 0.0);
 
   while (true)
   {
@@ -19,8 +19,8 @@ void asyncTrayTask(void *ignore)
     mutexGive(mutexes[MUTEX_ASYNC_TRAY]);
 
     mutexTake(mutexes[MUTEX_ASYNC_ARM], 500);
-    if (nextArmTarget > 0 && nextArmTarget != ARM_ZERO && !isArmAtTarget)
-      currentTrayPot = TRAY_ARM;
+    if (nextArmTarget > 0 && ((nextArmTarget != ARM_ZERO) || (nextArmTarget == ARM_ZERO && !isArmAtTargetTray)))
+      currentTrayTarget = TRAY_ARM;
     mutexGive(mutexes[MUTEX_ASYNC_ARM]);
 
     // Disengage if no target set
@@ -60,10 +60,12 @@ void waitUntilTrayMoveComplete()
 }
 void startAsyncTrayController()
 {
+  print("startAsyncTrayController\n");
   // Only if task is not already running
   unsigned int asyncState = taskGetState(asyncTrayHandle);
   if (asyncTrayHandle == NULL || (asyncState == TASK_DEAD))
   {
+    print("Need to start tray\n");
     // Reset variables
     mutexTake(mutexes[MUTEX_ASYNC_TRAY], 200);
     nextTrayTarget = -1;
