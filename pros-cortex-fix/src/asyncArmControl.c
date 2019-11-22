@@ -14,7 +14,7 @@ void asyncArmTask(void *ignore)
     int currentArmPot = getArmPot();
 
     // Take mutexes and set proper variables, depending on if operator control
-    if (!isAutonomous() && isEnabled())
+    if (!isAutonomous() && isEnabled() && isMainConnected)
     {
       if (joystickGetDigital(1, 6, JOY_UP))
   		{

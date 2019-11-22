@@ -44,5 +44,9 @@ const int PORT_redAllianceLED = 10;
 const int PORT_smallGoalLED = 11;
 const int PORT_skillsLED = 12;
 
+// Booleans for state
+bool isMainConnected = false;
+bool isPartnerConnected = false;
+
 // Mutexes
 Mutex mutexes[4];

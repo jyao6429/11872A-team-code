@@ -64,6 +64,12 @@ extern const int PORT_smallGoalLED;
 // IF on, robot is doing skills
 extern const int PORT_skillsLED;
 // Enum for different mutexes
+
+// Boolean to store if the main controller is connected
+extern bool isMainConnected;
+// Boolean to store if the partner controller is connected
+extern bool isPartnerConnected;
+
 enum MutexTypes
 {
   MUTEX_POSE,

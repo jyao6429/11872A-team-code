@@ -16,7 +16,7 @@ void asyncTrayTask(void *ignore)
     int currentTrayPot = getTrayPot();
 
     // Take mutexes and set proper variables, depending on if operatorControl or not
-    if (!isAutonomous() && isEnabled())
+    if (!isAutonomous() && isEnabled() && isMainConnected)
     {
       // Toggle button for angling the tray
   		if (joystickGetDigital(1, 7, JOY_DOWN))

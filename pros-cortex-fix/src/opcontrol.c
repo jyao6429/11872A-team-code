@@ -15,7 +15,10 @@ void operatorControl()
 
 	// Initialize toggle variables
 	isTesting = false;
-	bool isPartnerConnected = isJoystickConnected(2);
+
+	// Set values for joystick connection
+	isMainConnected = isJoystickConnected(1);
+	isPartnerConnected = isJoystickConnected(2);
 
 	while (true)
 	{
