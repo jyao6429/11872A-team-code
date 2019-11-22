@@ -9,15 +9,13 @@
 
 #include "main.h"
 
-bool isTrayVertical;
-
 void operatorControl()
 {
 	print("Starting operatorControl\n");
 
 	// Initialize toggle variables
 	isTesting = false;
-	isTrayVertical = false;
+	bool isPartnerConnected = isJoystickConnected(2);
 
 	while (true)
 	{
@@ -50,19 +48,8 @@ void operatorControl()
 		// Create variables for roller power
 		int rollerPower = 0;
 
-		// Handle the arm shift
-		if (joystickGetDigital(1, 6, JOY_UP) || true)
-		{
-			// Press buttons to set arm position
-			if (joystickGetDigital(1, 6, JOY_DOWN))
-				moveArmsZeroAsync();
-			else if (joystickGetDigital(1, 5, JOY_DOWN) || true)
-				moveArmsLowAsync();
-			else if (joystickGetDigital(1, 5, JOY_UP))
-				moveArmsMedAsync();
-			delay(1000);
-		}
-		else
+		// Handle the rollers if not controlling arms
+		if (!joystickGetDigital(1, 6, JOY_DOWN))
 		{
 			if (joystickGetDigital(1, 5, JOY_UP))
 				rollerPower = 127;
@@ -74,51 +61,23 @@ void operatorControl()
 		if (joystickGetDigital(1, 6, JOY_DOWN))
 			rollerPower /= 2;
 
-		// Button for killing arm movement
-		if (joystickGetDigital(1, 8, JOY_UP))
-			stopAsyncArmController();
-
-		// Toggle button for angling the tray
-		if (joystickGetDigital(1, 7, JOY_DOWN))
+		if (isPartnerConnected)
 		{
-			if (isTrayVertical)
+			// Partner controls for overriding tray
+			if (joystickGetDigital(2, 5, JOY_UP))
 			{
-				moveTrayAngledAsync();
-				isTrayVertical = false;
+				// Set tray power
+				setTray(joystickGetAnalog(2, 3));
 			}
-			else
+			// Partner controls for overriding intake arms
+			if (joystickGetDigital(2, 6, JOY_UP))
 			{
-				moveTrayVerticalAsync();
-				isTrayVertical = true;
+				// Set arm power, depending if holding or not
+				if (joystickGetDigital(2, 6, JOY_DOWN))
+					setArms(20);
+				else
+					setArms(joystickGetAnalog(2, 2));
 			}
-			delay(500);
-		}
-		else if (joystickGetDigital(1, 7, JOY_UP))
-		{
-			stopAsyncTrayController();
-		}
-
-		// Partner controls for overriding tray
-		if (joystickGetDigital(2, 5, JOY_UP))
-		{
-			// Kill asyncTrayController
-			stopAsyncTrayController();
-
-			// Set tray power
-			setTray(joystickGetAnalog(2, 3));
-		}
-
-		// Partner controls for overriding intake arms
-		if (joystickGetDigital(2, 6, JOY_UP))
-		{
-			// Kill asyncArmController
-			stopAsyncArmController();
-
-			// Set arm power, depending if holding or not
-			if (joystickGetDigital(2, 6, JOY_DOWN))
-				setArms(20);
-			else
-				setArms(joystickGetAnalog(2, 2));
 		}
 
 		setDriveLinear(leftPower, rightPower);

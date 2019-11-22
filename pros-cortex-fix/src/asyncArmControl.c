@@ -13,10 +13,35 @@ void asyncArmTask(void *ignore)
     int currentArmTarget = prevArmTarget;
     int currentArmPot = getArmPot();
 
-    // Take mutexes and set proper variables
-    mutexTake(mutexes[MUTEX_ASYNC_ARM], 200);
-    currentArmTarget = nextArmTarget;
-    mutexGive(mutexes[MUTEX_ASYNC_ARM]);
+    // Take mutexes and set proper variables, depending on if operator control
+    if (!isAutonomous() && isEnabled())
+    {
+      if (joystickGetDigital(1, 6, JOY_UP))
+  		{
+  			// Press buttons to set arm position
+  			if (joystickGetDigital(1, 6, JOY_DOWN))
+  				currentArmTarget = ARM_ZERO;
+  			else if (joystickGetDigital(1, 5, JOY_DOWN))
+  				currentArmTarget = ARM_LOW;
+  			else if (joystickGetDigital(1, 5, JOY_UP))
+  				currentArmTarget = ARM_MED;
+  		}
+      // If need to kill arm
+      else if (joystickGetDigital(1, 8, JOY_UP))
+      {
+        currentArmTarget = -1;
+        prevArmTarget = currentArmTarget;
+        mutexTake(mutexes[MUTEX_ASYNC_ARM], 200);
+        isArmAtTarget = true;
+        mutexGive(mutexes[MUTEX_ASYNC_ARM]);
+      }
+    }
+    else
+    {
+      mutexTake(mutexes[MUTEX_ASYNC_ARM], 200);
+      currentArmTarget = nextArmTarget;
+      mutexGive(mutexes[MUTEX_ASYNC_ARM]);
+    }
 
     // Disengage if no target set
     if (currentArmTarget < 0)
@@ -46,6 +71,7 @@ void asyncArmTask(void *ignore)
       mutexGive(mutexes[MUTEX_ASYNC_ARM]);
     }
 
+    // Signals tray if arms are within range to bring back tray
     if (abs(currentArmTarget - currentArmPot) < 1000)
     {
       mutexTake(mutexes[MUTEX_ASYNC_ARM], 200);

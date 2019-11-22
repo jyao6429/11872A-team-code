@@ -43,6 +43,9 @@ void initialize()
   // Initialize sonar
   leftSonar = ultrasonicInit(PORT_leftSonarOrange, PORT_leftSonarYellow);
 
+  // Start asyncArmController, which in turn starts asyncTrayController
+  startAsyncArmController();
+
   // Finally, initialize the autonomous choosing procedure
   chosenAuto = AUTO_NONE;
   autoChooser();

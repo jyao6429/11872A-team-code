@@ -1,11 +1,13 @@
 #include "main.h"
 
 PID trayPID;
+bool isTrayVertical;
 
 void asyncTrayTask(void *ignore)
 {
   int prevTrayTarget = -1;
   pidInit(&trayPID, 0.0005, 0.0003, 0.0);
+  isTrayVertical = false;
 
   while (true)
   {
@@ -13,10 +15,39 @@ void asyncTrayTask(void *ignore)
     int currentTrayTarget = prevTrayTarget;
     int currentTrayPot = getTrayPot();
 
-    // Take mutexes and set proper variables
-    mutexTake(mutexes[MUTEX_ASYNC_TRAY], 200);
-    currentTrayTarget = nextTrayTarget;
-    mutexGive(mutexes[MUTEX_ASYNC_TRAY]);
+    // Take mutexes and set proper variables, depending on if operatorControl or not
+    if (!isAutonomous() && isEnabled())
+    {
+      // Toggle button for angling the tray
+  		if (joystickGetDigital(1, 7, JOY_DOWN))
+  		{
+  			if (isTrayVertical)
+  			{
+  				moveTrayAngledAsync();
+  				isTrayVertical = false;
+  			}
+  			else
+  			{
+  				moveTrayVerticalAsync();
+  				isTrayVertical = true;
+  			}
+  			delay(500);
+  		}
+  		else if (joystickGetDigital(1, 7, JOY_UP))
+  		{
+        currentTrayTarget = -1;
+        prevTrayTarget = currentTrayTarget;
+        mutexTake(mutexes[MUTEX_ASYNC_TRAY], 200);
+        isTrayAtTarget = true;
+        mutexGive(mutexes[MUTEX_ASYNC_TRAY]);
+  		}
+    }
+    else
+    {
+      mutexTake(mutexes[MUTEX_ASYNC_TRAY], 200);
+      currentTrayTarget = nextTrayTarget;
+      mutexGive(mutexes[MUTEX_ASYNC_TRAY]);
+    }
 
     mutexTake(mutexes[MUTEX_ASYNC_ARM], 500);
     if (nextArmTarget > 0 && ((nextArmTarget != ARM_ZERO) || (nextArmTarget == ARM_ZERO && !isArmAtTargetTray)))
@@ -82,7 +113,6 @@ void startAsyncTrayController()
   // Create the task
   print("Creating task\n");
   asyncTrayHandle = taskCreate(asyncTrayTask, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT + 1);
-  delay(500);
   print("Started Tray\n");
 }
 void stopAsyncTrayController()
