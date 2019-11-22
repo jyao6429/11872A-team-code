@@ -143,8 +143,10 @@ void autoRedSmallSafe()
   // 5. Back away from the stack and tilt the tray back and return the arms down
   moveToTargetDisSimpleAsync(-45.0, 12.0, FIELD_WIDTH - 12.0, 12.0, -30, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_PROPORTIONAL, true);
   delay(1000);
-  moveTrayAngled();
-  moveArmsZero();
+  moveTrayAngledAsync();
+  waitUntilTrayMoveComplete();
+  moveArmsZeroAsync();
+  waitUntilArmMoveComplete();
   waitUntilChassisMoveComplete();
 }
 void autoRedSmallSuperSafe()

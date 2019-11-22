@@ -73,7 +73,7 @@ void startAsyncArmController()
   unsigned int asyncState = taskGetState(asyncArmHandle);
   if (asyncArmHandle != NULL && (asyncState != TASK_DEAD))
     return;
-  
+
   // Reset variables
   mutexTake(mutexes[MUTEX_ASYNC_ARM], 200);
   nextArmTarget = -1;
@@ -141,4 +141,28 @@ void moveArmsMedAsync()
   nextArmTarget = ARM_MED;
   isArmAtTarget = false;
   mutexGive(mutexes[MUTEX_ASYNC_ARM]);
+}
+int getArmPot()
+{
+  return analogRead(PORT_armPot);
+}
+void setArms(int power)
+{
+  motorSet(PORT_leftArm, power);
+  motorSet(PORT_rightArm, -power);
+}
+void setRollers(int power)
+{
+  motorSet(PORT_leftRoller, power);
+  motorSet(PORT_rightRoller, -power);
+}
+void stopArms()
+{
+  motorStop(PORT_leftArm);
+  motorStop(PORT_rightArm);
+}
+void stopRollers()
+{
+  motorStop(PORT_leftRoller);
+  motorStop(PORT_rightRoller);
 }

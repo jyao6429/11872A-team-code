@@ -3,6 +3,11 @@
 
 #include "main.h"
 
+#define ARM_ZERO 1660
+#define ARM_SCORE 2000
+#define ARM_LOW 3000
+#define ARM_MED 4000
+
 // Variables for handling async tasks
 // Keeps track when the Arm is moving
 bool isArmAtTarget;
@@ -40,5 +45,30 @@ void moveArmsLowAsync();
  * Holds intake arms to score/descore medium towers
  */
 void moveArmsMedAsync();
-
+/**
+ * Gets a normalized value from the arm potentiometer
+ *
+ * @returns the normalized value from the arm pot
+ */
+int getArmPot();
+/**
+ * Powers the motors on the intake arms
+ *
+ * @param power - the power for the arms, positive values raise the arm
+ */
+void setArms(int power);
+/**
+ * Powers the motors on the intake rollers
+ *
+ * @param power - the power for the rollers, positive values intake cubes
+ */
+void setRollers(int power);
+/**
+ * Stops the intake arms
+ */
+void stopArms();
+/**
+ * Stops the intake rollers
+ */
+void stopRollers();
 #endif

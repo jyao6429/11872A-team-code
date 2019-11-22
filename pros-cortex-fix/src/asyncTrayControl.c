@@ -121,3 +121,17 @@ void moveTrayAngledAsync()
   isTrayAtTarget = false;
   mutexGive(mutexes[MUTEX_ASYNC_TRAY]);
 }
+int getTrayPot()
+{
+  return analogRead(PORT_trayPot);
+}
+void setTray(int power)
+{
+  motorSet(PORT_leftTray, power);
+  motorSet(PORT_rightTray, -power);
+}
+void stopTray()
+{
+  motorStop(PORT_leftTray);
+  motorStop(PORT_rightTray);
+}
