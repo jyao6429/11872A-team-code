@@ -71,20 +71,20 @@ void startAsyncArmController()
   startAsyncTrayController();
   // Only if task is not already running
   unsigned int asyncState = taskGetState(asyncArmHandle);
-  if (asyncArmHandle == NULL || (asyncState == TASK_DEAD))
-  {
-    // Reset variables
-    mutexTake(mutexes[MUTEX_ASYNC_ARM], 200);
-    nextArmTarget = -1;
-    isArmAtTarget = true;
-    mutexGive(mutexes[MUTEX_ASYNC_ARM]);
+  if (asyncArmHandle != NULL && (asyncState != TASK_DEAD))
+    return;
+  
+  // Reset variables
+  mutexTake(mutexes[MUTEX_ASYNC_ARM], 200);
+  nextArmTarget = -1;
+  isArmAtTarget = true;
+  mutexGive(mutexes[MUTEX_ASYNC_ARM]);
 
-    // Stop the arm
-    stopArms();
+  // Stop the arm
+  stopArms();
 
-    // Create the task
-    asyncArmHandle = taskCreate(asyncArmTask, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT + 1);
-  }
+  // Create the task
+  asyncArmHandle = taskCreate(asyncArmTask, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT + 1);
 }
 void stopAsyncArmController()
 {

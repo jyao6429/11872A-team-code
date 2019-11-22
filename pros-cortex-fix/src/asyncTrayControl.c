@@ -63,21 +63,27 @@ void startAsyncTrayController()
   print("startAsyncTrayController\n");
   // Only if task is not already running
   unsigned int asyncState = taskGetState(asyncTrayHandle);
-  if (asyncTrayHandle == NULL || (asyncState == TASK_DEAD))
-  {
-    print("Need to start tray\n");
-    // Reset variables
-    mutexTake(mutexes[MUTEX_ASYNC_TRAY], 200);
-    nextTrayTarget = -1;
-    isTrayAtTarget = true;
-    mutexGive(mutexes[MUTEX_ASYNC_TRAY]);
+  if (asyncTrayHandle != NULL && (asyncState != TASK_DEAD))
+    return;
 
-    // Stop the tray
-    stopTray();
+  print("Need to start tray\n");
+  // Reset variables
+  mutexTake(mutexes[MUTEX_ASYNC_TRAY], 200);
+  print("Took MUTEX_ASYNC_TRAY\n");
+  nextTrayTarget = -1;
+  isTrayAtTarget = true;
+  mutexGive(mutexes[MUTEX_ASYNC_TRAY]);
+  print("Gave MUTEX_ASYNC_TRAY\n");
 
-    // Create the task
-    asyncTrayHandle = taskCreate(asyncTrayTask, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT + 1);
-  }
+  // Stop the tray
+  stopTray();
+  print("Stopped tray\n");
+
+  // Create the task
+  print("Creating task\n");
+  asyncTrayHandle = taskCreate(asyncTrayTask, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT + 1);
+  delay(500);
+  print("Started Tray\n");
 }
 void stopAsyncTrayController()
 {

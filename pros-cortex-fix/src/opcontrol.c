@@ -51,15 +51,16 @@ void operatorControl()
 		int rollerPower = 0;
 
 		// Handle the arm shift
-		if (joystickGetDigital(1, 6, JOY_UP))
+		if (joystickGetDigital(1, 6, JOY_UP) || true)
 		{
 			// Press buttons to set arm position
 			if (joystickGetDigital(1, 6, JOY_DOWN))
 				moveArmsZeroAsync();
-			else if (joystickGetDigital(1, 5, JOY_DOWN))
+			else if (joystickGetDigital(1, 5, JOY_DOWN) || true)
 				moveArmsLowAsync();
 			else if (joystickGetDigital(1, 5, JOY_UP))
 				moveArmsMedAsync();
+			delay(1000);
 		}
 		else
 		{
