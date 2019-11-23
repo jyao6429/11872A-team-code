@@ -2,6 +2,8 @@
 
 PID trayPID;
 bool isTrayVertical;
+// Handles the async task
+TaskHandle asyncTrayHandle;
 
 void asyncTrayTask(void *ignore)
 {
@@ -63,7 +65,7 @@ void asyncTrayTask(void *ignore)
     setTray(power);
 
     // Debug
-    printf("trayPot: %d\tpower: %d\ttarget: %d\n", currentTrayPot, power, currentTrayTarget);
+    //printf("trayPot: %d\tpower: %d\ttarget: %d\n", currentTrayPot, power, currentTrayTarget);
 
     // Set prev variables
     prevTrayTarget = currentTrayTarget;
@@ -93,27 +95,26 @@ void startAsyncTrayController()
 {
   print("startAsyncTrayController\n");
   // Only if task is not already running
-  unsigned int asyncState = taskGetState(asyncTrayHandle);
-  if (asyncTrayHandle != NULL && (asyncState != TASK_DEAD))
+  unsigned int asyncTrayState = taskGetState(asyncTrayHandle);
+  printf("asyncTrayState: %d\n", asyncTrayState);
+  if (asyncTrayHandle != NULL && (asyncTrayState != TASK_DEAD))
     return;
 
   print("Need to start tray\n");
   // Reset variables
-  mutexTake(mutexes[MUTEX_ASYNC_TRAY], 200);
+  mutexTake(mutexes[MUTEX_ASYNC_TRAY], 500);
   print("Took MUTEX_ASYNC_TRAY\n");
   nextTrayTarget = -1;
   isTrayAtTarget = true;
-  mutexGive(mutexes[MUTEX_ASYNC_TRAY]);
-  print("Gave MUTEX_ASYNC_TRAY\n");
-
   // Stop the tray
   stopTray();
   print("Stopped tray\n");
-
   // Create the task
   print("Creating task\n");
-  asyncTrayHandle = taskCreate(asyncTrayTask, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT + 1);
+  asyncTrayHandle = taskCreate(asyncTrayTask, TASK_DEFAULT_STACK_SIZE, NULL, (TASK_PRIORITY_DEFAULT + 1));
   print("Started Tray\n");
+  mutexGive(mutexes[MUTEX_ASYNC_TRAY]);
+  print("Gave MUTEX_ASYNC_TRAY\n");
 }
 void stopAsyncTrayController()
 {

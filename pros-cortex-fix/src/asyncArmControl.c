@@ -1,6 +1,8 @@
 #include "main.h"
 
 PID armPID;
+// Handles the async task
+TaskHandle asyncArmHandle;
 
 void asyncArmTask(void *ignore)
 {
@@ -100,17 +102,16 @@ void startAsyncArmController()
   if (asyncArmHandle != NULL && (asyncState != TASK_DEAD))
     return;
 
+  // Take the mutex
+  mutexTake(mutexes[MUTEX_ASYNC_ARM], 500);
   // Reset variables
-  mutexTake(mutexes[MUTEX_ASYNC_ARM], 200);
   nextArmTarget = -1;
   isArmAtTarget = true;
-  mutexGive(mutexes[MUTEX_ASYNC_ARM]);
-
   // Stop the arm
   stopArms();
-
   // Create the task
   asyncArmHandle = taskCreate(asyncArmTask, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT + 1);
+  mutexGive(mutexes[MUTEX_ASYNC_ARM]);
 }
 void stopAsyncArmController()
 {
