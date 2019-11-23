@@ -3,7 +3,7 @@
 
 #include "main.h"
 
-#define TRAY_ANGLED 40
+#define TRAY_ANGLED 50
 #define TRAY_VERTICAL 1450
 #define TRAY_ARM 700
 

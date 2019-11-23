@@ -3,81 +3,94 @@
 PID trayPID;
 bool isTrayVertical = false;
 int prevTrayTarget = -1;
+
 // Handles the async task
 TaskHandle asyncTrayHandle;
 
 void asyncTrayLoop()
 {
-    // Precaution in case mutex is taken
-    int currentTrayTarget = prevTrayTarget;
-    int currentTrayPot = getTrayPot();
+  // Precaution in case mutex is taken
+  int currentTrayTarget = prevTrayTarget;
+  int currentTrayPot = getTrayPot();
 
-    // Take mutexes and set proper variables, depending on if operatorControl or not
-    if (!isAutonomous() && isEnabled() && isMainConnected)
-    {
-      // Toggle button for angling the tray
-  		if (joystickGetDigital(1, 7, JOY_DOWN))
-  		{
-  			if (isTrayVertical)
-  			{
-  				currentTrayTarget = TRAY_ANGLED;
-  				isTrayVertical = false;
-  			}
-  			else
-  			{
-  				currentTrayTarget = TRAY_VERTICAL;
-  				isTrayVertical = true;
-  			}
-  			delay(500);
-  		}
-  		else if (joystickGetDigital(1, 7, JOY_UP))
-  		{
-        currentTrayTarget = -1;
-        prevTrayTarget = currentTrayTarget;
-        mutexTake(mutexes[MUTEX_ASYNC_TRAY], 200);
-        isTrayAtTarget = true;
-        mutexGive(mutexes[MUTEX_ASYNC_TRAY]);
-  		}
-    }
-    else
-    {
-      mutexTake(mutexes[MUTEX_ASYNC_TRAY], 200);
-      currentTrayTarget = nextTrayTarget;
-      mutexGive(mutexes[MUTEX_ASYNC_TRAY]);
-    }
+  // Take mutexes and set proper variables, depending on if operatorControl or not
+  if (!isAutonomous() && isEnabled() && isMainConnected)
+  {
+    // Toggle button for angling the tray
+		if (joystickGetDigital(1, 7, JOY_DOWN))
+		{
+			isTrayVertical = !isTrayVertical;;
+      
+      if (isTrayVertical)
+        currentTrayTarget = TRAY_VERTICAL;
+      else
+        currentTrayTarget = TRAY_ANGLED;
+			delay(250);
+		}
 
-    mutexTake(mutexes[MUTEX_ASYNC_ARM], 500);
-    if (nextArmTarget > 0 && ((nextArmTarget != ARM_ZERO) || (nextArmTarget == ARM_ZERO && !isArmAtTargetTray)))
-      currentTrayTarget = TRAY_ARM;
-    mutexGive(mutexes[MUTEX_ASYNC_ARM]);
 
-    // Disengage if no target set
-    if (currentTrayTarget < 0)
-      return;
-
-    // Calculate and set power for tray
-    int power = pidCalculate(&trayPID, currentTrayTarget, currentTrayPot) * 127;
-    setTray(power);
-
-    // Debug
-    //printf("trayPot: %d\tpower: %d\ttarget: %d\n", currentTrayPot, power, currentTrayTarget);
-
-    // Set prev variables
-    prevTrayTarget = currentTrayTarget;
-
-    // Sets if tray is within target
-    if (abs(currentTrayTarget - currentTrayPot) < 20)
-    {
+		if (joystickGetDigital(1, 7, JOY_UP))
+		{
+      currentTrayTarget = -1;
+      prevTrayTarget = currentTrayTarget;
       mutexTake(mutexes[MUTEX_ASYNC_TRAY], 200);
       isTrayAtTarget = true;
       mutexGive(mutexes[MUTEX_ASYNC_TRAY]);
-    }
+		}
+  }
+  else
+  {
+    mutexTake(mutexes[MUTEX_ASYNC_TRAY], 200);
+    currentTrayTarget = nextTrayTarget;
+    mutexGive(mutexes[MUTEX_ASYNC_TRAY]);
+  }
+
+  mutexTake(mutexes[MUTEX_ASYNC_ARM], 500);
+  if (trayOverride)
+    currentTrayTarget = TRAY_ARM;
+  mutexGive(mutexes[MUTEX_ASYNC_ARM]);
+
+  //print("Tray always printing\n");
+
+  // Disengage if no target set
+  if (currentTrayTarget < 0)
+  {
+    stopTray();
+    return;
+  }
+
+  // Reinitialize PID if needed
+  if (currentTrayTarget != prevTrayTarget)
+  {
+    if (currentTrayTarget == TRAY_VERTICAL)
+      pidInit(&trayPID, 0.0005, 0.0001, 0.0);
     else
-    {
-      mutexTake(mutexes[MUTEX_ASYNC_TRAY], 200);
-      isTrayAtTarget = false;
-      mutexGive(mutexes[MUTEX_ASYNC_TRAY]);
-    }
+      pidInit(&trayPID, 0.0015, 0.0001, 0.0);
+  }
+
+  // Calculate and set power for tray
+  int power = pidCalculate(&trayPID, currentTrayTarget, currentTrayPot) * 127;
+  setTray(power);
+
+  // Debug
+  printf("trayPot: %d\tpower: %d\ttarget: %d\ttrayPID.sigma: %3.3f\n", currentTrayPot, power, currentTrayTarget, trayPID.sigma);
+
+  // Set prev variables
+  prevTrayTarget = currentTrayTarget;
+
+  // Sets if tray is within target
+  if (abs(currentTrayTarget - currentTrayPot) < 20)
+  {
+    mutexTake(mutexes[MUTEX_ASYNC_TRAY], 200);
+    isTrayAtTarget = true;
+    mutexGive(mutexes[MUTEX_ASYNC_TRAY]);
+  }
+  else
+  {
+    mutexTake(mutexes[MUTEX_ASYNC_TRAY], 200);
+    isTrayAtTarget = false;
+    mutexGive(mutexes[MUTEX_ASYNC_TRAY]);
+  }
 }
 void waitUntilTrayMoveComplete()
 {
@@ -85,29 +98,28 @@ void waitUntilTrayMoveComplete()
 }
 void startAsyncTrayController()
 {
-  print("startAsyncTrayController\n");
+  print("~~~~~~~~~~~~~~Begin startAsyncTrayController~~~~~~~~~~~~~~~~\n");
   // Only if task is not already running
   unsigned int asyncTrayState = taskGetState(asyncTrayHandle);
   printf("asyncTrayState: %d\n", asyncTrayState);
   if (asyncTrayHandle != NULL && (asyncTrayState != TASK_DEAD))
     return;
 
-  print("Need to start tray\n");
   // Reset variables
   mutexTake(mutexes[MUTEX_ASYNC_TRAY], 500);
-  print("Took MUTEX_ASYNC_TRAY\n");
   nextTrayTarget = -1;
   isTrayAtTarget = true;
-  pidInit(&trayPID, 0.0005, 0.0003, 0.0);
+
+  // Initialize PID
+  pidInit(&trayPID, 0.0005, 0.0001, 0.0);
+
   // Stop the tray
   stopTray();
-  print("Stopped tray\n");
+
   // Create the task
-  print("Creating task\n");
   asyncTrayHandle = taskRunLoop(asyncTrayLoop, 20);
-  print("Started Tray\n");
   mutexGive(mutexes[MUTEX_ASYNC_TRAY]);
-  print("Gave MUTEX_ASYNC_TRAY\n");
+  print("~~~~~~~~~~~~~~Finished startAsyncTrayController~~~~~~~~~~~~~~~\n");
 }
 void stopAsyncTrayController()
 {

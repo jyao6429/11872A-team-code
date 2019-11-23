@@ -11,10 +11,12 @@
 
 void deploy()
 {
-  moveArmsMedAsync();
-  waitUntilArmMoveComplete();
-  moveArmsZeroAsync();
-  delay(1000);
+  moveTrayVerticalAsync();
+  waitUntilTrayMoveComplete();
+  setRollers(-127);
+  delay(2000);
+  moveTrayAngledAsync();
+  waitUntilTrayMoveComplete();
 }
 void score()
 {

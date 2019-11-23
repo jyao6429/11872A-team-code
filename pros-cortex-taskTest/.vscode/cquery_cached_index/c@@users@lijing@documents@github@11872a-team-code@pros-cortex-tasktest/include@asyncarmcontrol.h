@@ -3,7 +3,7 @@
 
 #include "main.h"
 
-#define ARM_ZERO 1660
+#define ARM_ZERO 1630
 #define ARM_SCORE 2000
 #define ARM_LOW 3000
 #define ARM_MED 4000
@@ -11,7 +11,7 @@
 // Variables for handling async tasks
 // Keeps track when the Arm is moving
 bool isArmAtTarget;
-bool isArmAtTargetTray;
+bool trayOverride;
 // The next move to be performed by the robot
 int nextArmTarget;
 

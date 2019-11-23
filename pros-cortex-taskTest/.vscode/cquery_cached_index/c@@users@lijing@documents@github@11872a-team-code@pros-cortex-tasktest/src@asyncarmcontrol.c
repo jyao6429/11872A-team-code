@@ -1,88 +1,87 @@
 #include "main.h"
 
 PID armPID;
+bool trayOverride = false;
 // Handles the async task
 TaskHandle asyncArmHandle;
 int prevArmTarget = -1;
 
 void asyncArmLoop()
 {
+  // Precaution in case mutex is taken
+  int currentArmTarget = prevArmTarget;
+  int currentArmPot = getArmPot();
 
-    // Precaution in case mutex is taken
-    int currentArmTarget = prevArmTarget;
-    int currentArmPot = getArmPot();
-
-    // Take mutexes and set proper variables, depending on if operator control
-    if (!isAutonomous() && isEnabled() && isMainConnected)
+  // Take mutexes and set proper variables, depending on if operator control
+  if (!isAutonomous() && isEnabled() && isMainConnected)
+  {
+    if (joystickGetDigital(1, 6, JOY_UP))
+		{
+			// Press buttons to set arm position
+			if (joystickGetDigital(1, 6, JOY_DOWN))
+				currentArmTarget = ARM_ZERO;
+			else if (joystickGetDigital(1, 5, JOY_DOWN))
+				currentArmTarget = ARM_LOW;
+			else if (joystickGetDigital(1, 5, JOY_UP))
+				currentArmTarget = ARM_MED;
+		}
+    // If need to kill arm
+    else if (joystickGetDigital(1, 8, JOY_UP))
     {
-      if (joystickGetDigital(1, 6, JOY_UP))
-  		{
-  			// Press buttons to set arm position
-  			if (joystickGetDigital(1, 6, JOY_DOWN))
-  				currentArmTarget = ARM_ZERO;
-  			else if (joystickGetDigital(1, 5, JOY_DOWN))
-  				currentArmTarget = ARM_LOW;
-  			else if (joystickGetDigital(1, 5, JOY_UP))
-  				currentArmTarget = ARM_MED;
-  		}
-      // If need to kill arm
-      else if (joystickGetDigital(1, 8, JOY_UP))
-      {
-        currentArmTarget = -1;
-        prevArmTarget = currentArmTarget;
-        mutexTake(mutexes[MUTEX_ASYNC_ARM], 200);
-        isArmAtTarget = true;
-        mutexGive(mutexes[MUTEX_ASYNC_ARM]);
-      }
-    }
-    else
-    {
-      mutexTake(mutexes[MUTEX_ASYNC_ARM], 200);
-      currentArmTarget = nextArmTarget;
-      mutexGive(mutexes[MUTEX_ASYNC_ARM]);
-    }
-
-    // Disengage if no target set
-    if (currentArmTarget < 0)
-      return;
-
-    // Calculate and set power for arm
-    int power = pidCalculate(&armPID, currentArmTarget, currentArmPot) * 127;
-    setArms(power);
-
-    // Debug
-    //printf("armPot: %d\tpower: %d\ttarget: %d\n", currentArmPot, power, currentArmTarget);
-
-    // Set prev variables
-    prevArmTarget = currentArmTarget;
-
-    // Sets if arm is within target
-    if (abs(currentArmTarget - currentArmPot) < 50)
-    {
+      currentArmTarget = -1;
+      prevArmTarget = currentArmTarget;
       mutexTake(mutexes[MUTEX_ASYNC_ARM], 200);
       isArmAtTarget = true;
       mutexGive(mutexes[MUTEX_ASYNC_ARM]);
     }
-    else
-    {
-      mutexTake(mutexes[MUTEX_ASYNC_ARM], 200);
-      isArmAtTarget = false;
-      mutexGive(mutexes[MUTEX_ASYNC_ARM]);
-    }
+  }
+  else
+  {
+    mutexTake(mutexes[MUTEX_ASYNC_ARM], 200);
+    currentArmTarget = nextArmTarget;
+    mutexGive(mutexes[MUTEX_ASYNC_ARM]);
+  }
 
-    // Signals tray if arms are within range to bring back tray
-    if (abs(currentArmTarget - currentArmPot) < 1000)
-    {
-      mutexTake(mutexes[MUTEX_ASYNC_ARM], 200);
-      isArmAtTargetTray = true;
-      mutexGive(mutexes[MUTEX_ASYNC_ARM]);
-    }
-    else
-    {
-      mutexTake(mutexes[MUTEX_ASYNC_ARM], 200);
-      isArmAtTargetTray = false;
-      mutexGive(mutexes[MUTEX_ASYNC_ARM]);
-    }
+  mutexTake(mutexes[MUTEX_ASYNC_ARM], 200);
+  trayOverride = currentArmTarget > 0 && (currentArmTarget != ARM_ZERO || (currentArmTarget == ARM_ZERO && abs(currentArmPot - currentArmTarget) > 1000));
+  mutexGive(mutexes[MUTEX_ASYNC_ARM]);
+
+  //print("Arm always printing\n");
+
+  // Disengage if no target set
+  if (currentArmTarget < 0)
+  {
+    stopArms();
+    return;
+  }
+
+  // Reinitialize PID if needed
+  if (currentArmTarget != prevArmTarget)
+    pidInit(&armPID, 0.005, 0.001, 0.0);
+
+  // Calculate and set power for arm
+  int power = pidCalculate(&armPID, currentArmTarget, currentArmPot) * 127;
+  setArms(power);
+
+  // Debug
+  printf("armPot: %d\tpower: %d\ttarget: %d\n", currentArmPot, power, currentArmTarget);
+
+  // Set prev variables
+  prevArmTarget = currentArmTarget;
+
+  // Sets if arm is within target
+  if (abs(currentArmTarget - currentArmPot) < 50)
+  {
+    mutexTake(mutexes[MUTEX_ASYNC_ARM], 200);
+    isArmAtTarget = true;
+    mutexGive(mutexes[MUTEX_ASYNC_ARM]);
+  }
+  else
+  {
+    mutexTake(mutexes[MUTEX_ASYNC_ARM], 200);
+    isArmAtTarget = false;
+    mutexGive(mutexes[MUTEX_ASYNC_ARM]);
+  }
 }
 void waitUntilArmMoveComplete()
 {
@@ -91,6 +90,8 @@ void waitUntilArmMoveComplete()
 void startAsyncArmController()
 {
   startAsyncTrayController();
+
+  print("~~~~~~~~~~~~~~Begin startAsyncArmController~~~~~~~~~~~~~~~~\n");
   // Only if task is not already running
   unsigned int asyncState = taskGetState(asyncArmHandle);
   if (asyncArmHandle != NULL && (asyncState != TASK_DEAD))
@@ -101,12 +102,18 @@ void startAsyncArmController()
   // Reset variables
   nextArmTarget = -1;
   isArmAtTarget = true;
+
+  // Initialize the PID
   pidInit(&armPID, 0.005, 0.001, 0.0);
   // Stop the arm
   stopArms();
+
   // Create the task
   asyncArmHandle = taskRunLoop(asyncArmLoop, 20);
   mutexGive(mutexes[MUTEX_ASYNC_ARM]);
+
+  print("~~~~~~~~~~~~~~Finished startAsyncArmController~~~~~~~~~~~~~~~~\n");
+
 }
 void stopAsyncArmController()
 {

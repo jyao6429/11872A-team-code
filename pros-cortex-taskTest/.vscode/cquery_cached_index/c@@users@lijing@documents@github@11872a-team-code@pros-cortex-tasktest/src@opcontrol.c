@@ -15,6 +15,7 @@ void operatorControl()
 
 	// Initialize toggle variables
 	isTesting = false;
+	bool isSlowDrive = false;
 
 	// Set values for joystick connection
 	isMainConnected = isJoystickConnected(1);
@@ -80,6 +81,26 @@ void operatorControl()
 				else
 					setArms(joystickGetAnalog(2, 2));
 			}
+		}
+
+		// Handle if slowing down drivetrain to prevent tipping
+		if (joystickGetDigital(1, 8, JOY_RIGHT))
+		{
+			isSlowDrive = !isSlowDrive;
+			delay(250);
+		}
+		if (isSlowDrive)
+		{
+			leftPower /= 2;
+			rightPower /= 2;
+		}
+
+		// Hold button to back up slowly and outtake
+		if (joystickGetDigital(1, 7, JOY_LEFT))
+		{
+			leftPower = -40;
+			rightPower = -40;
+			rollerPower = -40;
 		}
 
 		setDriveLinear(leftPower, rightPower);
