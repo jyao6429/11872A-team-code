@@ -20,16 +20,14 @@ void asyncTrayLoop()
 		if (joystickGetDigital(1, 7, JOY_DOWN))
 		{
 			isTrayVertical = !isTrayVertical;;
-      
+
       if (isTrayVertical)
         currentTrayTarget = TRAY_VERTICAL;
       else
         currentTrayTarget = TRAY_ANGLED;
 			delay(250);
 		}
-
-
-		if (joystickGetDigital(1, 7, JOY_UP))
+		else if (joystickGetDigital(1, 7, JOY_UP))
 		{
       currentTrayTarget = -1;
       prevTrayTarget = currentTrayTarget;
@@ -44,6 +42,9 @@ void asyncTrayLoop()
     currentTrayTarget = nextTrayTarget;
     mutexGive(mutexes[MUTEX_ASYNC_TRAY]);
   }
+
+  if (prevTrayTarget == TRAY_ARM)
+    currentTrayTarget = TRAY_ANGLED;
 
   mutexTake(mutexes[MUTEX_ASYNC_ARM], 500);
   if (trayOverride)

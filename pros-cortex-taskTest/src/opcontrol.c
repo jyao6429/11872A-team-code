@@ -13,6 +13,8 @@ void operatorControl()
 {
 	print("Starting operatorControl\n");
 
+	startAsyncArmController();
+
 	// Initialize toggle variables
 	isTesting = false;
 	bool isSlowDrive = false;
@@ -23,7 +25,6 @@ void operatorControl()
 
 	while (true)
 	{
-
 		// Using interactive button for testing
 		if (digitalRead(PORT_interactButton) == LOW)
 		{
@@ -102,6 +103,9 @@ void operatorControl()
 			rightPower = -40;
 			rollerPower = -40;
 		}
+
+		if (joystickGetDigital(1, 8, JOY_LEFT))
+			startAsyncArmController();
 
 		setDriveLinear(leftPower, rightPower);
 		setRollers(rollerPower);

@@ -13,8 +13,9 @@ void deploy()
 {
   moveTrayVerticalAsync();
   waitUntilTrayMoveComplete();
-  setRollers(-127);
-  delay(2000);
+  setRollers(-60);
+  delay(750);
+  stopRollers();
   moveTrayAngledAsync();
   waitUntilTrayMoveComplete();
 }

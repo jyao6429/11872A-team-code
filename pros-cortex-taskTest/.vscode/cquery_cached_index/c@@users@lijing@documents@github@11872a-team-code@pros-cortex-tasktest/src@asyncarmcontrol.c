@@ -43,7 +43,7 @@ void asyncArmLoop()
   }
 
   mutexTake(mutexes[MUTEX_ASYNC_ARM], 200);
-  trayOverride = currentArmTarget > 0 && (currentArmTarget != ARM_ZERO || (currentArmTarget == ARM_ZERO && abs(currentArmPot - currentArmTarget) > 1000));
+  trayOverride = currentArmTarget > 0 && (currentArmTarget != ARM_ZERO || (currentArmTarget == ARM_ZERO && abs(currentArmPot - currentArmTarget) > 1500));
   mutexGive(mutexes[MUTEX_ASYNC_ARM]);
 
   //print("Arm always printing\n");
