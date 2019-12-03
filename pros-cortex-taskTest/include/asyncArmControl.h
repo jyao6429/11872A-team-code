@@ -5,8 +5,8 @@
 
 #define ARM_ZERO 1630
 #define ARM_SCORE 2000
-#define ARM_LOW 3000
-#define ARM_MED 4000
+#define ARM_LOW 3150
+#define ARM_MED 3600
 
 // Variables for handling async tasks
 // Keeps track when the Arm is moving

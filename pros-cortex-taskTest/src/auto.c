@@ -9,11 +9,13 @@
 
 #include "main.h"
 
+#define MAX_INTAKE_CHASSIS_V 60
+
 void deploy()
 {
   moveTrayVerticalAsync();
   waitUntilTrayMoveComplete();
-  setRollers(-60);
+  setRollers(-127);
   delay(750);
   stopRollers();
   moveTrayAngledAsync();
@@ -42,8 +44,7 @@ void score()
 
   // Tilt the stack vertical for scoring
   moveTrayVerticalAsync();
-  delay(2000);
-  setRollers(-40);
+  waitUntilTrayMoveComplete();
 }
 void autoSkillsSuperSafe()
 {
@@ -53,6 +54,7 @@ void autoSkillsSuperSafe()
 
   // 1.
   moveToTargetSimpleAsync(0.0, -8.0, 0.0, 0.0, -127, 0, 2.0, 0, 0, 0, STOP_SOFT, MTT_SIMPLE);
+  waitUntilChassisMoveComplete();
 
   // 2.
   moveToTargetSimple(0.0, 0.0, 0.0, -8.0, 127, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_PROPORTIONAL);
@@ -66,12 +68,11 @@ void autoBlueSmallSafe()
 
   // 1. Start rollers and drive forward to collect preload and 4 cubes
   setRollers(127);
-  moveToTargetSimpleAsync(26.4, 50.0, 26.4, BACK_TO_CENTER, 60, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_PROPORTIONAL);
+  moveToTargetSimpleAsync(26.4, 50.0, 26.4, BACK_TO_CENTER, MAX_INTAKE_CHASSIS_V, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_PROPORTIONAL);
   waitUntilChassisMoveComplete();
 
   // 2. Stop rollers and drive backwards to diagonal for scoring
   setRollers(60);
-  stopAsyncArmController();
   moveToTargetSimpleAsync(26.4, 26.4, 26.4, globalPose.y, -80, 0, 0.5, 0, 20, 0, STOP_SOFT, MTT_CASCADING);
   waitUntilChassisMoveComplete();
 
@@ -85,11 +86,10 @@ void autoBlueSmallSafe()
   score();
 
   // 5. Back away from the stack and tilt the tray back and return the arms down
-  moveToTargetDisSimpleAsync(45.0, 18.0, 12.0, 12.0, -50, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_PROPORTIONAL, true);
-  delay(1000);
-  moveTrayAngledAsync();
-  moveArmsZeroAsync();
+  setRollers(-40);
+  moveToTargetDisSimpleAsync(45.0, 18.0, 12.0, 12.0, -30, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_PROPORTIONAL, true);
   waitUntilChassisMoveComplete();
+  moveTrayAngledAsync();
 }
 void autoBlueSmallSuperSafe()
 {
@@ -99,6 +99,7 @@ void autoBlueSmallSuperSafe()
 
   // 1.
   moveToTargetSimpleAsync(0.0, -8.0, 0.0, 0.0, -127, 0, 2.0, 0, 0, 0, STOP_SOFT, MTT_SIMPLE);
+  waitUntilChassisMoveComplete();
 
   // 2.
   moveToTargetSimple(-24.0, 16.0, 0.0, -8.0, 127, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_PROPORTIONAL);
@@ -112,6 +113,7 @@ void autoBlueLargeSuperSafe()
 
   // 1.
   moveToTargetSimpleAsync(0.0, -8.0, 0.0, 0.0, -127, 0, 2.0, 0, 0, 0, STOP_SOFT, MTT_SIMPLE);
+  waitUntilChassisMoveComplete();
 
   // 2.
   moveToTargetSimple(24.0, 16.0, 0.0, -8.0, 127, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_PROPORTIONAL);
@@ -160,6 +162,7 @@ void autoRedSmallSuperSafe()
 
   // 1.
   moveToTargetSimpleAsync(0.0, -8.0, 0.0, 0.0, -127, 0, 2.0, 0, 0, 0, STOP_SOFT, MTT_SIMPLE);
+  waitUntilChassisMoveComplete();
 
   // 2.
   moveToTargetSimple(24.0, 16.0, 0.0, -8.0, 127, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_PROPORTIONAL);
@@ -173,6 +176,7 @@ void autoRedLargeSuperSafe()
 
   // 1.
   moveToTargetSimpleAsync(0.0, -8.0, 0.0, 0.0, -127, 0, 2.0, 0, 0, 0, STOP_SOFT, MTT_SIMPLE);
+  waitUntilChassisMoveComplete();
 
   // 2.
   moveToTargetSimple(-24.0, 16.0, 0.0, -8.0, 127, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_PROPORTIONAL);
