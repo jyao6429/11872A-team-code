@@ -61,22 +61,17 @@ void autoSkillsSuperSafe()
 }
 void autoBlueSmallSafe()
 {
-  // 0. Reset to proper pose on the field, then push preload forward and deploy
+  // 0. Reset to proper pose on the field
   resetPositionFull(&globalPose, 26.4, BACK_TO_CENTER, 0.0, true);
 	resetVelocity(&globalVel, globalPose);
-
-  moveToTargetSimpleAsync(26.4, 15.0, 26.4, BACK_TO_CENTER, 127, 127, 1, 0, 0, 0, STOP_HARSH, MTT_SIMPLE);
-  waitUntilChassisMoveComplete();
-  moveToTargetSimpleAsync(26.4, BACK_TO_CENTER + 1, 26.4, 15.0, -127, -127, 1, 0, 0, 0, STOP_NONE, MTT_SIMPLE);
   deploy();
-  waitUntilChassisMoveComplete();
 
   // 1. Start rollers and drive forward to collect preload and 4 cubes
   setRollers(127);
   moveToTargetSimpleAsync(26.4, 50.0, 26.4, BACK_TO_CENTER, MAX_INTAKE_CHASSIS_V, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_PROPORTIONAL);
   waitUntilChassisMoveComplete();
 
-  // 2. Slow rollers and drive backwards to diagonal for scoring
+  // 2. Stop rollers and drive backwards to diagonal for scoring
   setRollers(60);
   moveToTargetSimpleAsync(26.4, 26.4, 26.4, globalPose.y, -80, 0, 0.5, 0, 20, 0, STOP_SOFT, MTT_CASCADING);
   waitUntilChassisMoveComplete();
@@ -85,14 +80,14 @@ void autoBlueSmallSafe()
   turnToTargetNewAsync(0.0, 0.0, TURN_CCW, 0.6, 25, 10, 0.0, true, true);
   waitUntilChassisMoveComplete();
 
-  // 4. Drive towards small goal, and score the stack
+  // 4. Drive towards goal, and score the stack
   moveToTargetSimpleAsync(15.0, 15.0, 26.4, 26.4, 100, 0, 0.5, 0, 0, 0, STOP_NONE, MTT_PROPORTIONAL);
   waitUntilChassisMoveComplete();
   score();
 
-  // 5. Back away from the stack while outtaking and tilt the tray back
-  setRollers(-100);
-  moveToTargetDisSimpleAsync(45.0, -18.0, 12.0, 12.0, -40, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_PROPORTIONAL, true);
+  // 5. Back away from the stack and tilt the tray back and return the arms down
+  setRollers(-40);
+  moveToTargetDisSimpleAsync(45.0, 18.0, 12.0, 12.0, -30, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_PROPORTIONAL, true);
   waitUntilChassisMoveComplete();
   moveTrayAngledAsync();
 }
