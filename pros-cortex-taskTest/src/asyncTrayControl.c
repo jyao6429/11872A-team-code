@@ -64,10 +64,12 @@ void asyncTrayLoop()
   if (currentTrayTarget != prevTrayTarget)
   {
     if (currentTrayTarget == TRAY_VERTICAL)
-      pidInit(&trayPID, 0.0005, 0.0001, 0.0);
+      pidInit(&trayPID, 0.001, 0.0002, 0.0);
     else
-      pidInit(&trayPID, 0.0015, 0.0001, 0.0);
+      pidInit(&trayPID, 0.0015, 0.0002, 0.0);
   }
+  else if (currentTrayPot > 1500)
+    pidInit(&trayPID, 0.0015, 0.0002, 0.0);
 
   // Calculate and set power for tray
   int power = pidCalculate(&trayPID, currentTrayTarget, currentTrayPot) * 127;

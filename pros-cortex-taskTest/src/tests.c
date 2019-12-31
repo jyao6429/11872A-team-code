@@ -162,10 +162,11 @@ void testTask(void *ignore)
 	//testNewMotionAlgorithms();
 	//testAsyncNew();
 	//testTray();
-	testArms();
+	//testArms();
 	//deploy();
 	//tuneWheelDiameter();
 	//tuneWheelbase();
+	//autonomous();
 
 
 	// Stop everything
@@ -175,7 +176,7 @@ void testTask(void *ignore)
 	stopRollers();
 
 	// Debug if wanted
-	while (false)
+	while (true)
 	{
 		// Debug pots
 		printf("armPot: %d\tdialPot: %d\ttrayPot: %d\n", analogRead(PORT_armPot), analogRead(PORT_dialPot), analogRead(PORT_trayPot));

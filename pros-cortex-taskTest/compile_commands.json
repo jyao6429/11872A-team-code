@@ -55,37 +55,6 @@
             "-fdiagnostics-color",
             "-std=gnu99",
             "-o",
-            "bin/tests.c.o",
-            "src\\tests.c"
-        ],
-        "directory": "C:\\Users\\Lijing\\Documents\\Github\\11872A-team-code\\pros-cortex-taskTest",
-        "file": "src\\tests.c"
-    },
-    {
-        "arguments": [
-            "clang++",
-            "-c",
-            "-target",
-            "armv7ar-none-none-eabi",
-            "-fno-ms-extensions",
-            "-fno-ms-compatibility",
-            "-fno-delayed-template-parsing",
-            "-isystemc:\\program files\\pros\\toolchain\\usr\\bin\\../lib/gcc/arm-none-eabi/7.2.1/include",
-            "-isystemc:\\program files\\pros\\toolchain\\usr\\bin\\../lib/gcc/arm-none-eabi/7.2.1/include-fixed",
-            "-isystemc:\\program files\\pros\\toolchain\\usr\\bin\\../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/include",
-            "-isystem./include",
-            "-iquote./include/./",
-            "-mthumb",
-            "-mcpu=cortex-m3",
-            "-mlittle-endian",
-            "-Os",
-            "-ffunction-sections",
-            "-fsigned-char",
-            "-fomit-frame-pointer",
-            "-fsingle-precision-constant",
-            "-fdiagnostics-color",
-            "-std=gnu99",
-            "-o",
             "bin/chassis.c.o",
             "src\\chassis.c"
         ],
@@ -179,37 +148,6 @@
             "-fdiagnostics-color",
             "-std=gnu99",
             "-o",
-            "bin/global.c.o",
-            "src\\global.c"
-        ],
-        "directory": "C:\\Users\\Lijing\\Documents\\Github\\11872A-team-code\\pros-cortex-taskTest",
-        "file": "src\\global.c"
-    },
-    {
-        "arguments": [
-            "clang++",
-            "-c",
-            "-target",
-            "armv7ar-none-none-eabi",
-            "-fno-ms-extensions",
-            "-fno-ms-compatibility",
-            "-fno-delayed-template-parsing",
-            "-isystemc:\\program files\\pros\\toolchain\\usr\\bin\\../lib/gcc/arm-none-eabi/7.2.1/include",
-            "-isystemc:\\program files\\pros\\toolchain\\usr\\bin\\../lib/gcc/arm-none-eabi/7.2.1/include-fixed",
-            "-isystemc:\\program files\\pros\\toolchain\\usr\\bin\\../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/include",
-            "-isystem./include",
-            "-iquote./include/./",
-            "-mthumb",
-            "-mcpu=cortex-m3",
-            "-mlittle-endian",
-            "-Os",
-            "-ffunction-sections",
-            "-fsigned-char",
-            "-fomit-frame-pointer",
-            "-fsingle-precision-constant",
-            "-fdiagnostics-color",
-            "-std=gnu99",
-            "-o",
             "bin/asyncChassisControl.c.o",
             "src\\asyncChassisControl.c"
         ],
@@ -277,37 +215,6 @@
         ],
         "directory": "C:\\Users\\Lijing\\Documents\\Github\\11872A-team-code\\pros-cortex-taskTest",
         "file": "src\\NERD_PID.c"
-    },
-    {
-        "arguments": [
-            "clang++",
-            "-c",
-            "-target",
-            "armv7ar-none-none-eabi",
-            "-fno-ms-extensions",
-            "-fno-ms-compatibility",
-            "-fno-delayed-template-parsing",
-            "-isystemc:\\program files\\pros\\toolchain\\usr\\bin\\../lib/gcc/arm-none-eabi/7.2.1/include",
-            "-isystemc:\\program files\\pros\\toolchain\\usr\\bin\\../lib/gcc/arm-none-eabi/7.2.1/include-fixed",
-            "-isystemc:\\program files\\pros\\toolchain\\usr\\bin\\../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/include",
-            "-isystem./include",
-            "-iquote./include/./",
-            "-mthumb",
-            "-mcpu=cortex-m3",
-            "-mlittle-endian",
-            "-Os",
-            "-ffunction-sections",
-            "-fsigned-char",
-            "-fomit-frame-pointer",
-            "-fsingle-precision-constant",
-            "-fdiagnostics-color",
-            "-std=gnu99",
-            "-o",
-            "bin/asyncTrayControl.c.o",
-            "src\\asyncTrayControl.c"
-        ],
-        "directory": "C:\\Users\\Lijing\\Documents\\Github\\11872A-team-code\\pros-cortex-taskTest",
-        "file": "src\\asyncTrayControl.c"
     },
     {
         "arguments": [
@@ -427,6 +334,37 @@
             "-fdiagnostics-color",
             "-std=gnu99",
             "-o",
+            "bin/init.c.o",
+            "src\\init.c"
+        ],
+        "directory": "C:\\Users\\Lijing\\Documents\\Github\\11872A-team-code\\pros-cortex-taskTest",
+        "file": "src\\init.c"
+    },
+    {
+        "arguments": [
+            "clang++",
+            "-c",
+            "-target",
+            "armv7ar-none-none-eabi",
+            "-fno-ms-extensions",
+            "-fno-ms-compatibility",
+            "-fno-delayed-template-parsing",
+            "-isystemc:\\program files\\pros\\toolchain\\usr\\bin\\../lib/gcc/arm-none-eabi/7.2.1/include",
+            "-isystemc:\\program files\\pros\\toolchain\\usr\\bin\\../lib/gcc/arm-none-eabi/7.2.1/include-fixed",
+            "-isystemc:\\program files\\pros\\toolchain\\usr\\bin\\../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/include",
+            "-isystem./include",
+            "-iquote./include/./",
+            "-mthumb",
+            "-mcpu=cortex-m3",
+            "-mlittle-endian",
+            "-Os",
+            "-ffunction-sections",
+            "-fsigned-char",
+            "-fomit-frame-pointer",
+            "-fsingle-precision-constant",
+            "-fdiagnostics-color",
+            "-std=gnu99",
+            "-o",
             "bin/aps.c.o",
             "src\\aps.c"
         ],
@@ -458,11 +396,42 @@
             "-fdiagnostics-color",
             "-std=gnu99",
             "-o",
-            "bin/init.c.o",
-            "src\\init.c"
+            "bin/asyncTrayControl.c.o",
+            "src\\asyncTrayControl.c"
         ],
         "directory": "C:\\Users\\Lijing\\Documents\\Github\\11872A-team-code\\pros-cortex-taskTest",
-        "file": "src\\init.c"
+        "file": "src\\asyncTrayControl.c"
+    },
+    {
+        "arguments": [
+            "clang++",
+            "-c",
+            "-target",
+            "armv7ar-none-none-eabi",
+            "-fno-ms-extensions",
+            "-fno-ms-compatibility",
+            "-fno-delayed-template-parsing",
+            "-isystemc:\\program files\\pros\\toolchain\\usr\\bin\\../lib/gcc/arm-none-eabi/7.2.1/include",
+            "-isystemc:\\program files\\pros\\toolchain\\usr\\bin\\../lib/gcc/arm-none-eabi/7.2.1/include-fixed",
+            "-isystemc:\\program files\\pros\\toolchain\\usr\\bin\\../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/include",
+            "-isystem./include",
+            "-iquote./include/./",
+            "-mthumb",
+            "-mcpu=cortex-m3",
+            "-mlittle-endian",
+            "-Os",
+            "-ffunction-sections",
+            "-fsigned-char",
+            "-fomit-frame-pointer",
+            "-fsingle-precision-constant",
+            "-fdiagnostics-color",
+            "-std=gnu99",
+            "-o",
+            "bin/auto.c.o",
+            "src\\auto.c"
+        ],
+        "directory": "C:\\Users\\Lijing\\Documents\\Github\\11872A-team-code\\pros-cortex-taskTest",
+        "file": "src\\auto.c"
     },
     {
         "arguments": [
@@ -520,10 +489,41 @@
             "-fdiagnostics-color",
             "-std=gnu99",
             "-o",
-            "bin/auto.c.o",
-            "src\\auto.c"
+            "bin/global.c.o",
+            "src\\global.c"
         ],
         "directory": "C:\\Users\\Lijing\\Documents\\Github\\11872A-team-code\\pros-cortex-taskTest",
-        "file": "src\\auto.c"
+        "file": "src\\global.c"
+    },
+    {
+        "arguments": [
+            "clang++",
+            "-c",
+            "-target",
+            "armv7ar-none-none-eabi",
+            "-fno-ms-extensions",
+            "-fno-ms-compatibility",
+            "-fno-delayed-template-parsing",
+            "-isystemc:\\program files\\pros\\toolchain\\usr\\bin\\../lib/gcc/arm-none-eabi/7.2.1/include",
+            "-isystemc:\\program files\\pros\\toolchain\\usr\\bin\\../lib/gcc/arm-none-eabi/7.2.1/include-fixed",
+            "-isystemc:\\program files\\pros\\toolchain\\usr\\bin\\../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/include",
+            "-isystem./include",
+            "-iquote./include/./",
+            "-mthumb",
+            "-mcpu=cortex-m3",
+            "-mlittle-endian",
+            "-Os",
+            "-ffunction-sections",
+            "-fsigned-char",
+            "-fomit-frame-pointer",
+            "-fsingle-precision-constant",
+            "-fdiagnostics-color",
+            "-std=gnu99",
+            "-o",
+            "bin/tests.c.o",
+            "src\\tests.c"
+        ],
+        "directory": "C:\\Users\\Lijing\\Documents\\Github\\11872A-team-code\\pros-cortex-taskTest",
+        "file": "src\\tests.c"
     }
 ]

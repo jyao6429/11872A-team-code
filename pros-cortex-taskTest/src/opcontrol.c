@@ -25,7 +25,7 @@ void operatorControl()
 
 	while (true)
 	{
-		/*
+
 		// Using interactive button for testing
 		if (digitalRead(PORT_interactButton) == LOW)
 		{
@@ -42,7 +42,7 @@ void operatorControl()
 				delay(500);
 			}
 		}
-		*/
+
 		// Get power for drivetrains, match to cubic function for more precision in slow movements
 		int leftPower = joystickGetAnalog(1, 3);
 		int rightPower = joystickGetAnalog(1, 2);

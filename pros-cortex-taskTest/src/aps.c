@@ -139,7 +139,19 @@ void trackPoseTask(void *ignore)
 }
 bool isRobotStopped()
 {
-  return (fabs(globalVel.x) < 0.5) && (fabs(globalVel.y) < 0.5) && (fabs(globalVel.angle) < M_PI / 30);
+  // Get velocity vector of the robot
+  Cart vel;
+  vel.x = globalVel.x;
+  vel.y = globalVel.y;
+
+  // Convert to polar vector, the shift the angle so facing along robot
+  Polar polarVel;
+  cartToPolar(vel, &polarVel);
+  polarVel.angle += globalPose.angle;
+  // Shift back to cartesian vectors
+  polarToCart(polarVel, &vel);
+
+  return (fabs(vel.y) < 0.5) && (fabs(globalVel.angle) < M_PI / 30);
 }
 double calculateTravelDistance(int encoderCount, double wheelDiameter, int encoderResolution)
 {
