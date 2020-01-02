@@ -3,9 +3,9 @@
 
 #include "main.h"
 
-#define TRAY_ANGLED 50
-#define TRAY_VERTICAL 1450
-#define TRAY_ARM 700
+#define TRAY_ANGLED 65
+#define TRAY_VERTICAL 2030
+#define TRAY_ARM 900
 
 // Variables for handling async tasks
 // Keeps track if the tray is at the target

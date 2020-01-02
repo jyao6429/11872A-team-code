@@ -162,7 +162,7 @@ void testTask(void *ignore)
 	//testNewMotionAlgorithms();
 	//testAsyncNew();
 	//testTray();
-	//testArms();
+	testArms();
 	//deploy();
 	//tuneWheelDiameter();
 	//tuneWheelbase();

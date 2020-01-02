@@ -43,7 +43,7 @@ void asyncArmLoop()
   }
 
   mutexTake(mutexes[MUTEX_ASYNC_ARM], 200);
-  trayOverride = currentArmTarget > 0 && (currentArmTarget != ARM_ZERO || (currentArmTarget == ARM_ZERO && abs(currentArmPot - currentArmTarget) > 1500));
+  trayOverride = currentArmTarget > 0 && (currentArmTarget != ARM_ZERO || (currentArmTarget == ARM_ZERO && abs(currentArmPot - currentArmTarget) > 1000));
   mutexGive(mutexes[MUTEX_ASYNC_ARM]);
 
   //print("Arm always printing\n");
@@ -182,8 +182,8 @@ void setArms(int power)
 }
 void setRollers(int power)
 {
-  motorSet(PORT_leftRoller, power);
-  motorSet(PORT_rightRoller, -power);
+  motorSet(PORT_leftRoller, -power);
+  motorSet(PORT_rightRoller, power);
 }
 void stopArms()
 {

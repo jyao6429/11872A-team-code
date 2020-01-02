@@ -3,10 +3,10 @@
 
 #include "main.h"
 
-#define ARM_ZERO 1630
-#define ARM_SCORE 2000
-#define ARM_LOW 3150
-#define ARM_MED 3600
+#define ARM_ZERO 220
+#define ARM_SCORE 1000
+#define ARM_LOW 1400
+#define ARM_MED 2300
 
 // Variables for handling async tasks
 // Keeps track when the Arm is moving

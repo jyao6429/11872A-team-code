@@ -64,11 +64,11 @@ void asyncTrayLoop()
   if (currentTrayTarget != prevTrayTarget)
   {
     if (currentTrayTarget == TRAY_VERTICAL)
-      pidInit(&trayPID, 0.001, 0.0002, 0.0);
+      pidInit(&trayPID, 0.0008, 0.0002, 0.0);
     else
-      pidInit(&trayPID, 0.0015, 0.0002, 0.0);
+      pidInit(&trayPID, 0.0012, 0.0002, 0.0);
   }
-  else if (currentTrayPot > 1500)
+  else if (currentTrayPot > 2100)
     pidInit(&trayPID, 0.0015, 0.0002, 0.0);
 
   // Calculate and set power for tray
@@ -166,8 +166,8 @@ int getTrayPot()
 }
 void setTray(int power)
 {
-  motorSet(PORT_leftTray, power);
-  motorSet(PORT_rightTray, -power);
+  motorSet(PORT_leftTray, -power);
+  motorSet(PORT_rightTray, power);
 }
 void stopTray()
 {
