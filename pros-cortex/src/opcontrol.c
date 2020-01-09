@@ -108,6 +108,18 @@ void operatorControl()
 		if (joystickGetDigital(1, 8, JOY_LEFT))
 			startAsyncArmController();
 
+		// Manual overrides for tray and arms
+		if (joystickGetDigital(1, 7, JOY_UP))
+		{
+			setTray(rightPower);
+			rightPower = 0;
+		}
+		if (joystickGetDigital(1, 8, JOY_UP))
+		{
+			setArms(leftPower);
+			leftPower = 0;
+		}
+
 		setDriveLinear(leftPower, rightPower);
 		setRollers(rollerPower);
 
