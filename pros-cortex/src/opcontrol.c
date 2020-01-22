@@ -102,7 +102,6 @@ void operatorControl()
 		{
 			leftPower = -40;
 			rightPower = -40;
-			rollerPower = -100;
 		}
 
 		if (joystickGetDigital(1, 8, JOY_LEFT))
@@ -111,6 +110,12 @@ void operatorControl()
 		// Manual overrides for tray and arms
 		if (joystickGetDigital(1, 7, JOY_UP))
 		{
+			if ((getTrayPot() > TRAY_VERTICAL + 100 && rightPower > 0) || (getTrayPot() < TRAY_ANGLED && rightPower < 0))
+			{
+				rightPower = 0;
+			}
+			rightPower = (rightPower > 30 && getTrayPot() > TRAY_VERTICAL - 400) ? 50 : rightPower;
+
 			setTray(rightPower);
 			rightPower = 0;
 		}

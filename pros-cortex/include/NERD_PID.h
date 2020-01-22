@@ -24,7 +24,7 @@ typedef struct
  * Ki - integral gain
  * Kd - derivative gain
  */
-void pidInit(PID *pid, double Kp, double Ki, double Kd);
+void pidInit(PID *pid, double Kp, double Ki, double Kd, double Kf);
 /**
  * initialize pid structure, set parameters based on another PID structure
  *

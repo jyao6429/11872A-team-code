@@ -57,7 +57,7 @@ void asyncArmLoop()
 
   // Reinitialize PID if needed
   if (currentArmTarget != prevArmTarget)
-    pidInit(&armPID, 0.005, 0.001, 0.0);
+    pidInit(&armPID, 0.006, 0.00007, 0.0001, 0.0);
 
   // Calculate and set power for arm
   int power = pidCalculate(&armPID, currentArmTarget, currentArmPot) * 127;
@@ -103,8 +103,6 @@ void startAsyncArmController()
   nextArmTarget = -1;
   isArmAtTarget = true;
 
-  // Initialize the PID
-  pidInit(&armPID, 0.005, 0.001, 0.0);
   // Stop the arm
   stopArms();
 

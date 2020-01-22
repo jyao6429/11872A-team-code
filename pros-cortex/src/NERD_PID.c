@@ -41,12 +41,12 @@
 
 #include "main.h"
 
-void pidInit(PID *pid, double Kp, double Ki, double Kd)
+void pidInit(PID *pid, double Kp, double Ki, double Kd, double Kf)
 {
 	pid->Kp = Kp;
 	pid->Ki = Ki;
 	pid->Kd = Kd;
-	pid->Kf = 0.0;
+	pid->Kf = Kf;
 	pid->sigma = 0.0;
 	pid->lastValue = 0.0;
 	pid->lastTime = millis();

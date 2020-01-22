@@ -132,11 +132,13 @@ void testArms()
 	moveArmsLowAsync();
 	print("~~~2~~~\n");
 	waitUntilArmMoveComplete();
+
 	delay(2000);
 	print("~~~3~~~\n");
 	moveArmsMedAsync();
 	print("~~~4~~~\n");
 	waitUntilArmMoveComplete();
+
 	delay(2000);
 	print("~~~5~~~\n");
 	moveArmsZeroAsync();
@@ -161,8 +163,8 @@ void testTask(void *ignore)
 	//gatherVelocityData();
 	//testNewMotionAlgorithms();
 	//testAsyncNew();
-	//testTray();
-	testArms();
+	testTray();
+	//testArms();
 	//deploy();
 	//tuneWheelDiameter();
 	//tuneWheelbase();
@@ -176,7 +178,7 @@ void testTask(void *ignore)
 	stopRollers();
 
 	// Debug if wanted
-	while (true)
+	while (false)
 	{
 		// Debug pots
 		printf("armPot: %d\tdialPot: %d\ttrayPot: %d\n", analogRead(PORT_armPot), analogRead(PORT_dialPot), analogRead(PORT_trayPot));

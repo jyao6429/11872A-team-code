@@ -64,12 +64,12 @@ void asyncTrayLoop()
   if (currentTrayTarget != prevTrayTarget)
   {
     if (currentTrayTarget == TRAY_VERTICAL)
-      pidInit(&trayPID, 0.0006, 0.0003, 0.0);
+      pidInit(&trayPID, 0.0003, 0.00001, 0.0, 25.0 / (TRAY_VERTICAL * 127));
     else
-      pidInit(&trayPID, 0.0012, 0.0002, 0.0);
+      pidInit(&trayPID, 0.0012, 0.0002, 0.0, 0.0);
   }
-  else if (currentTrayPot > 2100)
-    pidInit(&trayPID, 0.0015, 0.0002, 0.0);
+  else if (currentTrayPot > TRAY_VERTICAL + 19)
+    pidInit(&trayPID, 0.0015, 0.0002, 0.0, 0.0);
 
   // Calculate and set power for tray
   int power = pidCalculate(&trayPID, currentTrayTarget, currentTrayPot) * 127;
@@ -112,9 +112,6 @@ void startAsyncTrayController()
   mutexTake(mutexes[MUTEX_ASYNC_TRAY], 500);
   nextTrayTarget = -1;
   isTrayAtTarget = true;
-
-  // Initialize PID
-  pidInit(&trayPID, 0.0005, 0.0001, 0.0);
 
   // Stop the tray
   stopTray();
