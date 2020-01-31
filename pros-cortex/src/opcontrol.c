@@ -121,12 +121,16 @@ void operatorControl()
 		}
 		if (joystickGetDigital(1, 8, JOY_UP))
 		{
+			if ((getTrayPot() > ARM_MED + 100 && leftPower > 0) || (getTrayPot() < ARM_ZERO - 20 && rightPower < 0))
+			{
+				leftPower = 0;
+			}
 			setArms(leftPower);
 			leftPower = 0;
 		}
 
-		setDriveLinear(leftPower, rightPower);
-		setRollers(rollerPower);
+		//setDriveLinear(leftPower, rightPower);
+		//setRollers(rollerPower);
 
 		delay(20);
 	}

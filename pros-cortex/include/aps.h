@@ -5,9 +5,9 @@
 
 // Physical parameters in inches
 // distance from center to left tracking wheel
-#define SL 4.48951
+#define SL 4.43436
 // distance from center to right tracking wheel
-#define SR 4.48951
+#define SR 4.43436
 // distance from center to back tracking wheel
 #define SB 5.36208
 // diameter of side wheels

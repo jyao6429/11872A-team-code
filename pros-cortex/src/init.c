@@ -36,7 +36,7 @@ void initialize()
   mutexes[MUTEX_ASYNC_ARM] = mutexCreate();
 
   // Initialize encoders
-  leftEncoder = encoderInit(PORT_leftEncoder, PORT_leftEncoder + 1, false);
+  leftEncoder = encoderInit(PORT_leftEncoder, PORT_leftEncoder + 1, true);
   rightEncoder = encoderInit(PORT_rightEncoder, PORT_rightEncoder + 1, true);
   backEncoder = encoderInit(PORT_backEncoder, PORT_backEncoder + 1, true);
 

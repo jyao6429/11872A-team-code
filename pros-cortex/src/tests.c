@@ -96,21 +96,27 @@ void testSonar()
 }
 void tuneWheelDiameter()
 {
-	moveToTargetSimpleAsync(0.0, 120.0, 0.0, 0.0, 127, 0, 0.5, 0, 0, 0, STOP_NONE, MTT_PROPORTIONAL);
+	moveToTargetSimpleAsync(0.0, 60.0, 0.0, 0.0, 127, 0, 0.5, 0, 0, 0, STOP_NONE, MTT_PROPORTIONAL);
 	waitUntilChassisMoveComplete();
 }
 void tuneWheelbase()
 {
-	while (globalPose.angle < 1980)
+	setDrive(40, 40);
+	delay(1000);
+
+	while (globalPose.angle < degToRad(720))
 	{
 		setDriveLinear(127, -127);
+		printf("X: %3.3f   Y: %3.3f   A: %3.3f   XV: %3.3f   YV: %3.3f   AV: %3.3f\n", globalPose.x, globalPose.y, radToDeg(globalPose.angle), globalVel.x, globalVel.y, radToDeg(globalVel.angle));
 		delay(50);
 	}
+	setDrive(0, 0);
+
 	turnToAngleNewAsync(0.0, TURN_CCW, 0.7, 20, 10, true, true);
 	waitUntilChassisMoveComplete();
 
 	setDriveLinear(-30, -30);
-	delay(2000);
+	delay(4000);
 	stopDrive();
 }
 void testTray()
@@ -163,11 +169,11 @@ void testTask(void *ignore)
 	//gatherVelocityData();
 	//testNewMotionAlgorithms();
 	//testAsyncNew();
-	testTray();
+	//testTray();
 	//testArms();
 	//deploy();
 	//tuneWheelDiameter();
-	//tuneWheelbase();
+	tuneWheelbase();
 	//autonomous();
 
 
@@ -178,11 +184,11 @@ void testTask(void *ignore)
 	stopRollers();
 
 	// Debug if wanted
-	while (false)
+	while (true)
 	{
 		// Debug pots
-		printf("armPot: %d\tdialPot: %d\ttrayPot: %d\n", analogRead(PORT_armPot), analogRead(PORT_dialPot), analogRead(PORT_trayPot));
-		//printf("X: %3.3f   Y: %3.3f   A: %3.3f   XV: %3.3f   YV: %3.3f   AV: %3.3f\n", globalPose.x, globalPose.y, radToDeg(globalPose.angle), globalVel.x, globalVel.y, radToDeg(globalVel.angle));
+		//printf("armPot: %d\tdialPot: %d\ttrayPot: %d\n", analogRead(PORT_armPot), analogRead(PORT_dialPot), analogRead(PORT_trayPot));
+		printf("X: %3.3f   Y: %3.3f   A: %3.3f   XV: %3.3f   YV: %3.3f   AV: %3.3f\n", globalPose.x, globalPose.y, radToDeg(globalPose.angle), globalVel.x, globalVel.y, radToDeg(globalVel.angle));
 		delay(50);
 	}
 	printf("Done Testing\n");

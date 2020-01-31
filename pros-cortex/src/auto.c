@@ -102,14 +102,9 @@ void autoBlueSmallSafe()
 
 //score();
 
-  // 5. Back away from the stack while outtaking and tilt the tray back
-  delay(300);
-  setRollers(-100);
-  setDrive(-40, -40);
-  delay(1000);
-  stopDrive();
-  //moveToTargetDisSimpleAsync(45.0, -12.0, 0.0, 0.0, -40, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_PROPORTIONAL, true);
-  //waitUntilChassisMoveComplete();
+  // 5. Back away from the stack and tilt the tray back
+  moveToTargetDisSimpleAsync(45.0, 12.0, 0.0, 0.0, -40, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_PROPORTIONAL, true);
+  waitUntilChassisMoveComplete();
   moveTrayAngledAsync();
 
 }

@@ -64,7 +64,7 @@ void asyncTrayLoop()
   if (currentTrayTarget != prevTrayTarget)
   {
     if (currentTrayTarget == TRAY_VERTICAL)
-      pidInit(&trayPID, 0.0004, 0.000005, 0.0, 18.0 / (TRAY_VERTICAL * 127));
+      pidInit(&trayPID, 0.00035, 0.000005, 0.0, 18.0 / (TRAY_VERTICAL * 127));
     else
       pidInit(&trayPID, 0.0012, 0.0002, 0.0, 0.0);
   }
