@@ -64,17 +64,8 @@ void autoBlueSmallSafe()
   // 0. Reset to proper pose on the field, then push preload forward and deploy
   resetPositionFull(&globalPose, 26.4, BACK_TO_CENTER, 0.0, true);
 	resetVelocity(&globalVel, globalPose);
-/*
-  print("~~~~1~~~~~\n");
-  moveToTargetSimpleAsync(26.4, 15.0, 26.4, BACK_TO_CENTER, 127, 127, 1, 0, 0, 0, STOP_HARSH, MTT_SIMPLE);
-  waitUntilChassisMoveComplete();
-  print("~~~~2~~~~~\n");
-  moveToTargetSimpleAsync(26.4, BACK_TO_CENTER + 1, 26.4, 15.0, -127, -127, 1, 0, 0, 0, STOP_NONE, MTT_SIMPLE);
-  print("~~~~3~~~~~\n");
-  waitUntilChassisMoveComplete();
-  print("~~~~4~~~~~\n");
   deploy();
-*/
+
   // 1. Start rollers and drive forward to collect preload and 4 cubes
   moveArmsZeroAsync();
   setRollers(127);

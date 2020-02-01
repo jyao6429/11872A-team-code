@@ -3,7 +3,7 @@
 
 #include "main.h"
 
-#define ARM_ZERO 220
+#define ARM_ZERO 190
 #define ARM_SCORE 1000
 #define ARM_LOW 1400
 #define ARM_MED 2300

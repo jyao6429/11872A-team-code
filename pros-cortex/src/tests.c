@@ -152,6 +152,13 @@ void testArms()
 	print("~~~6~~~\n");
 	waitUntilTrayMoveComplete();
 }
+void intakeTest()
+{
+	moveArmsZeroAsync();
+	moveTrayAngledAsync();
+	setRollers(127);
+	delay(100000);
+}
 
 /***************************************************************
  *                   Tasks to handle tests                     *
@@ -174,7 +181,8 @@ void testTask(void *ignore)
 	//deploy();
 	//tuneWheelDiameter();
 	//tuneWheelbase();
-	autonomous();
+	//autonomous();
+	intakeTest();
 
 
 	// Stop everything
