@@ -9,7 +9,7 @@
 
 #include "main.h"
 
-#define MAX_INTAKE_CHASSIS_V 40
+#define MAX_INTAKE_CHASSIS_V 60
 
 void deploy()
 {
@@ -76,6 +76,7 @@ void autoBlueSmallSafe()
   deploy();
 */
   // 1. Start rollers and drive forward to collect preload and 4 cubes
+  moveArmsZeroAsync();
   setRollers(127);
   moveToTargetSimpleAsync(26.4, 50.0, 26.4, BACK_TO_CENTER, MAX_INTAKE_CHASSIS_V, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_PROPORTIONAL);
   waitUntilChassisMoveComplete();
@@ -83,7 +84,6 @@ void autoBlueSmallSafe()
   //waitUntilChassisMoveComplete();
 
   // 2. Slow rollers and drive backwards to diagonal for scoring
-  setRollers(40);
   moveToTargetSimpleAsync(26.4, 26.4, 26.4, globalPose.y, -100, 0, 0.5, 0, 20, 0, STOP_SOFT, MTT_CASCADING);
   waitUntilChassisMoveComplete();
 
@@ -94,16 +94,22 @@ void autoBlueSmallSafe()
   // 4. Drive towards small goal, and score the stack
   moveToTargetSimpleAsync(14.0, 14.0, 26.4, 26.4, 100, 0, 0.5, 0, 0, 0, STOP_NONE, MTT_PROPORTIONAL);
   waitUntilChassisMoveComplete();
-  setRollers(-40);
-  delay(300);
+  setRollers(-127);
+  delay(625);
+  setRollers(127);
+  delay(200);
   stopRollers();
   moveTrayVerticalAsync();
   waitUntilTrayMoveComplete();
 
-//score();
+  setDrive(60, 60);
+  delay(500);
+
+
+  //score();
 
   // 5. Back away from the stack and tilt the tray back
-  moveToTargetDisSimpleAsync(45.0, 12.0, 0.0, 0.0, -40, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_PROPORTIONAL, true);
+  moveToTargetDisSimpleAsync(45.0, 12.0, 12.0, 12.0, -40, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_PROPORTIONAL, true);
   waitUntilChassisMoveComplete();
   moveTrayAngledAsync();
 

@@ -57,7 +57,16 @@ void asyncArmLoop()
 
   // Reinitialize PID if needed
   if (currentArmTarget != prevArmTarget)
-    pidInit(&armPID, 0.006, 0.00007, 0.0001, 0.0);
+  {
+    if (currentArmTarget == ARM_ZERO)
+    {
+      pidInit(&armPID, 0.003, 0.0001, 0.0001, -20.0 / (127 * ARM_ZERO));
+    }
+    else
+    {
+      pidInit(&armPID, 0.006, 0.00007, 0.0001, 0.0);
+    }
+  }
 
   // Calculate and set power for arm
   int power = pidCalculate(&armPID, currentArmTarget, currentArmPot) * 127;

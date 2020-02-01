@@ -129,8 +129,8 @@ void operatorControl()
 			leftPower = 0;
 		}
 
-		//setDriveLinear(leftPower, rightPower);
-		//setRollers(rollerPower);
+		setDriveLinear(leftPower, rightPower);
+		setRollers(rollerPower);
 
 		delay(20);
 	}
