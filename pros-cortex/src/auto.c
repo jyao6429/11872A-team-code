@@ -13,6 +13,7 @@
 
 void deploy()
 {
+  moveArmsZeroAsync();
   moveTrayVerticalAsync();
   waitUntilTrayMoveComplete();
   setRollers(-127);
@@ -67,7 +68,6 @@ void autoBlueSmallSafe()
   deploy();
 
   // 1. Start rollers and drive forward to collect preload and 4 cubes
-  moveArmsZeroAsync();
   setRollers(127);
   moveToTargetSimpleAsync(26.4, 50.0, 26.4, BACK_TO_CENTER, MAX_INTAKE_CHASSIS_V, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_PROPORTIONAL);
   waitUntilChassisMoveComplete();
@@ -142,31 +142,37 @@ void autoRedSmallSafe()
 
   // 1. Start rollers and drive forward to collect preload and 4 cubes
   setRollers(127);
-  moveToTargetSimpleAsync(FIELD_WIDTH - 26.4, 50.0, FIELD_WIDTH - 26.4, BACK_TO_CENTER, 60, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_PROPORTIONAL);
+  moveToTargetSimpleAsync(FIELD_WIDTH - 26.4, 50.0, FIELD_WIDTH - 26.4, BACK_TO_CENTER, MAX_INTAKE_CHASSIS_V, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_PROPORTIONAL);
   waitUntilChassisMoveComplete();
+  //moveToTargetSimpleAsync(35.0, 55.0, 50.0, 26.4, MAX_INTAKE_CHASSIS_V, MAX_INTAKE_CHASSIS_V, 1, 0, 0, 0, STOP_NONE, MTT_PROPORTIONAL);
+  //waitUntilChassisMoveComplete();
 
-  // 2. Stop rollers and drive backwards to diagonal for scoring
-  setRollers(0);
-  moveToTargetSimpleAsync(FIELD_WIDTH - 26.4, 26.4, FIELD_WIDTH - 26.4, globalPose.y, -127, 0, 0.5, 0, 20, 0, STOP_SOFT, MTT_CASCADING);
+  // 2. Slow rollers and drive backwards to diagonal for scoring
+  moveToTargetSimpleAsync(FIELD_WIDTH - 26.4, 26.4, FIELD_WIDTH - 26.4, globalPose.y, -100, 0, 0.5, 0, 20, 0, STOP_SOFT, MTT_CASCADING);
   waitUntilChassisMoveComplete();
 
   // 3. Turn towards small goal
-  turnToTargetNewAsync(FIELD_WIDTH, 0.0, TURN_CW, 0.6, 25, 10, 0.0, true, true);
+  turnToTargetNewAsync(FIELD_WIDTH, FIELD_WIDTH, TURN_CW, 0.6, 25, 10, 0.0, true, true);
   waitUntilChassisMoveComplete();
 
-  // 4. Drive towards goal, and score the stack
-  moveToTargetSimpleAsync(FIELD_WIDTH - 15.0, 15.0, FIELD_WIDTH - 26.4, 26.4, 100, 0, 0.5, 0, 0, 0, STOP_NONE, MTT_PROPORTIONAL);
+  // 4. Drive towards small goal, and score the stack
+  moveToTargetSimpleAsync(FIELD_WIDTH - 14.0, FIELD_WIDTH - 14.0, FIELD_WIDTH - 26.4, 26.4, 100, 0, 0.5, 0, 0, 0, STOP_NONE, MTT_PROPORTIONAL);
   waitUntilChassisMoveComplete();
-  score();
-
-  // 5. Back away from the stack and tilt the tray back and return the arms down
-  moveToTargetDisSimpleAsync(-45.0, 12.0, FIELD_WIDTH - 12.0, 12.0, -30, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_PROPORTIONAL, true);
-  delay(1000);
-  moveTrayAngledAsync();
+  setRollers(-127);
+  delay(625);
+  setRollers(127);
+  delay(200);
+  stopRollers();
+  moveTrayVerticalAsync();
   waitUntilTrayMoveComplete();
-  moveArmsZeroAsync();
-  waitUntilArmMoveComplete();
+
+  setDrive(60, 60);
+  delay(500);
+
+  // 5. Back away from the stack and tilt the tray back
+  moveToTargetDisSimpleAsync(-45.0, 12.0, FIELD_WIDTH - 12.0, FIELD_WIDTH - 12.0, -40, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_PROPORTIONAL, true);
   waitUntilChassisMoveComplete();
+  moveTrayAngledAsync();
 }
 void autoRedSmallSuperSafe()
 {
@@ -208,7 +214,7 @@ void autonomous()
       autoBlueLargeSuperSafe();
       break;
     case AUTO_RED_SMALL:
-      autoRedSmallSuperSafe();
+      autoRedSmallSafe();
       break;
     case AUTO_RED_LARGE:
       autoRedLargeSuperSafe();

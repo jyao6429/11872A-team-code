@@ -14,6 +14,8 @@ void operatorControl()
 	print("Starting operatorControl\n");
 
 	startAsyncArmController();
+	moveArmsZeroAsync();
+	moveTrayAngledAsync();
 
 	// Initialize toggle variables
 	isTesting = false;
@@ -100,8 +102,7 @@ void operatorControl()
 		// Hold button to back up slowly and outtake
 		if (joystickGetDigital(1, 7, JOY_LEFT))
 		{
-			leftPower = -40;
-			rightPower = -40;
+			leftPower = rightPower;
 		}
 
 		if (joystickGetDigital(1, 8, JOY_LEFT))
