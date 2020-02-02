@@ -5,7 +5,7 @@
 
 #define ARM_ZERO 190
 #define ARM_SCORE 1000
-#define ARM_LOW 1400
+#define ARM_LOW 1630
 #define ARM_MED 2300
 
 // Variables for handling async tasks

@@ -181,8 +181,8 @@ void testTask(void *ignore)
 	//deploy();
 	//tuneWheelDiameter();
 	//tuneWheelbase();
-	//autonomous();
-	intakeTest();
+	autonomous();
+	//intakeTest();
 
 
 	// Stop everything
