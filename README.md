@@ -3,4 +3,4 @@
 We are a growing team from Greenville, South Carolina, and this is the repository for our PROS code.
 
 ## Libraries
-~~We are using the amazing [NERD RobotC library](https://bitbucket.org/VRCNERD/nerd_robotc) with some modifications for our PID and gyro implementations.~~
+We are using the [NERD RobotC library](https://bitbucket.org/VRCNERD/nerd_robotc) with some modifications for our PID implementations.
