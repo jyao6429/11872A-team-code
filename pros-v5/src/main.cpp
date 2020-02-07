@@ -27,6 +27,32 @@ void initialize() {
 	pros::lcd::set_text(1, "Hello PROS User!");
 
 	pros::lcd::register_btn1_cb(on_center_button);
+
+	// Initialize tracking wheel encoders
+	leftEncoder(PORT_leftEncoder, PORT_leftEncoder + 1, true);
+	rightEncoder(PORT_rightEncoder, PORT_rightEncoder + 1, true);
+	backEncoder(PORT_backEncoder, PORT_backEncoder + 1, true);
+
+	// Initialize trayPot
+	trayPot(PORT_trayPot);
+
+	// Initialize non-chassis motors
+	trayMotor(PORT_tray);
+	trayMotor.setGearing(AbstractMotor::gearset::red);
+
+	armMotor(PORT_arm);
+	armMotor.setGearing(AbstractMotor::gearset::red);
+	armMotor.setBrakeMode(AbstractMotor::brakeMode::hold);
+
+	leftIntakeMotor(PORT_leftRoller);
+	leftIntakeMotor.setGearing(AbstractMotor::gearset::green);
+	rightIntakeMotor(PORT_rightRoller);
+	rightIntakeMotor.setGearing(AbstractMotor::gearset::green);
+
+	chassis = ChassisControllerBuilder()
+						.withMotors({PORT_leftMotor0, PORT_leftMotor1}, {-PORT_rightMotor0, -PORT_rightMotor1})
+						.withDimensions(AbstractMotor::gearset::green, {{4_in, 15.5_in}, imev5GreenTPR})
+						.build();
 }
 
 /**
@@ -58,7 +84,30 @@ void competition_initialize() {}
  * will be stopped. Re-enabling the robot will restart the task, not re-start it
  * from where it left off.
  */
-void autonomous() {}
+void autonomous()
+{
+	// Choose the correct autonomous
+  switch (chosenAuto)
+  {
+    case AUTO_BLUE_SMALL:
+      autoBlueSmallSuperSafe();
+      break;
+    case AUTO_BLUE_LARGE:
+      autoBlueLargeSuperSafe();
+      break;
+    case AUTO_RED_SMALL:
+      autoRedSmallSuperSafe();
+      break;
+    case AUTO_RED_LARGE:
+      autoRedLargeSuperSafe();
+      break;
+    case AUTO_SKILLS:
+      autoSkillsSuperSafe();
+      break;
+    case AUTO_NONE:
+      break;
+  }
+}
 
 /**
  * Runs the operator control code. This function will be started in its own task
@@ -73,20 +122,21 @@ void autonomous() {}
  * operator control task will be stopped. Re-enabling the robot will restart the
  * task, not resume it from where it left off.
  */
-void opcontrol() {
-	pros::Controller master(pros::E_CONTROLLER_MASTER);
-	pros::Motor left_mtr(1);
-	pros::Motor right_mtr(2);
+void opcontrol()
+{
+	while (true)
+	{
+		double leftPower = controller.getAnalog(ControllerAnalog::leftY);
+		double rightPower = controller.getAnalog(ControllerAnalog::rightY);
 
-	while (true) {
-		pros::lcd::print(0, "%d %d %d", (pros::lcd::read_buttons() & LCD_BTN_LEFT) >> 2,
-		                 (pros::lcd::read_buttons() & LCD_BTN_CENTER) >> 1,
-		                 (pros::lcd::read_buttons() & LCD_BTN_RIGHT) >> 0);
-		int left = master.get_analog(ANALOG_LEFT_Y);
-		int right = master.get_analog(ANALOG_RIGHT_Y);
+		leftPower = pow(leftPower, 3);
+		rightPower = pow(rightPower, 3);
 
-		left_mtr = left;
-		right_mtr = right;
-		pros::delay(20);
+
+
+
+		setDrive(leftPower, rightPower);
+
+		pros::delay(10);
 	}
 }
