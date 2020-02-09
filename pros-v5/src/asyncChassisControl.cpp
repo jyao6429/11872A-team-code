@@ -1,12 +1,14 @@
 #include "main.h"
+// Handles the async task
+std::unique_ptr<pros::Task> asyncChassisHandle;
 
 void asyncChassisTask(void *ignore)
 {
   // Store the current move
   AsyncChassisOptions currentChassisMove = ASYNC_CHASSIS_NONE;
-  mutexTake(mutexes[MUTEX_ASYNC_CHASSIS], 1000);
+  mutexes[MUTEX_ASYNC_CHASSIS].take(1000);
   currentChassisMove = nextChassisMove;
-  mutexGive(mutexes[MUTEX_ASYNC_CHASSIS]);
+  mutexes[MUTEX_ASYNC_CHASSIS].give();
 
   // Switch between each motion type
   switch (currentChassisMove)
@@ -30,21 +32,20 @@ void asyncChassisTask(void *ignore)
       break;
   }
   // Reset variables
-  mutexTake(mutexes[MUTEX_ASYNC_CHASSIS], 200);
+  mutexes[MUTEX_ASYNC_CHASSIS].take(200);
   nextChassisMove = ASYNC_CHASSIS_NONE;
   isChassisMoving = false;
-  mutexGive(mutexes[MUTEX_ASYNC_CHASSIS]);
+  mutexes[MUTEX_ASYNC_CHASSIS].give();
 }
 void waitUntilChassisMoveComplete()
 {
-  while (isChassisMoving) { delay(40); }
+  while (isChassisMoving) { pros::delay(40); }
 }
 void queueAsyncChassisController(AsyncChassisOptions moveToQueue)
 {
   // Stop task if needed
-  unsigned int asyncState = taskGetState(asyncChassisHandle);
-  if (asyncChassisHandle != NULL && (asyncState != TASK_DEAD))
-    taskDelete(asyncChassisHandle);
+  if (asyncChassisHandle != NULL && (asyncChassisHandle->get_state() != pros::E_TASK_STATE_DELETED) && (asyncChassisHandle->get_state() != pros::E_TASK_STATE_INVALID))
+    asyncChassisHandle->remove();
   stopDrive();
 
   // Checks if there is an actual motion to do
@@ -52,25 +53,24 @@ void queueAsyncChassisController(AsyncChassisOptions moveToQueue)
     return;
 
   // Start the task
-  mutexTake(mutexes[MUTEX_ASYNC_CHASSIS], 2000);
+  mutexes[MUTEX_ASYNC_CHASSIS].take(2000);
   nextChassisMove = moveToQueue;
   isChassisMoving = true;
-  asyncChassisHandle = taskCreate(asyncChassisTask, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT + 1);
-  mutexGive(mutexes[MUTEX_ASYNC_CHASSIS]);
+  asyncChassisHandle = std::make_unique<pros::Task>(asyncChassisTask, nullptr, TASK_PRIORITY_DEFAULT + 1);
+  mutexes[MUTEX_ASYNC_CHASSIS].give();
 }
 void stopAsyncChassisController()
 {
   // Stop task if needed
-  unsigned int asyncState = taskGetState(asyncChassisHandle);
-  if (asyncChassisHandle != NULL && (asyncState != TASK_DEAD))
-    taskDelete(asyncChassisHandle);
+  if (asyncChassisHandle != NULL && (asyncChassisHandle->get_state() != pros::E_TASK_STATE_DELETED) && (asyncChassisHandle->get_state() != pros::E_TASK_STATE_INVALID))
+    asyncChassisHandle->remove();
   stopDrive();
 
   // Reset variables
-  mutexTake(mutexes[MUTEX_ASYNC_CHASSIS], 500);
+  mutexes[MUTEX_ASYNC_CHASSIS].take(500);
   nextChassisMove = ASYNC_CHASSIS_NONE;
   isChassisMoving = false;
-  mutexGive(mutexes[MUTEX_ASYNC_CHASSIS]);
+  mutexes[MUTEX_ASYNC_CHASSIS].give();
 }
 void moveToTargetSimpleAsync(double targetX, double targetY, double startX, double startY, int power, int startPower, double maxErrorX, double decelEarly, int decelPower, double dropEarly, StopType stopType, MTTMode mode)
 {

@@ -28,31 +28,9 @@ void initialize() {
 
 	pros::lcd::register_btn1_cb(on_center_button);
 
-	// Initialize tracking wheel encoders
-	leftEncoder(PORT_leftEncoder, PORT_leftEncoder + 1, true);
-	rightEncoder(PORT_rightEncoder, PORT_rightEncoder + 1, true);
-	backEncoder(PORT_backEncoder, PORT_backEncoder + 1, true);
+	initArm();
+	initDrive();
 
-	// Initialize trayPot
-	trayPot(PORT_trayPot);
-
-	// Initialize non-chassis motors
-	trayMotor(PORT_tray);
-	trayMotor.setGearing(AbstractMotor::gearset::red);
-
-	armMotor(PORT_arm);
-	armMotor.setGearing(AbstractMotor::gearset::red);
-	armMotor.setBrakeMode(AbstractMotor::brakeMode::hold);
-
-	leftIntakeMotor(PORT_leftRoller);
-	leftIntakeMotor.setGearing(AbstractMotor::gearset::green);
-	rightIntakeMotor(PORT_rightRoller);
-	rightIntakeMotor.setGearing(AbstractMotor::gearset::green);
-
-	chassis = ChassisControllerBuilder()
-						.withMotors({PORT_leftMotor0, PORT_leftMotor1}, {-PORT_rightMotor0, -PORT_rightMotor1})
-						.withDimensions(AbstractMotor::gearset::green, {{4_in, 15.5_in}, imev5GreenTPR})
-						.build();
 }
 
 /**
@@ -124,6 +102,8 @@ void autonomous()
  */
 void opcontrol()
 {
+	Controller controller;
+
 	while (true)
 	{
 		double leftPower = controller.getAnalog(ControllerAnalog::leftY);

@@ -45,8 +45,6 @@ Vel globalVel;
 // The angle at last reset
 double resetAngle;
 
-// handles the tracking task
-pros::Task APSTask;
 /**
  * Stops position and velocity tracking
  */

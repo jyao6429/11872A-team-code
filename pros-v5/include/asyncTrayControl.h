@@ -39,12 +39,14 @@ void moveTrayAngledAsync();
  * @returns the value from the tray pot
  */
 int getTrayPot();
+void setTray(double power);
 /**
  * Sets the motor power for the tray
  *
  * @param power - the power to set the motor to
  */
 void setTray(int power);
+void setTrayVel(double speed);
 /**
  * Stops the tray motor
  */

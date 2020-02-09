@@ -1,10 +1,18 @@
 #include "main.h"
 
+// handles the tracking task
+std::unique_ptr<pros::Task> APSTask;
+
+// Encoders themselves
+ADIEncoder leftEncoder('A', 'B', true);
+ADIEncoder rightEncoder('E', 'F', true);
+ADIEncoder backEncoder('C', 'D', true);
+
 void stopAPS()
 {
   // Stop task
-  if (APSTask != NULL && (APSTask.get_state() != pros::E_TASK_STATE_DELETED	))
-    taskDelete(APSTask);
+  if (APSTask != NULL && (APSTask->get_state() != pros::E_TASK_STATE_DELETED) && (APSTask->get_state() != pros::E_TASK_STATE_INVALID))
+    APSTask->remove();
 }
 void resetPositionFull(Pose *position, double startX, double startY, double startAngle, bool isDegrees)
 {
@@ -31,7 +39,7 @@ void resetPositionFull(Pose *position, double startX, double startY, double star
   position->y = startY;
 
   // Create new task to track position
-  APSTask(trackPoseTask, NULL, TASK_PRIORITY_DEFAULT + 2, TASK_STACK_DEPTH_DEFAULT, "APS");
+  APSTask = std::make_unique<pros::Task>(trackPoseTask, nullptr, TASK_PRIORITY_DEFAULT + 2);
 }
 void resetPosition(Pose *position)
 {

@@ -3,6 +3,7 @@
 
 #include "main.h"
 
+void initDrive();
 /**
  * Powers the motors on the chassis using voltage control
  *

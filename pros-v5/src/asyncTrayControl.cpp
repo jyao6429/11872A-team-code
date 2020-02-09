@@ -1,117 +1,94 @@
 #include "main.h"
 
-PID trayPID;
-bool isTrayVertical = false;
-int prevTrayTarget = -1;
-
 // Handles the async task
-TaskHandle asyncTrayHandle;
+std::unique_ptr<pros::Task> asyncTrayHandle;
 
-void asyncTrayLoop()
+Motor trayMotor(8);
+Potentiometer trayPot('G');
+
+void asyncTrayTask(void *ignore)
 {
-  // Precaution in case mutex is taken
-  int currentTrayTarget = prevTrayTarget;
-  int currentTrayPot = getTrayPot();
+  bool isTrayVertical = false;
+  int prevTrayTarget = -1;
 
-  // Take mutexes and set proper variables, depending on if operatorControl or not
-  if (!isAutonomous() && isEnabled() && isMainConnected)
-  {
-    // Toggle button for angling the tray
-		if (joystickGetDigital(1, 7, JOY_DOWN))
-		{
-			isTrayVertical = !isTrayVertical;;
+  auto trayStackingController = IterativeControllerFactory::posPID(0.1, 0.0, 0.0);
+  auto trayController = IterativeControllerFactory::posPID(0.2, 0.01, 0.01);
 
-      if (isTrayVertical)
-        currentTrayTarget = TRAY_VERTICAL;
-      else
-        currentTrayTarget = TRAY_ANGLED;
-			delay(250);
-		}
-		else if (joystickGetDigital(1, 7, JOY_UP))
-		{
-      currentTrayTarget = -1;
-      prevTrayTarget = currentTrayTarget;
-      mutexTake(mutexes[MUTEX_ASYNC_TRAY], 200);
-      isTrayAtTarget = true;
-      mutexGive(mutexes[MUTEX_ASYNC_TRAY]);
-		}
-  }
-  else
+  trayStackingController.setOutputLimits(100, -100);
+  trayController.setOutputLimits(100, -100);
+
+  trayStackingController.setTarget(TRAY_VERTICAL);
+  trayController.setTarget(TRAY_ANGLED);
+
+  while (true)
   {
-    mutexTake(mutexes[MUTEX_ASYNC_TRAY], 200);
+    // Precaution in case mutex is taken
+    int currentTrayTarget = prevTrayTarget;
+    int currentTrayPot = getTrayPot();
+
+    mutexes[MUTEX_ASYNC_TRAY].take(200);
     currentTrayTarget = nextTrayTarget;
-    mutexGive(mutexes[MUTEX_ASYNC_TRAY]);
-  }
+    mutexes[MUTEX_ASYNC_TRAY].give();
 
-  if (prevTrayTarget == TRAY_ARM)
-    currentTrayTarget = TRAY_ANGLED;
+    if (prevTrayTarget == TRAY_ARM)
+      currentTrayTarget = TRAY_ANGLED;
 
-  mutexTake(mutexes[MUTEX_ASYNC_ARM], 500);
-  if (trayOverride)
-    currentTrayTarget = TRAY_ARM;
-  mutexGive(mutexes[MUTEX_ASYNC_ARM]);
+    mutexes[MUTEX_ASYNC_TRAY].take(500);
+    if (needsTrayOverride())
+      currentTrayTarget = TRAY_ARM;
+    mutexes[MUTEX_ASYNC_TRAY].give();
 
-  //print("Tray always printing\n");
+    // Disengage if no target set
+    if (currentTrayTarget < 0)
+      continue;
 
-  // Disengage if no target set
-  if (currentTrayTarget < 0)
-  {
-    stopTray();
-    return;
-  }
+    if (currentTrayTarget != prevTrayTarget)
+      trayController.setTarget(currentTrayTarget);
 
-  // Reinitialize PID if needed
-  if (currentTrayTarget != prevTrayTarget)
-  {
+    double speed = 0;
+
     if (currentTrayTarget == TRAY_VERTICAL)
-      pidInit(&trayPID, 0.00035, 0.000005, 0.0, 18.0 / (TRAY_VERTICAL * 127));
-//    else if (currentTrayTarget == TRAY_ANGLED)
-//      pidInit(&trayPID, 0.0012, 0.0002, 0.0, -15.0 / (TRAY_ANGLED * 127));
+      speed = trayStackingController.step(currentTrayPot);
     else
-      pidInit(&trayPID, 0.0012, 0.0002, 0.0, 0.0);
-  }
-  else if (currentTrayPot > TRAY_VERTICAL)
-    pidInit(&trayPID, 0.004, 0.0002, 0.0, 0.0);
+      speed = trayController.step(currentTrayPot);
 
-  // Calculate and set power for tray
-  int power = pidCalculate(&trayPID, currentTrayTarget, currentTrayPot) * 127;
-  setTray(power);
+    setTrayVel(speed);
 
-  // Debug
-  printf("trayPot: %d\tpower: %d\ttarget: %d\ttrayPID.sigma: %3.3f\n", currentTrayPot, power, currentTrayTarget, trayPID.sigma);
+    // Debug
+    printf("trayPot: %d\tspeed: %3.3f\ttarget: %d\n", currentTrayPot, speed, currentTrayTarget);
 
-  // Set prev variables
-  prevTrayTarget = currentTrayTarget;
+    // Set prev variables
+    prevTrayTarget = currentTrayTarget;
 
-  // Sets if tray is within target
-  if (abs(currentTrayTarget - currentTrayPot) < 20)
-  {
-    mutexTake(mutexes[MUTEX_ASYNC_TRAY], 200);
-    isTrayAtTarget = true;
-    mutexGive(mutexes[MUTEX_ASYNC_TRAY]);
-  }
-  else
-  {
-    mutexTake(mutexes[MUTEX_ASYNC_TRAY], 200);
-    isTrayAtTarget = false;
-    mutexGive(mutexes[MUTEX_ASYNC_TRAY]);
+    // Sets if tray is within target
+    if (abs(currentTrayTarget - currentTrayPot) < 20)
+    {
+      mutexes[MUTEX_ASYNC_TRAY].take(200);
+      isTrayAtTarget = true;
+      mutexes[MUTEX_ASYNC_TRAY].give();
+    }
+    else
+    {
+      mutexes[MUTEX_ASYNC_TRAY].take(200);
+      isTrayAtTarget = false;
+      mutexes[MUTEX_ASYNC_TRAY].give();
+    }
+    pros::delay(10);
   }
 }
 void waitUntilTrayMoveComplete()
 {
-  while (!isTrayAtTarget) { delay(40); }
+  while (!isTrayAtTarget) { pros::delay(40); }
 }
 void startAsyncTrayController()
 {
-  print("~~~~~~~~~~~~~~Begin startAsyncTrayController~~~~~~~~~~~~~~~~\n");
+  printf("~~~~~~~~~~~~~~Begin startAsyncTrayController~~~~~~~~~~~~~~~~\n");
   // Only if task is not already running
-  unsigned int asyncTrayState = taskGetState(asyncTrayHandle);
-  printf("asyncTrayState: %d\n", asyncTrayState);
-  if (asyncTrayHandle != NULL && (asyncTrayState != TASK_DEAD))
+  if (asyncTrayHandle != NULL && (asyncTrayHandle->get_state() != pros::E_TASK_STATE_DELETED) && (asyncTrayHandle->get_state() != pros::E_TASK_STATE_INVALID))
     return;
 
   // Reset variables
-  mutexTake(mutexes[MUTEX_ASYNC_TRAY], 500);
+  mutexes[MUTEX_ASYNC_TRAY].take(500);
   nextTrayTarget = -1;
   isTrayAtTarget = true;
 
@@ -119,57 +96,77 @@ void startAsyncTrayController()
   stopTray();
 
   // Create the task
-  asyncTrayHandle = taskRunLoop(asyncTrayLoop, 20);
-  mutexGive(mutexes[MUTEX_ASYNC_TRAY]);
-  print("~~~~~~~~~~~~~~Finished startAsyncTrayController~~~~~~~~~~~~~~~\n");
+  asyncTrayHandle = std::make_unique<pros::Task>(asyncTrayTask, nullptr, TASK_PRIORITY_DEFAULT + 1);
+  mutexes[MUTEX_ASYNC_TRAY].give();
+  printf("~~~~~~~~~~~~~~Finished startAsyncTrayController~~~~~~~~~~~~~~~\n");
 }
 void stopAsyncTrayController()
 {
   // Stop task if needed
-  unsigned int asyncState = taskGetState(asyncTrayHandle);
-  if (asyncTrayHandle != NULL && (asyncState != TASK_DEAD))
-    taskDelete(asyncTrayHandle);
+  if (asyncTrayHandle != NULL && (asyncTrayHandle->get_state() != pros::E_TASK_STATE_DELETED) && (asyncTrayHandle->get_state() != pros::E_TASK_STATE_INVALID))
+    asyncTrayHandle->remove();
 
   // Reset variables
-  mutexTake(mutexes[MUTEX_ASYNC_TRAY], 500);
+  mutexes[MUTEX_ASYNC_TRAY].take(500);
   nextTrayTarget = -1;
   isTrayAtTarget = true;
-  mutexGive(mutexes[MUTEX_ASYNC_TRAY]);
+  mutexes[MUTEX_ASYNC_TRAY].give();
 
   // Stop the tray
   stopTray();
+}
+void pauseAsyncTrayController()
+{
+  // Start asyncTrayController if needed
+  startAsyncTrayController();
+  // Remove next target
+  mutexes[MUTEX_ASYNC_TRAY].take(1000);
+  nextTrayTarget = -1;
+  isTrayAtTarget = true;
+  mutexes[MUTEX_ASYNC_TRAY].give();
 }
 void moveTrayVerticalAsync()
 {
   // Start asyncTrayController if needed
   startAsyncTrayController();
   // Set the proper target
-  mutexTake(mutexes[MUTEX_ASYNC_TRAY], 1000);
+  mutexes[MUTEX_ASYNC_TRAY].take(500);
   nextTrayTarget = TRAY_VERTICAL;
   isTrayAtTarget = false;
-  mutexGive(mutexes[MUTEX_ASYNC_TRAY]);
+  mutexes[MUTEX_ASYNC_TRAY].give();
 }
 void moveTrayAngledAsync()
 {
   // Start asyncTrayController if needed
   startAsyncTrayController();
   // Set the proper target
-  mutexTake(mutexes[MUTEX_ASYNC_TRAY], 1000);
+  mutexes[MUTEX_ASYNC_TRAY].take(500);
   nextTrayTarget = TRAY_ANGLED;
   isTrayAtTarget = false;
-  mutexGive(mutexes[MUTEX_ASYNC_TRAY]);
+  mutexes[MUTEX_ASYNC_TRAY].give();
+}
+void initTray()
+{
+  trayMotor.setGearing(AbstractMotor::gearset::red);
+  startAsyncTrayController();
 }
 int getTrayPot()
 {
-  return analogRead(PORT_trayPot);
+  return trayPot.get();
+}
+void setTray(double power)
+{
+  trayMotor.moveVoltage(12000 * power);
 }
 void setTray(int power)
 {
-  motorSet(PORT_leftTray, -power);
-  motorSet(PORT_rightTray, power);
+  trayMotor.moveVoltage((12000.0 * power) / 127.0);
+}
+void setTrayVel(double speed)
+{
+  trayMotor.moveVelocity(speed);
 }
 void stopTray()
 {
-  motorStop(PORT_leftTray);
-  motorStop(PORT_rightTray);
+  trayMotor.moveVoltage(0);
 }
