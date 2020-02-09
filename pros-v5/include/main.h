@@ -1,3 +1,4 @@
+
 /**
  * \file main.h
  *
@@ -43,16 +44,16 @@
 //#include "pros/api_legacy.h"
 
 // User includes
-#include "global.h"
-#include "mathUtils.h"
-#include "aps.h"
-#include "motionAlgorithms.h"
-#include "chassis.h"
-#include "asyncChassisControl.h"
-#include "asyncTrayControl.h"
-#include "asyncArmControl.h"
-#include "auto.h"
-#include "tests.h"
+#include "global.hpp"
+#include "mathUtils.hpp"
+#include "aps.hpp"
+#include "motionAlgorithms.hpp"
+#include "chassis.hpp"
+#include "asyncChassisControl.hpp"
+#include "asyncTrayControl.hpp"
+#include "asyncArmControl.hpp"
+#include "auto.hpp"
+#include "tests.hpp"
 
 /**
  * If you find doing pros::Motor() to be tedious and you'd prefer just to do

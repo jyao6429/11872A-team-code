@@ -2,6 +2,8 @@
 
 // Maxiumum achievable linear velocity by the robot in inches per second
 #define MAX_LINEAR_VEL 42.0
+// Coordinates of last target
+Cart lastTarget;
 
 void moveToTargetSimple(double targetX, double targetY, double startX, double startY, int power, int startPower, double maxErrorX, double decelEarly, int decelPower, double dropEarly, StopType stopType, MTTMode mode)
 {

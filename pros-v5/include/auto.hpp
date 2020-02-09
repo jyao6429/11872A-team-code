@@ -12,7 +12,7 @@ typedef enum AutoOptions
   AUTO_SKILLS
 } AutoOptions;
 
-AutoOptions chosenAuto;
+extern AutoOptions chosenAuto;
 
 /**
  * Action in the beginning to deploy

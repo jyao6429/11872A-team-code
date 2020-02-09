@@ -39,11 +39,11 @@ typedef struct Vel
 
 // Variables for global position and velocity
 // The global position of the robot
-Pose globalPose;
+extern Pose globalPose;
 // The global velocity of the robot
-Vel globalVel;
+extern Vel globalVel;
 // The angle at last reset
-double resetAngle;
+extern double resetAngle;
 
 /**
  * Stops position and velocity tracking

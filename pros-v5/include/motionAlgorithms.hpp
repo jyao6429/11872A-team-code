@@ -25,9 +25,6 @@ typedef enum MTTMode
   MTT_CASCADING
 } MTTMode;
 
-// Coordinates of last target
-Cart lastTarget;
-
 /**
  * Moves to a desired position along a line connecting the target and starting points
  *

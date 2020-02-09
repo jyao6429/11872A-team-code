@@ -1,5 +1,13 @@
 #include "main.h"
 
+// Variables for global position and velocity
+// The global position of the robot
+Pose globalPose;
+// The global velocity of the robot
+Vel globalVel;
+// The angle at last reset
+double resetAngle;
+
 // handles the tracking task
 std::unique_ptr<pros::Task> APSTask;
 

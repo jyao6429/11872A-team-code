@@ -9,9 +9,9 @@
 
 // Variables for handling async tasks
 // Keeps track if the tray is at the target
-bool isTrayAtTarget;
+extern bool isTrayAtTarget;
 // The next target pot value for the tray
-int nextTrayTarget;
+extern int nextTrayTarget;
 
 /**
  * Waits until the tray completes the current motion

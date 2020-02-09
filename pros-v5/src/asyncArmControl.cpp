@@ -4,6 +4,8 @@ Motor armMotor(6);
 Motor leftIntakeMotor(7);
 Motor rightIntakeMotor(-4);
 
+int nextArmTarget;
+
 void initArm()
 {
   armMotor.setGearing(AbstractMotor::gearset::red);

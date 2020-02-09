@@ -16,6 +16,6 @@ enum MutexTypes
   MUTEX_ASYNC_ARM
 };
 // Mutexes
-pros::Mutex mutexes[4];
+extern pros::Mutex mutexes[4];
 
 #endif

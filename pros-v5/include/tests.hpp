@@ -2,7 +2,7 @@
 #define TESTS_H
 
 // boolean to control toggling between starting and stopping tests
-bool isTesting;
+extern bool isTesting;
 /**
  * Starts the testing task
  */

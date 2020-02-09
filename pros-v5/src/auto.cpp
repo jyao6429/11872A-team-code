@@ -11,6 +11,8 @@
 
 #define MAX_INTAKE_CHASSIS_V 50
 
+AutoOptions chosenAuto;
+
 void deploy()
 {
 

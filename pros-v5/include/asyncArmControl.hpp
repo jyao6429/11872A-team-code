@@ -9,7 +9,7 @@
 #define ARM_MED 2300
 
 // The next move to be performed by the robot
-int nextArmTarget;
+extern int nextArmTarget;
 
 void initArm();
 void resetArm();

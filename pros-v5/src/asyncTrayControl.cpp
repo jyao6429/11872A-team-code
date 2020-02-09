@@ -6,6 +6,12 @@ std::unique_ptr<pros::Task> asyncTrayHandle;
 Motor trayMotor(8);
 Potentiometer trayPot('G');
 
+// Variables for handling async tasks
+// Keeps track if the tray is at the target
+bool isTrayAtTarget;
+// The next target pot value for the tray
+int nextTrayTarget;
+
 void asyncTrayTask(void *ignore)
 {
   bool isTrayVertical = false;

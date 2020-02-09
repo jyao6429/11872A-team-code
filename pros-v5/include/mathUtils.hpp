@@ -1,7 +1,7 @@
 #ifndef MATH_UTILS_H
 #define MATH_UTILS_H
 
-#include "aps.h"
+#include "aps.hpp"
 #include "main.h"
 
 // Structs

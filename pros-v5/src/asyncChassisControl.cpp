@@ -1,6 +1,16 @@
 #include "main.h"
+
 // Handles the async task
 std::unique_ptr<pros::Task> asyncChassisHandle;
+// Variables for handling async tasks
+// Keeps track when the robot is performing a move
+bool isChassisMoving;
+// The next move to be performed by the robot
+AsyncChassisOptions nextChassisMove;
+// Container variables for each motion
+MTTContainer mttContainer;
+TTTSweepContainer sweepContainer;
+TTTRegularContainer turnContainer;
 
 void asyncChassisTask(void *ignore)
 {

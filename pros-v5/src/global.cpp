@@ -5,4 +5,4 @@ bool isMainConnected = false;
 bool isPartnerConnected = false;
 
 // Mutexes
-//pros::Mutex mutexes[4];
+pros::Mutex mutexes[4];

@@ -104,6 +104,7 @@ void intakeTest()
  *                   Tasks to handle tests                     *
  ***************************************************************/
 std::unique_ptr<pros::Task> testHandler;
+bool isTesting;
 
 void testTask(void *ignore)
 {
