@@ -1,17 +1,22 @@
 #include "main.h"
 
-// Handles the async task
-std::unique_ptr<pros::Task> asyncTrayHandle;
-
+// Devices for tray
 Motor trayMotor(8);
 Potentiometer trayPot('G');
 
 // Variables for handling async tasks
+// Handles the async task
+std::unique_ptr<pros::Task> asyncTrayHandle;
 // Keeps track if the tray is at the target
 bool isTrayAtTarget;
 // The next target pot value for the tray
 int nextTrayTarget;
 
+void initTray()
+{
+  trayMotor.setGearing(AbstractMotor::gearset::red);
+  startAsyncTrayController();
+}
 void asyncTrayTask(void *ignore)
 {
   bool isTrayVertical = false;
@@ -21,7 +26,6 @@ void asyncTrayTask(void *ignore)
   auto trayController = IterativeControllerFactory::posPID(0.2, 0.01, 0.01);
 
   trayStackingController.setOutputLimits(100, -100);
-  trayController.setOutputLimits(100, -100);
 
   trayStackingController.setTarget(TRAY_VERTICAL);
   trayController.setTarget(TRAY_ANGLED);
@@ -39,14 +43,18 @@ void asyncTrayTask(void *ignore)
     if (prevTrayTarget == TRAY_ARM)
       currentTrayTarget = TRAY_ANGLED;
 
-    mutexes[MUTEX_ASYNC_TRAY].take(500);
+    mutexes[MUTEX_ASYNC_ARM].take(500);
     if (needsTrayOverride())
       currentTrayTarget = TRAY_ARM;
-    mutexes[MUTEX_ASYNC_TRAY].give();
+    mutexes[MUTEX_ASYNC_ARM].give();
 
     // Disengage if no target set
     if (currentTrayTarget < 0)
+    {
+      if (pros::competition::is_autonomous())
+        stopTray();
       continue;
+    }
 
     if (currentTrayTarget != prevTrayTarget)
       trayController.setTarget(currentTrayTarget);
@@ -54,11 +62,15 @@ void asyncTrayTask(void *ignore)
     double speed = 0;
 
     if (currentTrayTarget == TRAY_VERTICAL)
+    {
       speed = trayStackingController.step(currentTrayPot);
+      setTrayVel(speed);
+    }
     else
+    {
       speed = trayController.step(currentTrayPot);
-
-    setTrayVel(speed);
+      setTray(speed);
+    }
 
     // Debug
     printf("trayPot: %d\tspeed: %3.3f\ttarget: %d\n", currentTrayPot, speed, currentTrayTarget);
@@ -97,10 +109,8 @@ void startAsyncTrayController()
   mutexes[MUTEX_ASYNC_TRAY].take(500);
   nextTrayTarget = -1;
   isTrayAtTarget = true;
-
   // Stop the tray
   stopTray();
-
   // Create the task
   asyncTrayHandle = std::make_unique<pros::Task>(asyncTrayTask, nullptr, TASK_PRIORITY_DEFAULT + 1);
   mutexes[MUTEX_ASYNC_TRAY].give();
@@ -131,31 +141,21 @@ void pauseAsyncTrayController()
   isTrayAtTarget = true;
   mutexes[MUTEX_ASYNC_TRAY].give();
 }
-void moveTrayVerticalAsync()
+void moveTrayToPosition(int trayTarget)
 {
   // Start asyncTrayController if needed
   startAsyncTrayController();
+  // Make sure target is within range
+  trayTarget = (trayTarget > TRAY_VERTICAL) ? TRAY_VERTICAL : trayTarget;
+  trayTarget = (trayTarget < TRAY_ANGLED) ? TRAY_ANGLED : trayTarget;
   // Set the proper target
   mutexes[MUTEX_ASYNC_TRAY].take(500);
-  nextTrayTarget = TRAY_VERTICAL;
+  nextTrayTarget = trayTarget;
   isTrayAtTarget = false;
   mutexes[MUTEX_ASYNC_TRAY].give();
 }
-void moveTrayAngledAsync()
-{
-  // Start asyncTrayController if needed
-  startAsyncTrayController();
-  // Set the proper target
-  mutexes[MUTEX_ASYNC_TRAY].take(500);
-  nextTrayTarget = TRAY_ANGLED;
-  isTrayAtTarget = false;
-  mutexes[MUTEX_ASYNC_TRAY].give();
-}
-void initTray()
-{
-  trayMotor.setGearing(AbstractMotor::gearset::red);
-  startAsyncTrayController();
-}
+void moveTrayVerticalAsync() { moveTrayToPosition(TRAY_VERTICAL); }
+void moveTrayAngledAsync() { moveTrayToPosition(TRAY_ANGLED); }
 int getTrayPot()
 {
   return trayPot.get();

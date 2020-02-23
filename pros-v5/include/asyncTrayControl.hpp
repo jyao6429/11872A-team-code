@@ -14,6 +14,10 @@ extern bool isTrayAtTarget;
 extern int nextTrayTarget;
 
 /**
+ * Initialized the tray motor and controller
+ */
+void initTray();
+/**
  * Waits until the tray completes the current motion
  */
 void waitUntilTrayMoveComplete();
@@ -25,6 +29,16 @@ void startAsyncTrayController();
  * Stops the async controller and resets variables to defaults
  */
 void stopAsyncTrayController();
+/**
+ * Pauses the async controller and resets variables to defaults
+ */
+void pauseAsyncTrayController();
+/**
+ * Moves the tray to a designated position
+ *
+ * @param trayTarget - the target position for the tray
+ */
+void moveTrayToPosition(int trayTarget);
 /**
  * Moves the tray to the vertical position for scoring
  */
@@ -39,13 +53,23 @@ void moveTrayAngledAsync();
  * @returns the value from the tray pot
  */
 int getTrayPot();
+/**
+ * Sets the motor power for the tray
+ *
+ * @param power - (-1.0 - 1.0) the power to set the motor to
+ */
 void setTray(double power);
 /**
  * Sets the motor power for the tray
  *
- * @param power - the power to set the motor to
+ * @param power - (-127 - 127) the power to set the motor to
  */
 void setTray(int power);
+/**
+ * Sets the motor velocity for the tray
+ *
+ * @param speed - (-100 - 100) the velocity to set the motor to
+ */
 void setTrayVel(double speed);
 /**
  * Stops the tray motor
