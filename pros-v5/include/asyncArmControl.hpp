@@ -4,22 +4,17 @@
 #include "main.h"
 
 #define ARM_ZERO 0
-#define ARM_SCORE 1000
+#define ARM_SECOND 500
 #define ARM_LOW 1630
 #define ARM_MED 2300
 
 // The next move to be performed by the robot
 extern int nextArmTarget;
 
-void initArm();
-void resetArm();
-bool needsTrayOverride();
-bool needsTrayOverride();
-double getArmPosition();
 /**
- * Waits until the arm completes the current motion
+ * Initializes the arm motor and controller
  */
-void waitUntilArmMoveComplete();
+void initArm();
 /**
  * Starts the async controller and resets variables to defaults
  */
@@ -29,13 +24,23 @@ void startAsyncArmController();
  */
 void stopAsyncArmController();
 /**
+ * Waits until the arm completes the current motion
+ */
+void waitUntilArmMoveComplete();
+/**
+ * Moves intake arms to the designated target position
+ *
+ * @param armTarget - the target position for the arms
+ */
+void moveArmsToPosition(int armTarget);
+/**
  * Moves intake arms to the down position for cube intake
  */
 void moveArmsZeroAsync();
 /**
- * Holds intake arms to clear the intake lock in order to score in the goal zones
+ * Holds intake arms to intake a cube stacked on one other cube
  */
-void moveArmsScoreAsync();
+void moveArmsSecondAsync();
 /**
  * Holds intake arms to score/descore low towers
  */
@@ -45,23 +50,57 @@ void moveArmsLowAsync();
  */
 void moveArmsMedAsync();
 /**
- * Gets a normalized value from the arm potentiometer
- *
- * @returns the normalized value from the arm pot
+ * Resets the IME for the arm
  */
-int getArmPot();
+void resetArm();
+/**
+ * Returns if the tray needs to be tilted forward for the arms to clears
+ *
+ * @return true if tray needs to be forward, false if not
+ */
+bool needsTrayOverride();
+/**
+ * Returns the arm IME value
+ *
+ * @return the arm position
+ */
+double getArmPosition();
 /**
  * Powers the motors on the intake arms
  *
- * @param power - the power for the arms, positive values raise the arm
+ * @param power - (-1.0 - 1.0) the power for the arms, positive values raise the arm
+ */
+void setArms(double power);
+/**
+ * Powers the motors on the intake arms
+ *
+ * @param power - (-127 - 127) the power for the arms, positive values raise the arm
  */
 void setArms(int power);
 /**
+ * Sets the motor velocity for the intake arms
+ *
+ * @param speed - (-100 - 100) the velocity to set the motor to
+ */
+void setArmsVel(double speed);
+/**
  * Powers the motors on the intake rollers
  *
- * @param power - the power for the rollers, positive values intake cubes
+ * @param power - (-1.0 - 1.0) the power for the rollers, positive values intake cubes
+ */
+void setRollers(double power);
+/**
+ * Powers the motors on the intake rollers
+ *
+ * @param power - (-127 - 127) the power for the rollers, positive values intake cubes
  */
 void setRollers(int power);
+/**
+ * Sets the motor velocity for the intake rollers
+ *
+ * @param speed - (-100 - 100) the velocity to set the motor to
+ */
+void setRollersVel(double speed);
 /**
  * Stops the intake arms
  */
