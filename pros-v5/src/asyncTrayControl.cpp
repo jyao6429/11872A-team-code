@@ -19,7 +19,6 @@ void initTray()
 }
 void asyncTrayTask(void *ignore)
 {
-  bool isTrayVertical = false;
   int prevTrayTarget = -1;
 
   auto trayStackingController = IterativeControllerFactory::posPID(0.1, 0.0, 0.0);

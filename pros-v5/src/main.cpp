@@ -109,18 +109,103 @@ void opcontrol()
 {
 	Controller controller;
 
+	moveArmsZeroAsync();
+	moveTrayAngledAsync();
+
+	// Controller buttons
+	ControllerButton intakeButton(ControllerDigital::L1);
+	ControllerButton outtakeButton(ControllerDigital::L2);
+	ControllerButton intakeShiftButton(ControllerDigital::R2);
+	ControllerButton armShiftButton(ControllerDigital::R1);
+	ControllerButton trayToggleButton(ControllerDigital::down);
+	ControllerButton backOutButton(ControllerDigital::left);
+	ControllerButton trayOverrideButton(ControllerDigital::up);
+	ControllerButton armOverrideButton(ControllerDigital::X);
+
+	// handles tray toggling
+	bool isTrayVertical = false;
+
 	while (true)
 	{
+		// Get power for drivetrain, match to cubic function for more precision in slow movements
 		double leftPower = controller.getAnalog(ControllerAnalog::leftY);
 		double rightPower = controller.getAnalog(ControllerAnalog::rightY);
 
 		leftPower = pow(leftPower, 3);
 		rightPower = pow(rightPower, 3);
 
+		// Variable for roller power
+		int rollerPower = 0;
 
+		// Handle the arm shift
+		if (armShiftButton.isPressed())
+		{
+			// Positions the arm based on button presses
+			if (intakeShiftButton.isPressed())
+				moveArmsZeroAsync();
+			else if (outtakeButton.isPressed())
+				moveArmsLowAsync();
+			else if (intakeButton.isPressed())
+				moveArmsMedAsync();
+		}
+		else
+		{
+			if (intakeButton.isPressed())
+				rollerPower = 127;
+			else if (outtakeButton.isPressed())
+				rollerPower = -127;
+		}
 
+		// Handle intake shift
+		if (intakeShiftButton.isPressed())
+			rollerPower /= 2;
+
+		// Handle tray toggle
+		if (trayToggleButton.isPressed())
+		{
+			if (isTrayVertical)
+			{
+				moveTrayAngledAsync();
+				isTrayVertical = false;
+			}
+			else
+			{
+				moveTrayVerticalAsync();
+				isTrayVertical = true;
+			}
+			pros::delay(250);
+		}
+
+		// Handle button for backing away from a stack
+		if (backOutButton.isPressed())
+		{
+			leftPower = rightPower;
+			rollerPower = rightPower * 127 * 1.7;
+		}
+
+		// Handle manual overrides
+		if (trayOverrideButton.isPressed())
+		{
+			if ((getTrayPot() > TRAY_VERTICAL + 100 && rightPower > 0) || (getTrayPot() < TRAY_ANGLED && rightPower < 0))
+				rightPower = 0;
+
+			setTray(rightPower);
+			rightPower = leftPower = 0;
+		}
+		if (armOverrideButton.isPressed())
+		{
+			if ((getArmPosition() > ARM_MED + 500 && leftPower > 0) || (getArmPosition() < ARM_ZERO - 20 && rightPower < 0))
+				leftPower = 0;
+
+			setArms(leftPower);
+			leftPower = rightPower = 0;
+		}
 
 		setDrive(leftPower, rightPower);
+		if (rollerPower == 0)
+			setRollersVel(0);
+		else
+			setRollers(rollerPower);
 
 		pros::delay(10);
 	}

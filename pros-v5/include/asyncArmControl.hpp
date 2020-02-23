@@ -98,7 +98,7 @@ void setRollers(int power);
 /**
  * Sets the motor velocity for the intake rollers
  *
- * @param speed - (-100 - 100) the velocity to set the motor to
+ * @param speed - (-200 - 200) the velocity to set the motor to
  */
 void setRollersVel(double speed);
 /**

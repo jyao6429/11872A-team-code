@@ -28,6 +28,7 @@ void initArm()
 }
 void startAsyncArmController()
 {
+  startAsyncTrayController();
   armMotor.modifyProfiledVelocity(100);
   mutexes[MUTEX_ASYNC_ARM].take(500);
   nextArmTarget = armMotor.getTargetPosition();
@@ -46,6 +47,7 @@ void waitUntilArmMoveComplete()
 }
 void moveArmsToPosition(int armTarget)
 {
+  startAsyncTrayController();
   // Make sure target is within range
   armTarget = (armTarget > ARM_MED + 500) ? ARM_MED + 500 : armTarget;
   armTarget = (armTarget < ARM_ZERO) ? ARM_ZERO: armTarget;
