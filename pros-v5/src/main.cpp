@@ -141,11 +141,11 @@ void opcontrol()
 		if (armShiftButton.isPressed())
 		{
 			// Positions the arm based on button presses
-			if (intakeShiftButton.isPressed())
+			if (intakeShiftButton.changedToPressed())
 				moveArmsZeroAsync();
-			else if (outtakeButton.isPressed())
+			else if (outtakeButton.changedToPressed())
 				moveArmsLowAsync();
-			else if (intakeButton.isPressed())
+			else if (intakeButton.changedToPressed())
 				moveArmsMedAsync();
 		}
 		else
@@ -161,7 +161,7 @@ void opcontrol()
 			rollerPower /= 2;
 
 		// Handle tray toggle
-		if (trayToggleButton.isPressed())
+		if (trayToggleButton.changedToPressed())
 		{
 			if (isTrayVertical)
 			{
@@ -173,7 +173,6 @@ void opcontrol()
 				moveTrayVerticalAsync();
 				isTrayVertical = true;
 			}
-			pros::delay(250);
 		}
 
 		// Handle button for backing away from a stack
