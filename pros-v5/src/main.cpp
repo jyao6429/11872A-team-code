@@ -28,10 +28,13 @@ void initialize() {
 
 	pros::lcd::register_btn1_cb(on_center_button);
 
+	printf("Initializing Arm\n");
 	initArm();
+	printf("Initializing Drive\n");
 	initDrive();
+	printf("Initializing Tray\n");
 	initTray();
-
+	printf("Done Initializing\n");
 }
 
 /**
@@ -121,6 +124,7 @@ void opcontrol()
 	ControllerButton backOutButton(ControllerDigital::left);
 	ControllerButton trayOverrideButton(ControllerDigital::up);
 	ControllerButton armOverrideButton(ControllerDigital::X);
+	ControllerButton armResetButton(ControllerDigital::Y);
 
 	// handles tray toggling
 	bool isTrayVertical = false;
@@ -185,6 +189,7 @@ void opcontrol()
 		// Handle manual overrides
 		if (trayOverrideButton.isPressed())
 		{
+			pauseAsyncTrayController();
 			if ((getTrayPot() > TRAY_VERTICAL + 100 && rightPower > 0) || (getTrayPot() < TRAY_ANGLED && rightPower < 0))
 				rightPower = 0;
 
@@ -193,12 +198,16 @@ void opcontrol()
 		}
 		if (armOverrideButton.isPressed())
 		{
-			if ((getArmPosition() > ARM_MED + 500 && leftPower > 0) || (getArmPosition() < ARM_ZERO - 20 && rightPower < 0))
+			if ((getArmPosition() > ARM_MED + 500 && leftPower > 0) || (getArmPosition() < ARM_ZERO - 20 && leftPower < 0))
 				leftPower = 0;
 
 			setArms(leftPower);
 			leftPower = rightPower = 0;
 		}
+
+		// Handle arm reset
+		if (armResetButton.changedToPressed())
+			resetArm();
 
 		setDrive(leftPower, rightPower);
 		if (rollerPower == 0)

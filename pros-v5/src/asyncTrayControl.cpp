@@ -1,7 +1,7 @@
 #include "main.h"
 
 // Devices for tray
-Motor trayMotor(8);
+Motor trayMotor(5);
 Potentiometer trayPot('G');
 
 // Variables for handling async tasks
@@ -19,16 +19,18 @@ void initTray()
 }
 void asyncTrayTask(void *ignore)
 {
+  printf("asyncTrayTask - created and starting\n");
   int prevTrayTarget = -1;
 
-  auto trayStackingController = IterativeControllerFactory::posPID(0.1, 0.0, 0.0);
-  auto trayController = IterativeControllerFactory::posPID(0.2, 0.01, 0.01);
+  auto trayStackingController = IterativeControllerFactory::posPID(0.065, 0.001, 0.0);
+  auto trayController = IterativeControllerFactory::posPID(0.005, 0.0002, 0.0001);
 
   trayStackingController.setOutputLimits(100, -100);
 
   trayStackingController.setTarget(TRAY_VERTICAL);
   trayController.setTarget(TRAY_ANGLED);
 
+  printf("asyncTrayTask - starting loop\n");
   while (true)
   {
     // Precaution in case mutex is taken
@@ -52,6 +54,7 @@ void asyncTrayTask(void *ignore)
     {
       if (pros::competition::is_autonomous())
         stopTray();
+      pros::delay(10);
       continue;
     }
 
@@ -72,13 +75,13 @@ void asyncTrayTask(void *ignore)
     }
 
     // Debug
-    printf("trayPot: %d\tspeed: %3.3f\ttarget: %d\n", currentTrayPot, speed, currentTrayTarget);
+    //printf("trayPot: %d\tspeed: %3.3f\ttarget: %d\n", currentTrayPot, speed, currentTrayTarget);
 
     // Set prev variables
     prevTrayTarget = currentTrayTarget;
 
     // Sets if tray is within target
-    if (abs(currentTrayTarget - currentTrayPot) < 20)
+    if (abs(currentTrayTarget - currentTrayPot) < 50)
     {
       mutexes[MUTEX_ASYNC_TRAY].take(200);
       isTrayAtTarget = true;
@@ -104,14 +107,19 @@ void startAsyncTrayController()
   if (asyncTrayHandle != NULL && (asyncTrayHandle->get_state() != pros::E_TASK_STATE_DELETED) && (asyncTrayHandle->get_state() != pros::E_TASK_STATE_INVALID))
     return;
 
+  printf("Need to start\n");
+
   // Reset variables
   mutexes[MUTEX_ASYNC_TRAY].take(500);
+  printf("Took mutex\n");
   nextTrayTarget = -1;
   isTrayAtTarget = true;
   // Stop the tray
   stopTray();
-  // Create the task
+  printf("Stopped tray\n");
+// Create the task
   asyncTrayHandle = std::make_unique<pros::Task>(asyncTrayTask, nullptr, TASK_PRIORITY_DEFAULT + 1);
+  printf("Started task\n");
   mutexes[MUTEX_ASYNC_TRAY].give();
   printf("~~~~~~~~~~~~~~Finished startAsyncTrayController~~~~~~~~~~~~~~~\n");
 }

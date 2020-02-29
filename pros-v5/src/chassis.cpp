@@ -1,10 +1,10 @@
 #include "main.h"
 
 // Drive motor ports
-const int PORT_leftMotor0 = 2;
-const int PORT_leftMotor1 = 3;
-const int PORT_rightMotor0 = 9;
-const int PORT_rightMotor1 = 8;
+const int PORT_leftMotor0 = 6;
+const int PORT_leftMotor1 = 10;
+const int PORT_rightMotor0 = 16;
+const int PORT_rightMotor1 = 20;
 
 std::shared_ptr<ChassisController> chassis;
 

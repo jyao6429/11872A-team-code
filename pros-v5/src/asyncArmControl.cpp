@@ -1,9 +1,9 @@
 #include "main.h"
 
 // Devices for arms
-Motor armMotor(6);
-Motor leftIntakeMotor(7);
-Motor rightIntakeMotor(-4);
+Motor armMotor(15);
+Motor leftIntakeMotor(1);
+Motor rightIntakeMotor(-11);
 
 // The next target position for the arm
 int nextArmTarget;
@@ -64,6 +64,7 @@ void moveArmsLowAsync() { moveArmsToPosition(ARM_LOW); }
 void moveArmsMedAsync() { moveArmsToPosition(ARM_MED); }
 void resetArm()
 {
+  printf("Resetting arms\n");
   setArms(-10);
   pros::delay(250);
   armMotor.tarePosition();
