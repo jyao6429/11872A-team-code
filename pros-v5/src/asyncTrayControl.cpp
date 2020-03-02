@@ -14,7 +14,7 @@ int nextTrayTarget;
 
 void initTray()
 {
-  trayMotor.setGearing(AbstractMotor::gearset::red);
+  trayMotor.setGearing(AbstractMotor::gearset::green);
   startAsyncTrayController();
 }
 void asyncTrayTask(void *ignore)

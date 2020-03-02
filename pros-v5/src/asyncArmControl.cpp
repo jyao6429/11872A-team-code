@@ -11,7 +11,7 @@ int nextArmTarget;
 void initArm()
 {
   // Set arm motor properties
-  armMotor.setGearing(AbstractMotor::gearset::red);
+  armMotor.setGearing(AbstractMotor::gearset::green);
   armMotor.setBrakeMode(AbstractMotor::brakeMode::hold);
   armMotor.setEncoderUnits(AbstractMotor::encoderUnits::degrees);
 
@@ -22,9 +22,9 @@ void initArm()
   resetArm();
 
   // Set intake motor properties
-  leftIntakeMotor.setGearing(AbstractMotor::gearset::green);
+  leftIntakeMotor.setGearing(AbstractMotor::gearset::red);
   leftIntakeMotor.setBrakeMode(AbstractMotor::brakeMode::brake);
-  rightIntakeMotor.setGearing(AbstractMotor::gearset::green);
+  rightIntakeMotor.setGearing(AbstractMotor::gearset::red);
   rightIntakeMotor.setBrakeMode(AbstractMotor::brakeMode::brake);
 }
 void startAsyncArmController()
