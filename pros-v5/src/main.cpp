@@ -28,6 +28,7 @@ void disabled()
 {
 	stopAPS();
 	stopAsyncChassisController();
+	stopTesting();
 }
 
 /**
@@ -58,6 +59,12 @@ void autonomous()
 
 	if (isConfirmed)
 		isTesting = false;
+
+	if (isTesting)
+	{
+		startTesting();
+		return;
+	}
 
 	if (color == AUTO_COLOR_SKILLS)
 	{
