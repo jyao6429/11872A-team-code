@@ -52,6 +52,7 @@
 #include "asyncChassisControl.hpp"
 #include "asyncTrayControl.hpp"
 #include "asyncArmControl.hpp"
+#include "lcdSelector.hpp"
 #include "auto.hpp"
 #include "tests.hpp"
 

@@ -1,33 +1,15 @@
 #include "main.h"
 
 /**
- * A callback function for LLEMU's center button.
- *
- * When this callback is fired, it will toggle line 2 of the LCD text between
- * "I was pressed!" and nothing.
- */
-void on_center_button() {
-	static bool pressed = false;
-	pressed = !pressed;
-	if (pressed) {
-		pros::lcd::set_text(2, "I was pressed!");
-	} else {
-		pros::lcd::clear_line(2);
-	}
-}
-
-/**
  * Runs initialization code. This occurs as soon as the program is started.
  *
  * All other competition modes are blocked by initialize; it is recommended
  * to keep execution time for this mode under a few seconds.
  */
-void initialize() {
-	pros::lcd::initialize();
-	pros::lcd::set_text(1, "Hello PROS User!");
-
-	pros::lcd::register_btn1_cb(on_center_button);
-
+void initialize()
+{
+	printf("Initializing LCD\n");
+	initLCD();
 	printf("Initializing Arm\n");
 	initArm();
 	printf("Initializing Drive\n");
@@ -72,26 +54,42 @@ void competition_initialize() {}
  */
 void autonomous()
 {
-	// Choose the correct autonomous
-  switch (chosenAuto)
+	bool isTesting = false;
+
+	if (isConfirmed)
+		isTesting = false;
+
+	if (color == AUTO_COLOR_SKILLS)
+	{
+		return;
+	}
+	if (side == SIDE_SMALL)
   {
-    case AUTO_BLUE_SMALL:
-      autoBlueSmallSuperSafe();
-      break;
-    case AUTO_BLUE_LARGE:
-      autoBlueLargeSuperSafe();
-      break;
-    case AUTO_RED_SMALL:
-      autoRedSmallSuperSafe();
-      break;
-    case AUTO_RED_LARGE:
-      autoRedLargeSuperSafe();
-      break;
-    case AUTO_SKILLS:
-      autoSkillsSuperSafe();
-      break;
-    case AUTO_NONE:
-      break;
+    switch (smallGoalAuto)
+    {
+      case SMALL_9PT:
+				break;
+      case SMALL_8PT:
+				break;
+      case SMALL_7PT:
+				break;
+    	case SMALL_6PT:
+				break;
+      case SMALL_5PT:
+				break;
+      case SMALL_1PT:
+				break;
+    }
+  }
+  else
+  {
+    switch (largeGoalAuto)
+    {
+      case LARGE_5PT:
+				break;
+      case LARGE_1PT:
+				break;
+    }
   }
 }
 
@@ -198,7 +196,8 @@ void opcontrol()
 		}
 		if (armOverrideButton.isPressed())
 		{
-			if ((getArmPosition() > ARM_MED + 500 && leftPower > 0) || (getArmPosition() < ARM_ZERO - 20 && leftPower < 0))
+			nextArmTarget = -1;
+			if ((getArmPosition() > ARM_MED + 500 && leftPower > 0) || (getArmPosition() < ARM_ZERO && leftPower < 0))
 				leftPower = 0;
 
 			setArms(leftPower);

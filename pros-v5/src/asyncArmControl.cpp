@@ -13,6 +13,7 @@ void initArm()
   // Set arm motor properties
   armMotor.setGearing(AbstractMotor::gearset::red);
   armMotor.setBrakeMode(AbstractMotor::brakeMode::hold);
+  armMotor.setEncoderUnits(AbstractMotor::encoderUnits::degrees);
 
   // Reset arm controllers
   mutexes[MUTEX_ASYNC_ARM].take(500);

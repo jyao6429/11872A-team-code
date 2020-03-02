@@ -1,7 +1,6 @@
 #ifndef AUTO_H
 #define AUTO_H
 
-// Enums for each autonomous routine
 typedef enum AutoOptions
 {
   AUTO_NONE,
