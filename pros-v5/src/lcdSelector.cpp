@@ -19,12 +19,12 @@ void updateText()
   if (!isConfirmed)
   {
     pros::lcd::set_text(1, "SELECTING AUTON: UNCONFIRMED");
-    pros::lcd::set_text(7, "Color & Side\t\tScript\t\tConfirm?");
+    pros::lcd::set_text(7, "Side       Script     Confirm?");
   }
   else
   {
     pros::lcd::set_text(1, "SELECTING AUTON: CONFIRMED");
-    pros::lcd::set_text(7, "Color & Side\t\tScript\t\tCancel?");
+    pros::lcd::set_text(7, "Side       Script     Cancel?");
   }
 
   // Text for skills

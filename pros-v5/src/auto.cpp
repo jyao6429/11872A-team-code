@@ -13,44 +13,145 @@
 
 AutoOptions chosenAuto;
 
+// Functions
 void deploy()
 {
-
+  moveArmsLowAsync();
+  waitUntilArmMoveComplete(1000);
   moveArmsZeroAsync();
-  moveTrayVerticalAsync();
-  //delay(1500);
-  //setRollers(-127);
-  waitUntilTrayMoveComplete();
-  //delay(750);
-  //moveTrayAngledAsync();
-  //waitUntilTrayMoveComplete();
-  //stopRollers();
+  setRollers(127);
+  waitUntilArmMoveComplete();
 }
-void score()
+void autoScoreSmall(AutoColor alliance, bool needsOuttake)
 {
+  // Variables for alliance specific motions
+  double XCoord = 0.0;
+  if (alliance == AUTO_COLOR_RED)
+    XCoord = FIELD_WIDTH - XCoord;
+
+  // 1. Turn towards small goal
+  turnToTargetNewAsync(XCoord, 0.0, TURN_CH, 0.6, 25, 10, 0.0, true, true);
+  waitUntilChassisMoveComplete();
+
+  // 2. Drive towards small goal, and score the stack
+  XCoord = 14.0;
+  double XCoord1 = 26.4;
+  if (alliance == AUTO_COLOR_RED)
+  {
+    XCoord = FIELD_WIDTH - XCoord;
+    XCoord1 = FIELD_WIDTH - XCoord1;
+  }
+  moveToTargetSimpleAsync(XCoord, 14.0, XCoord1, 26.4, 100, 0, 0.5, 0, 0, 0, STOP_NONE, MTT_PROPORTIONAL);
+  waitUntilChassisMoveComplete();
+
   // Variables to make sure robot is against wall
   unsigned long stopTimer = pros::millis();
   bool isStopped = false;
 
-  // Keep driving forwards until robot is still for 350 milliseconds
+  // 4. Keep driving forwards until robot is still for 250 milliseconds
   while (!isStopped)
   {
-    setDrive(0.4, 0.4);
+    setDrive(60, 60);
 
     if (!isRobotStopped())
       stopTimer = pros::millis();
 
-    if (pros::millis() - stopTimer > 350)
+    if (pros::millis() - stopTimer > 250)
     {
       isStopped = true;
-      setDrive(0.05, 0.05);
+      setDrive(5, 5);
     }
+    pros::delay(10);
   }
 
-  // Tilt the stack vertical for scoring
+  // 5. Outtake if needed
+  if (needsOuttake)
+  {
+    setRollers(-50);
+    pros::delay(600);
+    stopRollers();
+  }
+
+  // 6. Tilt the stack vertical for scoring
   moveTrayVerticalAsync();
   waitUntilTrayMoveComplete();
+
+  // 7. Back up and move tray back while outtaking
+  setDrive(-60, -60);
+  setRollersVel(-100);
+  moveTrayAngledAsync();
+  pros::delay(1000);
+  stopDrive();
+  stopRollers();
 }
+void autoRunOfFour(AutoColor alliance, bool backUp, bool getFifth)
+{
+  // Variable used for alliance
+  double XCoord = 26.4;
+  if (alliance == AUTO_COLOR_RED)
+    XCoord = FIELD_WIDTH - XCoord;
+
+  // 1. Start rollers and drive forward to collect preload and 4 cubes
+  moveArmsZeroAsync();
+  setRollers(127);
+  moveToTargetSimpleAsync(XCoord, 54.0, XCoord, BACK_TO_CENTER, MAX_INTAKE_CHASSIS_V, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_SIMPLE);
+  waitUntilChassisMoveComplete();
+
+  if (getFifth)
+  {
+
+  }
+
+  if (backUp)
+  {
+    // 2. Drive backwards to diagonal for scoring
+    moveToTargetSimpleAsync(XCoord, 26.4, XCoord, globalPose.y, -100, 0, 0.5, 0, 20, 0, STOP_SOFT, MTT_CASCADING);
+    waitUntilChassisMoveComplete();
+  }
+}
+void autoRunOfThree(AutoColor alliance, bool backUp)
+{
+  // Variable used for alliance
+  double XCoord = 26.4;
+  if (alliance == AUTO_COLOR_RED)
+    XCoord = FIELD_WIDTH - XCoord;
+
+  // 1. Start rollers and drive forward to collect preload and 4 cubes
+  moveArmsZeroAsync();
+  setRollers(127);
+  moveToTargetSimpleAsync(XCoord, 54.0, XCoord, BACK_TO_CENTER, MAX_INTAKE_CHASSIS_V, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_SIMPLE);
+  waitUntilChassisMoveComplete();
+}
+
+// Small goal scripts
+void autoSmall9Pt(AutoColor alliance)
+{
+  double XCoord = 0;
+  // Reset to proper pose on the field and deploy
+  resetPositionFull(&globalPose, 0.0, 0.0, 0.0, true);
+	resetVelocity(&globalVel, globalPose);
+  deploy();
+  autoRunOfThree(alliance, true);
+  autoRunOfFour(alliance, true, false);
+  autoScoreSmall(alliance, true);
+}
+// Large goal scripts
+// Shared scripts
+void autoOnePt()
+{
+  // Reset to proper pose on the field
+  resetPositionFull(&globalPose, 0.0, 0.0, 0.0, true);
+	resetVelocity(&globalVel, globalPose);
+
+  // 1. Back up and forward
+  moveToTargetSimple(0.0, -8.0, 0.0, 0.0, -127, 0, 2.0, 0, 0, 0, STOP_SOFT, MTT_SIMPLE);
+  moveToTargetSimple(0.0, 8.0, 0.0, 0.0, 127, 0, 2.0, 0, 0, 0, STOP_SOFT, MTT_SIMPLE);
+
+  // 2. Deploy
+  deploy();
+}
+
+// OLD STUFF
 void autoSkillsSuperSafe()
 {
   // Reset to proper pose on the field and deploy

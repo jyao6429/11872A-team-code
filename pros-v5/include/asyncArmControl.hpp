@@ -4,9 +4,9 @@
 #include "main.h"
 
 #define ARM_ZERO 0
-#define ARM_SECOND 500
-#define ARM_LOW 1630
-#define ARM_MED 2300
+#define ARM_SECOND 90
+#define ARM_LOW 340
+#define ARM_MED 560
 
 // The next move to be performed by the robot
 extern int nextArmTarget;
@@ -23,6 +23,7 @@ void startAsyncArmController();
  * Stops the async controller and resets variables to defaults
  */
 void stopAsyncArmController();
+bool waitUntilArmMoveComplete(int timeout);
 /**
  * Waits until the arm completes the current motion
  */

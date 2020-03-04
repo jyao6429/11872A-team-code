@@ -96,6 +96,17 @@ void asyncTrayTask(void *ignore)
     pros::delay(10);
   }
 }
+bool waitUntilTrayMoveComplete(int timeout)
+{
+  uint32_t timer = pros::millis();
+  while (!isTrayAtTarget)
+  {
+    if (pros::millis() - timer > timeout)
+      return true;
+    pros::delay(40);
+  }
+  return false;
+}
 void waitUntilTrayMoveComplete()
 {
   while (!isTrayAtTarget) { pros::delay(40); }

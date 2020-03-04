@@ -85,6 +85,7 @@ void autonomous()
       case SMALL_5PT:
 				break;
       case SMALL_1PT:
+				//autoOnePt();
 				break;
     }
   }

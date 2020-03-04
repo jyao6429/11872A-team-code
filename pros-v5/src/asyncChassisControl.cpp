@@ -47,6 +47,17 @@ void asyncChassisTask(void *ignore)
   isChassisMoving = false;
   mutexes[MUTEX_ASYNC_CHASSIS].give();
 }
+bool waitUntilChassisMoveComplete(int timeout)
+{
+  uint32_t timer = pros::millis();
+  while (isChassisMoving)
+  {
+    if (pros::millis() - timer > timeout)
+      return true;
+    pros::delay(40);
+  }
+  return false;
+}
 void waitUntilChassisMoveComplete()
 {
   while (isChassisMoving) { pros::delay(40); }

@@ -42,9 +42,21 @@ void stopAsyncArmController()
   nextArmTarget = -1;
   mutexes[MUTEX_ASYNC_ARM].give();
 }
+bool waitUntilArmMoveComplete(int timeout)
+{
+  uint32_t timer = pros::millis();
+  while (abs(getArmPosition() - nextArmTarget) > 10)
+  {
+    if (pros::millis() - timer > timeout)
+      return true;
+
+    pros::delay(40);
+  }
+  return false;
+}
 void waitUntilArmMoveComplete()
 {
-  while (abs(getArmPosition() - nextArmTarget) > 50) { pros::delay(40); }
+  while (abs(getArmPosition() - nextArmTarget) > 10) { pros::delay(40); }
 }
 void moveArmsToPosition(int armTarget)
 {
