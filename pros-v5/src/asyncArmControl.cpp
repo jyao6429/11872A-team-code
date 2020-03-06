@@ -85,7 +85,7 @@ void resetArm()
 }
 bool needsTrayOverride()
 {
-  return (nextArmTarget >= 0) && (nextArmTarget == ARM_LOW || nextArmTarget == ARM_MED || (nextArmTarget == ARM_ZERO && abs(getArmPosition() - nextArmTarget) > 100));
+  return (nextArmTarget >= 0) && (nextArmTarget == ARM_LOW || nextArmTarget == ARM_MED || (nextArmTarget == ARM_ZERO && abs(getArmPosition() - nextArmTarget) > 200));
 }
 double getArmPosition()
 {

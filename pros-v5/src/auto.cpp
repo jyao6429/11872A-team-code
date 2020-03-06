@@ -126,38 +126,117 @@ void autoRunOfFour(AutoColor alliance, bool backUp, bool getFifth)
 void autoRunOfThree(AutoColor alliance, bool backUpTo4, bool get2Stack)
 {
   // Variable used for alliance
-  double XCoord = 26.4;
+  double XCoord = 50.4;
   if (alliance == AUTO_COLOR_RED)
     XCoord = FIELD_WIDTH - XCoord;
 
   // 1. Start rollers and drive forward to collect preload and 4 cubes
   moveArmsZeroAsync();
   setRollers(127);
-  moveToTargetSimpleAsync(XCoord, 54.0, XCoord, BACK_TO_CENTER, MAX_INTAKE_CHASSIS_V, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_SIMPLE);
+  moveToTargetSimpleAsync(XCoord, 39.0, XCoord, BACK_TO_CENTER, MAX_INTAKE_CHASSIS_V, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_SIMPLE);
   waitUntilChassisMoveComplete(8000, 250, true);
 
   if (get2Stack)
   {
+    // 2. Move arms up to grab second cube and bring down to lower cube
     moveArmsSecondAsync();
+    moveToTargetSimpleAsync(XCoord, 54.0, XCoord, BACK_TO_CENTER, MAX_INTAKE_CHASSIS_V, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_SIMPLE);
     waitUntilArmMoveComplete(500);
-
+    moveArmsZeroAsync();
+    waitUntilArmMoveComplete(500);
+    waitUntilChassisMoveComplete(3000, 250, true);
   }
 
   if (backUpTo4)
   {
+    // 3. Back up a bit
+    moveToTargetSimpleAsync(XCoord, 44.0, XCoord, 54.0, -100, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_CASCADING);
+    waitUntilChassisMoveComplete(2000, 250, false);
 
+    // 4. Drive diagonally to run of 4
+    double XCoord1 = 26.4;
+    if (alliance == AUTO_COLOR_RED)
+      XCoord1 = FIELD_WIDTH - XCoord1;
+    moveToTargetSimpleAsync(XCoord1, 15.0, XCoord, 44.0, -100, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_CASCADING);
+    waitUntilChassisMoveComplete(5000, 250, false);
+
+    // 5. Turn to face forwards
+    turnToAngleNewAsync(0.0, TURN_CH, 0.6, 25, 10, true, false);
+    waitUntilChassisMoveComplete(2000, 250, true);
   }
 }
 
+// Skills scripts
+void autoSkills()
+{
+
+}
 // Small goal scripts
 void autoSmall9Pt(AutoColor alliance)
 {
-  double XCoord = 0;
+  double XCoord = 50.4;
+  if (alliance == AUTO_COLOR_RED)
+    XCoord = FIELD_WIDTH - XCoord;
+
   // Reset to proper pose on the field and deploy
-  resetPositionFull(&globalPose, 0.0, 0.0, 0.0, true);
+  resetPositionFull(&globalPose, XCoord, 0.0, 0.0, true);
 	resetVelocity(&globalVel, globalPose);
   deploy();
   autoRunOfThree(alliance, true, true);
+  autoRunOfFour(alliance, true, false);
+  autoScoreSmall(alliance, true);
+}
+void autoSmall8Pt(AutoColor alliance)
+{
+  double XCoord = 50.4;
+  if (alliance == AUTO_COLOR_RED)
+    XCoord = FIELD_WIDTH - XCoord;
+
+  // Reset to proper pose on the field and deploy
+  resetPositionFull(&globalPose, XCoord, 0.0, 0.0, true);
+	resetVelocity(&globalVel, globalPose);
+  deploy();
+  autoRunOfThree(alliance, true, false);
+  autoRunOfFour(alliance, true, true);
+  autoScoreSmall(alliance, true);
+}
+void autoSmall7Pt(AutoColor alliance)
+{
+  double XCoord = 50.4;
+  if (alliance == AUTO_COLOR_RED)
+    XCoord = FIELD_WIDTH - XCoord;
+
+  // Reset to proper pose on the field and deploy
+  resetPositionFull(&globalPose, XCoord, 0.0, 0.0, true);
+	resetVelocity(&globalVel, globalPose);
+  deploy();
+  autoRunOfThree(alliance, true, false);
+  autoRunOfFour(alliance, true, false);
+  autoScoreSmall(alliance, true);
+}
+void autoSmall6Pt(AutoColor alliance)
+{
+  double XCoord = 26.4;
+  if (alliance == AUTO_COLOR_RED)
+    XCoord = FIELD_WIDTH - XCoord;
+
+  // Reset to proper pose on the field and deploy
+  resetPositionFull(&globalPose, XCoord, 0.0, 0.0, true);
+	resetVelocity(&globalVel, globalPose);
+  deploy();
+  autoRunOfFour(alliance, true, true);
+  autoScoreSmall(alliance, true);
+}
+void autoSmall5Pt(AutoColor alliance)
+{
+  double XCoord = 26.4;
+  if (alliance == AUTO_COLOR_RED)
+    XCoord = FIELD_WIDTH - XCoord;
+
+  // Reset to proper pose on the field and deploy
+  resetPositionFull(&globalPose, XCoord, 0.0, 0.0, true);
+	resetVelocity(&globalVel, globalPose);
+  deploy();
   autoRunOfFour(alliance, true, false);
   autoScoreSmall(alliance, true);
 }
