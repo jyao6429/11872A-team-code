@@ -11,7 +11,7 @@ int nextArmTarget;
 void initArm()
 {
   // Set arm motor properties
-  armMotor.setGearing(AbstractMotor::gearset::green);
+  armMotor.setGearing(AbstractMotor::gearset::red);
   armMotor.setBrakeMode(AbstractMotor::brakeMode::hold);
   armMotor.setEncoderUnits(AbstractMotor::encoderUnits::degrees);
 
@@ -62,7 +62,7 @@ void moveArmsToPosition(int armTarget)
 {
   startAsyncTrayController();
   // Make sure target is within range
-  armTarget = (armTarget > ARM_MED + 500) ? ARM_MED + 500 : armTarget;
+  armTarget = (armTarget > ARM_MED + 50) ? ARM_MED + 50 : armTarget;
   armTarget = (armTarget < ARM_ZERO) ? ARM_ZERO: armTarget;
 
   // Set arm targets
@@ -85,7 +85,7 @@ void resetArm()
 }
 bool needsTrayOverride()
 {
-  return (nextArmTarget >= 0) && (nextArmTarget != ARM_ZERO || (nextArmTarget == ARM_ZERO && abs(getArmPosition() - nextArmTarget) > 1000));
+  return (nextArmTarget >= 0) && (nextArmTarget == ARM_LOW || nextArmTarget == ARM_MED || (nextArmTarget == ARM_ZERO && abs(getArmPosition() - nextArmTarget) > 100));
 }
 double getArmPosition()
 {

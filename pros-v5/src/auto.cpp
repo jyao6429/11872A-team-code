@@ -16,11 +16,13 @@ AutoOptions chosenAuto;
 // Functions
 void deploy()
 {
-  moveArmsLowAsync();
-  waitUntilArmMoveComplete(1000);
+  moveArmsMedAsync();
+  pros::delay(500);
+  setRollers(-127);
+  waitUntilArmMoveComplete(2000);
   moveArmsZeroAsync();
   setRollers(127);
-  waitUntilArmMoveComplete();
+  waitUntilArmMoveComplete(2000);
 }
 void autoScoreSmall(AutoColor alliance, bool needsOuttake)
 {
@@ -31,7 +33,7 @@ void autoScoreSmall(AutoColor alliance, bool needsOuttake)
 
   // 1. Turn towards small goal
   turnToTargetNewAsync(XCoord, 0.0, TURN_CH, 0.6, 25, 10, 0.0, true, true);
-  waitUntilChassisMoveComplete();
+  waitUntilChassisMoveComplete(4000, 250, false);
 
   // 2. Drive towards small goal, and score the stack
   XCoord = 14.0;
@@ -42,7 +44,7 @@ void autoScoreSmall(AutoColor alliance, bool needsOuttake)
     XCoord1 = FIELD_WIDTH - XCoord1;
   }
   moveToTargetSimpleAsync(XCoord, 14.0, XCoord1, 26.4, 100, 0, 0.5, 0, 0, 0, STOP_NONE, MTT_PROPORTIONAL);
-  waitUntilChassisMoveComplete();
+  waitUntilChassisMoveComplete(2000, 200, true);
 
   // Variables to make sure robot is against wall
   unsigned long stopTimer = pros::millis();
@@ -72,15 +74,27 @@ void autoScoreSmall(AutoColor alliance, bool needsOuttake)
     stopRollers();
   }
 
-  // 6. Tilt the stack vertical for scoring
+  // 6. Tilt the stack vertical and outtake to drop stack for scoring
   moveTrayVerticalAsync();
-  waitUntilTrayMoveComplete();
+  while (getTrayPot() < 1500)
+  {
+    // Handle outtake when stacking
+		if (getTrayPot() > 1200 && getTrayPot() < 1500 && nextTrayTarget == TRAY_VERTICAL)
+		{
+			setRollers(-70);
+		}
+  }
+  stopRollers();
+  waitUntilTrayMoveComplete(2000);
 
-  // 7. Back up and move tray back while outtaking
-  setDrive(-60, -60);
-  setRollersVel(-100);
+  // 6.5. Push forward a bit
+  setDrive(40, 40);
+  pros::delay(500);
+
+  // 7. Back up and move tray back
+  setDrive(-100, -100);
   moveTrayAngledAsync();
-  pros::delay(1000);
+  pros::delay(600);
   stopDrive();
   stopRollers();
 }
@@ -95,7 +109,7 @@ void autoRunOfFour(AutoColor alliance, bool backUp, bool getFifth)
   moveArmsZeroAsync();
   setRollers(127);
   moveToTargetSimpleAsync(XCoord, 54.0, XCoord, BACK_TO_CENTER, MAX_INTAKE_CHASSIS_V, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_SIMPLE);
-  waitUntilChassisMoveComplete();
+  waitUntilChassisMoveComplete(8000, 250, true);
 
   if (getFifth)
   {
@@ -106,10 +120,10 @@ void autoRunOfFour(AutoColor alliance, bool backUp, bool getFifth)
   {
     // 2. Drive backwards to diagonal for scoring
     moveToTargetSimpleAsync(XCoord, 26.4, XCoord, globalPose.y, -100, 0, 0.5, 0, 20, 0, STOP_SOFT, MTT_CASCADING);
-    waitUntilChassisMoveComplete();
+    waitUntilChassisMoveComplete(4000, 250, true);
   }
 }
-void autoRunOfThree(AutoColor alliance, bool backUp)
+void autoRunOfThree(AutoColor alliance, bool backUpTo4, bool get2Stack)
 {
   // Variable used for alliance
   double XCoord = 26.4;
@@ -120,7 +134,19 @@ void autoRunOfThree(AutoColor alliance, bool backUp)
   moveArmsZeroAsync();
   setRollers(127);
   moveToTargetSimpleAsync(XCoord, 54.0, XCoord, BACK_TO_CENTER, MAX_INTAKE_CHASSIS_V, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_SIMPLE);
-  waitUntilChassisMoveComplete();
+  waitUntilChassisMoveComplete(8000, 250, true);
+
+  if (get2Stack)
+  {
+    moveArmsSecondAsync();
+    waitUntilArmMoveComplete(500);
+
+  }
+
+  if (backUpTo4)
+  {
+
+  }
 }
 
 // Small goal scripts
@@ -131,7 +157,7 @@ void autoSmall9Pt(AutoColor alliance)
   resetPositionFull(&globalPose, 0.0, 0.0, 0.0, true);
 	resetVelocity(&globalVel, globalPose);
   deploy();
-  autoRunOfThree(alliance, true);
+  autoRunOfThree(alliance, true, true);
   autoRunOfFour(alliance, true, false);
   autoScoreSmall(alliance, true);
 }

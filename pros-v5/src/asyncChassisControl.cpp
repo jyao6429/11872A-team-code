@@ -47,16 +47,39 @@ void asyncChassisTask(void *ignore)
   isChassisMoving = false;
   mutexes[MUTEX_ASYNC_CHASSIS].give();
 }
-bool waitUntilChassisMoveComplete(int timeout)
+bool waitUntilChassisMoveComplete(int timeout, int stoppedTime, bool needsStop)
 {
   uint32_t timer = pros::millis();
+  uint32_t stopTimer = pros::millis();
+
+  bool isOverride = false;
   while (isChassisMoving)
   {
     if (pros::millis() - timer > timeout)
-      return true;
+    {
+      isOverride = true;
+      break;
+    }
+
+    if (!isRobotStopped())
+      stopTimer = pros::millis();
+
+    if (pros::millis() - stopTimer > stoppedTime)
+    {
+      isOverride = true;
+      break;
+    }
+
     pros::delay(40);
   }
-  return false;
+  if (isOverride && needsStop)
+    stopAsyncChassisController();
+
+  return isOverride;
+}
+bool waitUntilChassisMoveComplete(int timeout, bool needsStop)
+{
+  return waitUntilChassisMoveComplete(timeout, 1000000, needsStop);
 }
 void waitUntilChassisMoveComplete()
 {

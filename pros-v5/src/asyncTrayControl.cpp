@@ -14,7 +14,7 @@ int nextTrayTarget;
 
 void initTray()
 {
-  trayMotor.setGearing(AbstractMotor::gearset::green);
+  trayMotor.setGearing(AbstractMotor::gearset::red);
   startAsyncTrayController();
 }
 void asyncTrayTask(void *ignore)
@@ -193,4 +193,8 @@ void setTrayVel(double speed)
 void stopTray()
 {
   trayMotor.moveVoltage(0);
+}
+bool isTrayMotorOverTemp()
+{
+  return trayMotor.isOverTemp();
 }

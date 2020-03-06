@@ -5,7 +5,7 @@
 
 #define TRAY_ANGLED 310
 #define TRAY_VERTICAL 2500
-#define TRAY_ARM 900
+#define TRAY_ARM 600
 
 // Variables for handling async tasks
 // Keeps track if the tray is at the target
@@ -17,6 +17,7 @@ extern int nextTrayTarget;
  * Initialized the tray motor and controller
  */
 void initTray();
+bool waitUntilTrayMoveComplete(int timeout);
 /**
  * Waits until the tray completes the current motion
  */
@@ -75,4 +76,5 @@ void setTrayVel(double speed);
  * Stops the tray motor
  */
 void stopTray();
+bool isTrayMotorOverTemp();
 #endif

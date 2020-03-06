@@ -147,6 +147,12 @@ void opcontrol()
 		// Variable for roller power
 		int rollerPower = 0;
 
+		// Handle outtake when stacking
+		if (getTrayPot() > 1200 && getTrayPot() < 1500 && nextTrayTarget == TRAY_VERTICAL)
+		{
+			rollerPower = -70;
+		}
+
 		// Handle the arm shift
 		if (armShiftButton.isPressed())
 		{
@@ -221,6 +227,15 @@ void opcontrol()
 			setRollersVel(0);
 		else
 			setRollers(rollerPower);
+
+		// Print and rumble controller if tray motor is overheated
+		uint32_t trayTTimer = pros::millis();
+		if (isTrayMotorOverTemp() && pros::millis() - trayTTimer > 500)
+		{
+			controller.setText(0, 0, "Tray Over Temp");
+			controller.rumble("-");
+			trayTTimer = pros::millis();
+		}
 
 		pros::delay(10);
 	}

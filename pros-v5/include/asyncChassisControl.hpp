@@ -41,6 +41,9 @@ typedef struct TTTRegularContainer
   bool harshStop, isDegrees;
 } TTTRegularContainer;
 
+bool waitUntilChassisMoveComplete(int timeout, int stoppedTime, bool needsStop);
+bool waitUntilChassisMoveComplete(int timeout, bool needsStop);
+bool waitUntilChassisMoveComplete(int timeout);
 /**
  * Waits until the robot completes the current motion
  */
