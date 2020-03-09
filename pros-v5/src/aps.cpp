@@ -12,7 +12,7 @@ double resetAngle;
 std::unique_ptr<pros::Task> APSTask;
 
 // Encoders themselves
-ADIEncoder leftEncoder('A', 'B', true);
+ADIEncoder leftEncoder('A', 'B', false);
 ADIEncoder rightEncoder('E', 'F', true);
 ADIEncoder backEncoder('C', 'D', true);
 

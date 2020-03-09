@@ -24,7 +24,7 @@ void deploy()
   setRollers(127);
   waitUntilArmMoveComplete(2000);
 }
-void autoScoreSmall(AutoColor alliance, bool needsOuttake)
+void autoScoreSmall(AutoColor alliance, bool needsOuttake, bool needsReset)
 {
   // Variables for alliance specific motions
   double XCoord = 0.0;
@@ -79,10 +79,11 @@ void autoScoreSmall(AutoColor alliance, bool needsOuttake)
   while (getTrayPot() < 1500)
   {
     // Handle outtake when stacking
-		if (getTrayPot() > 1200 && getTrayPot() < 1500 && nextTrayTarget == TRAY_VERTICAL)
+		if (getTrayPot() > 1100 && getTrayPot() < 1400 && nextTrayTarget == TRAY_VERTICAL)
 		{
-			setRollers(-70);
+			setRollers(-50);
 		}
+    pros::delay(10);
   }
   stopRollers();
   waitUntilTrayMoveComplete(2000);
@@ -184,7 +185,7 @@ void autoSmall9Pt(AutoColor alliance)
   deploy();
   autoRunOfThree(alliance, true, true);
   autoRunOfFour(alliance, true, false);
-  autoScoreSmall(alliance, true);
+  autoScoreSmall(alliance, true, false);
 }
 void autoSmall8Pt(AutoColor alliance)
 {
@@ -198,7 +199,7 @@ void autoSmall8Pt(AutoColor alliance)
   deploy();
   autoRunOfThree(alliance, true, false);
   autoRunOfFour(alliance, true, true);
-  autoScoreSmall(alliance, true);
+  autoScoreSmall(alliance, true, false);
 }
 void autoSmall7Pt(AutoColor alliance)
 {
@@ -212,7 +213,7 @@ void autoSmall7Pt(AutoColor alliance)
   deploy();
   autoRunOfThree(alliance, true, false);
   autoRunOfFour(alliance, true, false);
-  autoScoreSmall(alliance, true);
+  autoScoreSmall(alliance, true, false);
 }
 void autoSmall6Pt(AutoColor alliance)
 {
@@ -225,7 +226,7 @@ void autoSmall6Pt(AutoColor alliance)
 	resetVelocity(&globalVel, globalPose);
   deploy();
   autoRunOfFour(alliance, true, true);
-  autoScoreSmall(alliance, true);
+  autoScoreSmall(alliance, true, false);
 }
 void autoSmall5Pt(AutoColor alliance)
 {
@@ -238,7 +239,7 @@ void autoSmall5Pt(AutoColor alliance)
 	resetVelocity(&globalVel, globalPose);
   deploy();
   autoRunOfFour(alliance, true, false);
-  autoScoreSmall(alliance, true);
+  autoScoreSmall(alliance, true, false);
 }
 // Large goal scripts
 // Shared scripts

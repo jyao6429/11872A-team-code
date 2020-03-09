@@ -135,6 +135,10 @@ void opcontrol()
 	// handles tray toggling
 	bool isTrayVertical = false;
 
+	resetPositionFull(&globalPose, 0.0, 0.0, 0.0, true);
+	resetVelocity(&globalVel, globalPose);
+	ControllerButton apsReset(ControllerDigital::B);
+
 	while (true)
 	{
 		// Get power for drivetrain, match to cubic function for more precision in slow movements
@@ -148,9 +152,9 @@ void opcontrol()
 		int rollerPower = 0;
 
 		// Handle outtake when stacking
-		if (getTrayPot() > 1200 && getTrayPot() < 1500 && nextTrayTarget == TRAY_VERTICAL)
+		if (getTrayPot() > 1100 && getTrayPot() < 1400 && nextTrayTarget == TRAY_VERTICAL)
 		{
-			rollerPower = -70;
+			rollerPower = -50;
 		}
 
 		// Handle the arm shift
@@ -236,6 +240,20 @@ void opcontrol()
 			controller.rumble("-");
 			trayTTimer = pros::millis();
 		}
+
+		char APSXY[80];
+		sprintf(APSXY, "X: %3.3f Y: %3.3f", globalPose.x, globalPose.y);
+		char APSA[80];
+		sprintf(APSA, "A: %3.3f", radToDeg(globalPose.angle));
+		if (apsReset.changedToPressed())
+		{
+			resetPositionFull(&globalPose, 0.0, 0.0, 0.0, true);
+			resetVelocity(&globalVel, globalPose);
+		}
+
+		pros::lcd::set_text(5, APSXY);
+		pros::lcd::set_text(6, APSA);
+
 
 		pros::delay(10);
 	}
