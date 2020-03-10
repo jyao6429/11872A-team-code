@@ -12,6 +12,7 @@ typedef enum AutoOptions
 } AutoOptions;
 
 extern AutoOptions chosenAuto;
+extern uint32_t autoTimer;
 
 /**
  * Action in the beginning to deploy
@@ -21,15 +22,22 @@ void autoScoreSmall(AutoColor alliance, bool needsOuttake, bool needsReset);
 void autoRunOfFour(AutoColor alliance, bool backUp, bool getFifth);
 void autoRunOfThree(AutoColor alliance, bool backUpTo4, bool get2Stack);
 
+// Testing scripts
+void autoTest0();
+
+// Skills scripts
 void autoSkills();
+
+// Small goal scripts
 void autoSmall9Pt(AutoColor alliance);
 void autoSmall8Pt(AutoColor alliance);
 void autoSmall7Pt(AutoColor alliance);
 void autoSmall6Pt(AutoColor alliance);
 void autoSmall5Pt(AutoColor alliance);
 
+void autoOnePt();
 
-
+// Old stuff
 void autoSkillsSuperSafe();
 void autoBlueSmallSafe();
 void autoBlueSmallSuperSafe();

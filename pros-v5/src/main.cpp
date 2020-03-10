@@ -55,19 +55,29 @@ void competition_initialize() {}
  */
 void autonomous()
 {
-	bool isTesting = false;
+	bool isTesting = true;
 
 	if (isConfirmed)
 		isTesting = false;
 
+	// Timer for auton
+	autoTimer = pros::millis();
+	char autoT[80];
+
 	if (isTesting)
 	{
-		startTesting();
+		//startTesting();
+		autoTest0();
+		sprintf(autoT, "AUTO TIME: %d", autoTimer);
+		pros::lcd::set_text(6, autoT);
 		return;
 	}
 
 	if (color == AUTO_COLOR_SKILLS)
 	{
+		void autoSkills();
+		sprintf(autoT, "AUTO TIME: %d", autoTimer);
+		pros::lcd::set_text(6, autoT);
 		return;
 	}
 	if (side == SIDE_SMALL)
@@ -75,17 +85,22 @@ void autonomous()
     switch (smallGoalAuto)
     {
       case SMALL_9PT:
+				autoSmall9Pt(color);
 				break;
       case SMALL_8PT:
+				autoSmall8Pt(color);
 				break;
       case SMALL_7PT:
+				autoSmall7Pt(color);
 				break;
     	case SMALL_6PT:
+				autoSmall6Pt(color);
 				break;
       case SMALL_5PT:
+				autoSmall5Pt(color);
 				break;
       case SMALL_1PT:
-				//autoOnePt();
+				autoOnePt();
 				break;
     }
   }
@@ -96,9 +111,12 @@ void autonomous()
       case LARGE_5PT:
 				break;
       case LARGE_1PT:
+				autoOnePt();
 				break;
     }
   }
+	sprintf(autoT, "AUTO TIME: %d", autoTimer);
+	pros::lcd::set_text(6, autoT);
 }
 
 /**
@@ -135,6 +153,10 @@ void opcontrol()
 	// handles tray toggling
 	bool isTrayVertical = false;
 
+	// Timer for tray over temp
+	uint32_t trayTTimer = pros::millis();
+
+	// APS stuff, comment out later
 	resetPositionFull(&globalPose, 0.0, 0.0, 0.0, true);
 	resetVelocity(&globalVel, globalPose);
 	ControllerButton apsReset(ControllerDigital::B);
@@ -206,7 +228,7 @@ void opcontrol()
 		if (trayOverrideButton.isPressed())
 		{
 			pauseAsyncTrayController();
-			if ((getTrayPot() > TRAY_VERTICAL + 100 && rightPower > 0) || (getTrayPot() < TRAY_ANGLED && rightPower < 0))
+			if ((getTrayPot() > TRAY_VERTICAL && rightPower > 0) || (getTrayPot() < TRAY_ANGLED && rightPower < 0))
 				rightPower = 0;
 
 			setTray(rightPower);
@@ -215,7 +237,7 @@ void opcontrol()
 		if (armOverrideButton.isPressed())
 		{
 			nextArmTarget = -1;
-			if ((getArmPosition() > ARM_MED + 500 && leftPower > 0) || (getArmPosition() < ARM_ZERO && leftPower < 0))
+			if ((getArmPosition() > ARM_MED + 50 && leftPower > 0) || (getArmPosition() < ARM_ZERO && leftPower < 0))
 				leftPower = 0;
 
 			setArms(leftPower);
@@ -233,7 +255,6 @@ void opcontrol()
 			setRollers(rollerPower);
 
 		// Print and rumble controller if tray motor is overheated
-		uint32_t trayTTimer = pros::millis();
 		if (isTrayMotorOverTemp() && pros::millis() - trayTTimer > 500)
 		{
 			controller.setText(0, 0, "Tray Over Temp");
@@ -241,19 +262,15 @@ void opcontrol()
 			trayTTimer = pros::millis();
 		}
 
-		char APSXY[80];
-		sprintf(APSXY, "X: %3.3f Y: %3.3f", globalPose.x, globalPose.y);
-		char APSA[80];
-		sprintf(APSA, "A: %3.3f", radToDeg(globalPose.angle));
+		// Odometry stuff, comment out later
 		if (apsReset.changedToPressed())
 		{
 			resetPositionFull(&globalPose, 0.0, 0.0, 0.0, true);
 			resetVelocity(&globalVel, globalPose);
 		}
-
-		pros::lcd::set_text(5, APSXY);
-		pros::lcd::set_text(6, APSA);
-
+		char APSXYA[80];
+		sprintf(APSXYA, "X: %3.3f Y: %3.3f A: %3.3f", globalPose.x, globalPose.y, radToDeg(globalPose.angle));
+		pros::lcd::set_text(5, APSXYA);
 
 		pros::delay(10);
 	}

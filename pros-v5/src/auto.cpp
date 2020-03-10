@@ -12,6 +12,7 @@
 #define MAX_INTAKE_CHASSIS_V 50
 
 AutoOptions chosenAuto;
+uint32_t autoTimer;
 
 // Functions
 void deploy()
@@ -48,7 +49,7 @@ void autoScoreSmall(AutoColor alliance, bool needsOuttake, bool needsReset)
 
   // Variables to make sure robot is against wall
   unsigned long stopTimer = pros::millis();
-  bool isStopped = false;
+  bool isStopped = true;
 
   // 4. Keep driving forwards until robot is still for 250 milliseconds
   while (!isStopped)
@@ -76,7 +77,7 @@ void autoScoreSmall(AutoColor alliance, bool needsOuttake, bool needsReset)
 
   // 6. Tilt the stack vertical and outtake to drop stack for scoring
   moveTrayVerticalAsync();
-  while (getTrayPot() < 1500)
+  while (getTrayPot() < 1400)
   {
     // Handle outtake when stacking
 		if (getTrayPot() > 1100 && getTrayPot() < 1400 && nextTrayTarget == TRAY_VERTICAL)
@@ -97,7 +98,6 @@ void autoScoreSmall(AutoColor alliance, bool needsOuttake, bool needsReset)
   moveTrayAngledAsync();
   pros::delay(600);
   stopDrive();
-  stopRollers();
 }
 void autoRunOfFour(AutoColor alliance, bool backUp, bool getFifth)
 {
@@ -109,12 +109,16 @@ void autoRunOfFour(AutoColor alliance, bool backUp, bool getFifth)
   // 1. Start rollers and drive forward to collect preload and 4 cubes
   moveArmsZeroAsync();
   setRollers(127);
-  moveToTargetSimpleAsync(XCoord, 54.0, XCoord, BACK_TO_CENTER, MAX_INTAKE_CHASSIS_V, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_SIMPLE);
+  moveToTargetSimpleAsync(XCoord, 49.0, XCoord, BACK_TO_CENTER, MAX_INTAKE_CHASSIS_V, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_SIMPLE);
   waitUntilChassisMoveComplete(8000, 250, true);
 
   if (getFifth)
   {
-
+    double XCoord1 = 35.0;
+    if (alliance == AUTO_COLOR_RED)
+      XCoord1 = FIELD_WIDTH - XCoord1;
+    moveToTargetSimpleAsync(XCoord1, 55.0, XCoord, 26.4, MAX_INTAKE_CHASSIS_V, MAX_INTAKE_CHASSIS_V, 1, 0, 0, 0, STOP_SOFT, MTT_SIMPLE);
+    waitUntilChassisMoveComplete(2000, 250, true);
   }
 
   if (backUp)
@@ -141,7 +145,7 @@ void autoRunOfThree(AutoColor alliance, bool backUpTo4, bool get2Stack)
   {
     // 2. Move arms up to grab second cube and bring down to lower cube
     moveArmsSecondAsync();
-    moveToTargetSimpleAsync(XCoord, 54.0, XCoord, BACK_TO_CENTER, MAX_INTAKE_CHASSIS_V, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_SIMPLE);
+    moveToTargetSimpleAsync(XCoord, 54.0, XCoord, BACK_TO_CENTER, MAX_INTAKE_CHASSIS_V, MAX_INTAKE_CHASSIS_V, 1.0, 0, 0, 0, STOP_NONE, MTT_SIMPLE);
     waitUntilArmMoveComplete(500);
     moveArmsZeroAsync();
     waitUntilArmMoveComplete(500);
@@ -167,10 +171,29 @@ void autoRunOfThree(AutoColor alliance, bool backUpTo4, bool get2Stack)
   }
 }
 
+// Testing scripts
+void autoTest0()
+{
+  resetPositionFull(&globalPose, 26.4, BACK_TO_CENTER, 0.0, true);
+	resetVelocity(&globalVel, globalPose);
+  //deploy();
+  //autoRunOfThree(alliance, true, true);
+  autoRunOfFour(AUTO_COLOR_BLUE, true, false);
+  autoScoreSmall(AUTO_COLOR_BLUE, true, false);
+}
+
 // Skills scripts
 void autoSkills()
 {
+  // Reset to proper pose on the field and deploy
+  resetPositionFull(&globalPose, 50.4, BACK_TO_CENTER, 0.0, true);
+	resetVelocity(&globalVel, globalPose);
+  deploy();
 
+  // 1. 9 Pt stack and reset
+  autoRunOfThree(AUTO_COLOR_BLUE, true, true);
+  autoRunOfFour(AUTO_COLOR_BLUE, true, false);
+  autoScoreSmall(AUTO_COLOR_BLUE, true, true);
 }
 // Small goal scripts
 void autoSmall9Pt(AutoColor alliance)
@@ -180,7 +203,7 @@ void autoSmall9Pt(AutoColor alliance)
     XCoord = FIELD_WIDTH - XCoord;
 
   // Reset to proper pose on the field and deploy
-  resetPositionFull(&globalPose, XCoord, 0.0, 0.0, true);
+  resetPositionFull(&globalPose, XCoord, BACK_TO_CENTER, 0.0, true);
 	resetVelocity(&globalVel, globalPose);
   deploy();
   autoRunOfThree(alliance, true, true);
@@ -194,7 +217,7 @@ void autoSmall8Pt(AutoColor alliance)
     XCoord = FIELD_WIDTH - XCoord;
 
   // Reset to proper pose on the field and deploy
-  resetPositionFull(&globalPose, XCoord, 0.0, 0.0, true);
+  resetPositionFull(&globalPose, XCoord, BACK_TO_CENTER, 0.0, true);
 	resetVelocity(&globalVel, globalPose);
   deploy();
   autoRunOfThree(alliance, true, false);
@@ -208,7 +231,7 @@ void autoSmall7Pt(AutoColor alliance)
     XCoord = FIELD_WIDTH - XCoord;
 
   // Reset to proper pose on the field and deploy
-  resetPositionFull(&globalPose, XCoord, 0.0, 0.0, true);
+  resetPositionFull(&globalPose, XCoord, BACK_TO_CENTER, 0.0, true);
 	resetVelocity(&globalVel, globalPose);
   deploy();
   autoRunOfThree(alliance, true, false);
@@ -222,7 +245,7 @@ void autoSmall6Pt(AutoColor alliance)
     XCoord = FIELD_WIDTH - XCoord;
 
   // Reset to proper pose on the field and deploy
-  resetPositionFull(&globalPose, XCoord, 0.0, 0.0, true);
+  resetPositionFull(&globalPose, XCoord, BACK_TO_CENTER, 0.0, true);
 	resetVelocity(&globalVel, globalPose);
   deploy();
   autoRunOfFour(alliance, true, true);
@@ -235,7 +258,7 @@ void autoSmall5Pt(AutoColor alliance)
     XCoord = FIELD_WIDTH - XCoord;
 
   // Reset to proper pose on the field and deploy
-  resetPositionFull(&globalPose, XCoord, 0.0, 0.0, true);
+  resetPositionFull(&globalPose, XCoord, BACK_TO_CENTER, 0.0, true);
 	resetVelocity(&globalVel, globalPose);
   deploy();
   autoRunOfFour(alliance, true, false);
@@ -251,7 +274,7 @@ void autoOnePt()
 
   // 1. Back up and forward
   moveToTargetSimple(0.0, -8.0, 0.0, 0.0, -127, 0, 2.0, 0, 0, 0, STOP_SOFT, MTT_SIMPLE);
-  moveToTargetSimple(0.0, 8.0, 0.0, 0.0, 127, 0, 2.0, 0, 0, 0, STOP_SOFT, MTT_SIMPLE);
+  moveToTargetSimple(0.0, 0.0, 0.0, 0.0, 127, 0, 2.0, 0, 0, 0, STOP_SOFT, MTT_SIMPLE);
 
   // 2. Deploy
   deploy();
