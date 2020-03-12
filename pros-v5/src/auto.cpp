@@ -9,7 +9,7 @@
 
 #include "main.h"
 
-#define MAX_INTAKE_CHASSIS_V 50
+#define MAX_INTAKE_CHASSIS_V 45
 
 AutoOptions chosenAuto;
 uint32_t autoTimer;
@@ -29,22 +29,26 @@ void autoScoreSmall(AutoColor alliance, bool needsOuttake, bool needsReset)
 {
   // Variables for alliance specific motions
   double XCoord = 0.0;
+  TurnDir turn = TURN_CCW;
   if (alliance == AUTO_COLOR_RED)
+  {
     XCoord = FIELD_WIDTH - XCoord;
+    turn = TURN_CW;
+  }
 
   // 1. Turn towards small goal
-  turnToTargetNewAsync(XCoord, 0.0, TURN_CH, 0.6, 25, 10, 0.0, true, true);
+  turnToTargetNewAsync(XCoord, 0.0, turn, 0.7, 30, 10, 0.0, true, true);
   waitUntilChassisMoveComplete(4000, 250, false);
 
   // 2. Drive towards small goal, and score the stack
-  XCoord = 14.0;
+  XCoord = 12.0;
   double XCoord1 = 26.4;
   if (alliance == AUTO_COLOR_RED)
   {
     XCoord = FIELD_WIDTH - XCoord;
     XCoord1 = FIELD_WIDTH - XCoord1;
   }
-  moveToTargetSimpleAsync(XCoord, 14.0, XCoord1, 26.4, 100, 0, 0.5, 0, 0, 0, STOP_NONE, MTT_PROPORTIONAL);
+  moveToTargetSimpleAsync(XCoord, 12.0, XCoord1, 26.4, 100, 0, 0.5, 0, 0, 0, STOP_NONE, MTT_CASCADING);
   waitUntilChassisMoveComplete(2000, 200, true);
 
   // Variables to make sure robot is against wall
@@ -62,7 +66,7 @@ void autoScoreSmall(AutoColor alliance, bool needsOuttake, bool needsReset)
     if (pros::millis() - stopTimer > 250)
     {
       isStopped = true;
-      setDrive(5, 5);
+      stopDrive();
     }
     pros::delay(10);
   }
@@ -70,19 +74,18 @@ void autoScoreSmall(AutoColor alliance, bool needsOuttake, bool needsReset)
   // 5. Outtake if needed
   if (needsOuttake)
   {
-    setRollers(-50);
-    pros::delay(600);
-    stopRollers();
+    outtakeOneCubeAsync();
+    waitUntilRollerMoveComplete(1000);
   }
 
   // 6. Tilt the stack vertical and outtake to drop stack for scoring
   moveTrayVerticalAsync();
-  while (getTrayPot() < 1400)
+  while (getTrayPot() < 1300)
   {
     // Handle outtake when stacking
-		if (getTrayPot() > 1100 && getTrayPot() < 1400 && nextTrayTarget == TRAY_VERTICAL)
+		if (getTrayPot() > 1000 && getTrayPot() < 1500 && nextTrayTarget == TRAY_VERTICAL)
 		{
-			setRollers(-50);
+			setRollers(-70);
 		}
     pros::delay(10);
   }
@@ -90,11 +93,11 @@ void autoScoreSmall(AutoColor alliance, bool needsOuttake, bool needsReset)
   waitUntilTrayMoveComplete(2000);
 
   // 6.5. Push forward a bit
-  setDrive(40, 40);
+  setDrive(30, 30);
   pros::delay(500);
 
   // 7. Back up and move tray back
-  setDrive(-100, -100);
+  setDrive(-70, -70);
   moveTrayAngledAsync();
   pros::delay(600);
   stopDrive();
@@ -109,8 +112,10 @@ void autoRunOfFour(AutoColor alliance, bool backUp, bool getFifth)
   // 1. Start rollers and drive forward to collect preload and 4 cubes
   moveArmsZeroAsync();
   setRollers(127);
+  moveToTargetSimpleAsync(XCoord, 13.0, XCoord, BACK_TO_CENTER, 127, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_SIMPLE);
+  waitUntilChassisMoveComplete(2000, 250, true);
   moveToTargetSimpleAsync(XCoord, 49.0, XCoord, BACK_TO_CENTER, MAX_INTAKE_CHASSIS_V, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_SIMPLE);
-  waitUntilChassisMoveComplete(8000, 250, true);
+  waitUntilChassisMoveComplete(6000, 250, true);
 
   if (getFifth)
   {
@@ -124,7 +129,7 @@ void autoRunOfFour(AutoColor alliance, bool backUp, bool getFifth)
   if (backUp)
   {
     // 2. Drive backwards to diagonal for scoring
-    moveToTargetSimpleAsync(XCoord, 26.4, XCoord, globalPose.y, -100, 0, 0.5, 0, 20, 0, STOP_SOFT, MTT_CASCADING);
+    moveToTargetSimpleAsync(XCoord, 26.4, XCoord, globalPose.y, -127, 0, 1.5, 0, 20, 0, STOP_HARSH, MTT_CASCADING);
     waitUntilChassisMoveComplete(4000, 250, true);
   }
 }
@@ -138,15 +143,18 @@ void autoRunOfThree(AutoColor alliance, bool backUpTo4, bool get2Stack)
   // 1. Start rollers and drive forward to collect preload and 4 cubes
   moveArmsZeroAsync();
   setRollers(127);
-  moveToTargetSimpleAsync(XCoord, 39.0, XCoord, BACK_TO_CENTER, MAX_INTAKE_CHASSIS_V, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_SIMPLE);
-  waitUntilChassisMoveComplete(8000, 250, true);
+  moveToTargetSimpleAsync(XCoord, 18.0, XCoord, BACK_TO_CENTER, 127, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_SIMPLE);
+  waitUntilChassisMoveComplete(400, 250, false);
+  moveToTargetSimpleAsync(XCoord, 37.0, XCoord, BACK_TO_CENTER, MAX_INTAKE_CHASSIS_V, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_SIMPLE);
+  waitUntilChassisMoveComplete(4000, 250, true);
 
   if (get2Stack)
   {
     // 2. Move arms up to grab second cube and bring down to lower cube
     moveArmsSecondAsync();
+    pros::delay(300);
     moveToTargetSimpleAsync(XCoord, 54.0, XCoord, BACK_TO_CENTER, MAX_INTAKE_CHASSIS_V, MAX_INTAKE_CHASSIS_V, 1.0, 0, 0, 0, STOP_NONE, MTT_SIMPLE);
-    waitUntilArmMoveComplete(500);
+    waitUntilArmMoveComplete(1000);
     moveArmsZeroAsync();
     waitUntilArmMoveComplete(500);
     waitUntilChassisMoveComplete(3000, 250, true);
@@ -155,32 +163,55 @@ void autoRunOfThree(AutoColor alliance, bool backUpTo4, bool get2Stack)
   if (backUpTo4)
   {
     // 3. Back up a bit
-    moveToTargetSimpleAsync(XCoord, 44.0, XCoord, 54.0, -100, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_CASCADING);
+    moveToTargetSimpleAsync(XCoord, 44.0, XCoord, 54.0, -127, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_SIMPLE);
     waitUntilChassisMoveComplete(2000, 250, false);
 
     // 4. Drive diagonally to run of 4
     double XCoord1 = 26.4;
+    TurnDir turn1 = TURN_CW;
+    TurnDir turn2 = TURN_CCW;
     if (alliance == AUTO_COLOR_RED)
+    {
       XCoord1 = FIELD_WIDTH - XCoord1;
-    moveToTargetSimpleAsync(XCoord1, 15.0, XCoord, 44.0, -100, 0, 1.0, 0, 0, 0, STOP_NONE, MTT_CASCADING);
+      turn1 = TURN_CCW;
+      turn2 = TURN_CW;
+    }
+    turnToTargetNew(XCoord1, 15.0, turn1, 0.7, 30, 10, 180.0, true, true);
+    waitUntilChassisMoveComplete(2000, 250, false);
+    moveToTargetSimpleAsync(XCoord1, 15.0, XCoord, 44.0, -127, 0, 1.0, 0, 0, 0, STOP_SOFT, MTT_SIMPLE);
     waitUntilChassisMoveComplete(5000, 250, false);
 
     // 5. Turn to face forwards
-    turnToAngleNewAsync(0.0, TURN_CH, 0.6, 25, 10, true, false);
+    turnToAngleNewAsync(0.0, turn2, 0.7, 30, 10, true, false);
     waitUntilChassisMoveComplete(2000, 250, true);
   }
 }
 
-// Testing scripts
-void autoTest0()
+
+void test5Pt()
 {
-  resetPositionFull(&globalPose, 26.4, BACK_TO_CENTER, 0.0, true);
+  resetPositionFull(&globalPose, 50.4, BACK_TO_CENTER, 0.0, true);
 	resetVelocity(&globalVel, globalPose);
-  //deploy();
-  //autoRunOfThree(alliance, true, true);
+  deploy();
+  autoRunOfThree(AUTO_COLOR_BLUE, true, false);
   autoRunOfFour(AUTO_COLOR_BLUE, true, false);
   autoScoreSmall(AUTO_COLOR_BLUE, true, false);
 }
+void testStack()
+{
+  resetPositionFull(&globalPose, 26.4, 26.4, -135.0, true);
+	resetVelocity(&globalVel, globalPose);
+  autoScoreSmall(AUTO_COLOR_BLUE, true, false);
+}
+// Testing scripts
+void autoTest()
+{
+  test5Pt();
+  //testStack();
+  //outtakeOneCubeAsync();
+  //waitUntilRollerMoveComplete(1000);
+}
+
 
 // Skills scripts
 void autoSkills()

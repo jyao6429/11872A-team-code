@@ -81,7 +81,7 @@ void asyncTrayTask(void *ignore)
     prevTrayTarget = currentTrayTarget;
 
     // Sets if tray is within target
-    if (abs(currentTrayTarget - currentTrayPot) < 50)
+    if (abs(currentTrayTarget - currentTrayPot) < 100)
     {
       mutexes[MUTEX_ASYNC_TRAY].take(200);
       isTrayAtTarget = true;

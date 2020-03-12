@@ -162,8 +162,8 @@ void initLCD()
 
   color = AUTO_COLOR_BLUE;
   side = SIDE_SMALL;
-  smallGoalAuto = SMALL_9PT;
-  largeGoalAuto = LARGE_1PT;
+  smallGoalAuto = 0;
+  largeGoalAuto = 0;
 
   // Set all the default text for the screen
   updateText();

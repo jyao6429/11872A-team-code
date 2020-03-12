@@ -29,7 +29,7 @@ void testNewMotionAlgorithms()
 void testAsyncNew()
 {
 	printf("~~~1~~~\n");
-	turnToAngleNewAsync(-90, TURN_CCW, 0.9, 127, 0, false, true);
+	turnToAngleNewAsync(-90, TURN_CH, 0.9, 127, 0, false, true);
 	printf("~~~2~~~\n");
 	waitUntilChassisMoveComplete();
 	printf("~~~3~~~\n");
@@ -115,7 +115,7 @@ void testTask(void *ignore)
 	// Call method for the test
 	//gatherVelocityData();
 	//testNewMotionAlgorithms();
-	//testAsyncNew();
+	testAsyncNew();
 	//testTray();
 	//testArms();
 	//deploy();

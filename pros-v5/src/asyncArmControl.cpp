@@ -2,8 +2,6 @@
 
 // Devices for arms
 Motor armMotor(15);
-Motor leftIntakeMotor(1);
-Motor rightIntakeMotor(-11);
 
 // The next target position for the arm
 int nextArmTarget;
@@ -20,12 +18,6 @@ void initArm()
   nextArmTarget = -1;
   mutexes[MUTEX_ASYNC_ARM].give();
   resetArm();
-
-  // Set intake motor properties
-  leftIntakeMotor.setGearing(AbstractMotor::gearset::red);
-  leftIntakeMotor.setBrakeMode(AbstractMotor::brakeMode::brake);
-  rightIntakeMotor.setGearing(AbstractMotor::gearset::red);
-  rightIntakeMotor.setBrakeMode(AbstractMotor::brakeMode::brake);
 }
 void startAsyncArmController()
 {
@@ -103,27 +95,7 @@ void setArmsVel(double speed)
 {
   armMotor.moveVelocity(speed);
 }
-void setRollers(double power)
-{
-  leftIntakeMotor.moveVoltage(12000 * power);
-  rightIntakeMotor.moveVoltage(12000 * power);
-}
-void setRollers(int power)
-{
-  leftIntakeMotor.moveVoltage((12000.0 * power) / 127.0);
-  rightIntakeMotor.moveVoltage((12000.0 * power) / 127.0);
-}
-void setRollersVel(double speed)
-{
-  leftIntakeMotor.moveVelocity(speed);
-  rightIntakeMotor.moveVelocity(speed);
-}
 void stopArms()
 {
   armMotor.moveVoltage(0);
-}
-void stopRollers()
-{
-  leftIntakeMotor.moveVoltage(0);
-  rightIntakeMotor.moveVoltage(0);
 }

@@ -23,7 +23,7 @@ void autoRunOfFour(AutoColor alliance, bool backUp, bool getFifth);
 void autoRunOfThree(AutoColor alliance, bool backUpTo4, bool get2Stack);
 
 // Testing scripts
-void autoTest0();
+void autoTest();
 
 // Skills scripts
 void autoSkills();
@@ -35,6 +35,7 @@ void autoSmall7Pt(AutoColor alliance);
 void autoSmall6Pt(AutoColor alliance);
 void autoSmall5Pt(AutoColor alliance);
 
+// Shared scripts
 void autoOnePt();
 
 // Old stuff

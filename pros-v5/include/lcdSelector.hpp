@@ -16,11 +16,11 @@ typedef enum AutoSide
 } AutoSide;
 typedef enum AutoSmallScripts
 {
-  SMALL_9PT = 0,
-  SMALL_8PT,
+  SMALL_5PT = 0,
   SMALL_7PT,
+  SMALL_9PT,
   SMALL_6PT,
-  SMALL_5PT,
+  SMALL_8PT,
   SMALL_1PT
 } AutoSmallScripts;
 typedef enum AutoLargeScripts

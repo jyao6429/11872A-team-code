@@ -4,8 +4,8 @@
 #include "main.h"
 
 #define ARM_ZERO 0
-#define ARM_SECOND 90
-#define ARM_LOW 340
+#define ARM_SECOND 120
+#define ARM_LOW 440
 #define ARM_MED 560
 
 // The next move to be performed by the robot
@@ -85,29 +85,8 @@ void setArms(int power);
  */
 void setArmsVel(double speed);
 /**
- * Powers the motors on the intake rollers
- *
- * @param power - (-1.0 - 1.0) the power for the rollers, positive values intake cubes
- */
-void setRollers(double power);
-/**
- * Powers the motors on the intake rollers
- *
- * @param power - (-127 - 127) the power for the rollers, positive values intake cubes
- */
-void setRollers(int power);
-/**
- * Sets the motor velocity for the intake rollers
- *
- * @param speed - (-200 - 200) the velocity to set the motor to
- */
-void setRollersVel(double speed);
-/**
  * Stops the intake arms
  */
 void stopArms();
-/**
- * Stops the intake rollers
- */
-void stopRollers();
+
 #endif

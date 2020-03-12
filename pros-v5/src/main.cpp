@@ -16,6 +16,7 @@ void initialize()
 	initDrive();
 	printf("Initializing Tray\n");
 	initTray();
+	initRollers();
 	printf("Done Initializing\n");
 }
 
@@ -67,8 +68,8 @@ void autonomous()
 	if (isTesting)
 	{
 		//startTesting();
-		autoTest0();
-		sprintf(autoT, "AUTO TIME: %d", autoTimer);
+		autoTest();
+		sprintf(autoT, "AUTO TIME: %d", pros::millis() - autoTimer);
 		pros::lcd::set_text(6, autoT);
 		return;
 	}
@@ -157,9 +158,9 @@ void opcontrol()
 	uint32_t trayTTimer = pros::millis();
 
 	// APS stuff, comment out later
-	resetPositionFull(&globalPose, 0.0, 0.0, 0.0, true);
-	resetVelocity(&globalVel, globalPose);
-	ControllerButton apsReset(ControllerDigital::B);
+	//resetPositionFull(&globalPose, 0.0, 0.0, 0.0, true);
+	//resetVelocity(&globalVel, globalPose);
+	//ControllerButton apsReset(ControllerDigital::B);
 
 	while (true)
 	{
@@ -174,9 +175,9 @@ void opcontrol()
 		int rollerPower = 0;
 
 		// Handle outtake when stacking
-		if (getTrayPot() > 1100 && getTrayPot() < 1400 && nextTrayTarget == TRAY_VERTICAL)
+		if (getTrayPot() > 1000 && getTrayPot() < 1500 && nextTrayTarget == TRAY_VERTICAL)
 		{
-			rollerPower = -50;
+			rollerPower = -60;
 		}
 
 		// Handle the arm shift
@@ -263,6 +264,7 @@ void opcontrol()
 		}
 
 		// Odometry stuff, comment out later
+		/*
 		if (apsReset.changedToPressed())
 		{
 			resetPositionFull(&globalPose, 0.0, 0.0, 0.0, true);
@@ -271,7 +273,8 @@ void opcontrol()
 		char APSXYA[80];
 		sprintf(APSXYA, "X: %3.3f Y: %3.3f A: %3.3f", globalPose.x, globalPose.y, radToDeg(globalPose.angle));
 		pros::lcd::set_text(5, APSXYA);
-
+		*/
+		
 		pros::delay(10);
 	}
 }

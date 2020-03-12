@@ -49,6 +49,7 @@
 #include "aps.hpp"
 #include "motionAlgorithms.hpp"
 #include "chassis.hpp"
+#include "intake.hpp"
 #include "asyncChassisControl.hpp"
 #include "asyncTrayControl.hpp"
 #include "asyncArmControl.hpp"
