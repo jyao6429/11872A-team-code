@@ -175,9 +175,9 @@ void opcontrol()
 		int rollerPower = 0;
 
 		// Handle outtake when stacking
-		if (getTrayPot() > 1000 && getTrayPot() < 1500 && nextTrayTarget == TRAY_VERTICAL)
+		if (getTrayPot() > 1000 && getTrayPot() < 1400 && nextTrayTarget == TRAY_VERTICAL)
 		{
-			rollerPower = -60;
+			rollerPower = -50;
 		}
 
 		// Handle the arm shift
@@ -274,7 +274,7 @@ void opcontrol()
 		sprintf(APSXYA, "X: %3.3f Y: %3.3f A: %3.3f", globalPose.x, globalPose.y, radToDeg(globalPose.angle));
 		pros::lcd::set_text(5, APSXYA);
 		*/
-		
+
 		pros::delay(10);
 	}
 }

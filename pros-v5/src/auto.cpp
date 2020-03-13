@@ -48,6 +48,13 @@ void autoScoreSmall(AutoColor alliance, bool needsOuttake, bool needsReset)
     XCoord = FIELD_WIDTH - XCoord;
     XCoord1 = FIELD_WIDTH - XCoord1;
   }
+
+  // 5. Outtake if needed
+  if (needsOuttake)
+  {
+    outtakeOneCubeAsync();
+  }
+
   moveToTargetSimpleAsync(XCoord, 12.0, XCoord1, 26.4, 100, 0, 0.5, 0, 0, 0, STOP_NONE, MTT_CASCADING);
   waitUntilChassisMoveComplete(2000, 200, true);
 
@@ -71,21 +78,14 @@ void autoScoreSmall(AutoColor alliance, bool needsOuttake, bool needsReset)
     pros::delay(10);
   }
 
-  // 5. Outtake if needed
-  if (needsOuttake)
-  {
-    outtakeOneCubeAsync();
-    waitUntilRollerMoveComplete(1000);
-  }
-
   // 6. Tilt the stack vertical and outtake to drop stack for scoring
   moveTrayVerticalAsync();
-  while (getTrayPot() < 1300)
+  while (getTrayPot() < 1400)
   {
     // Handle outtake when stacking
-		if (getTrayPot() > 1000 && getTrayPot() < 1500 && nextTrayTarget == TRAY_VERTICAL)
+		if (getTrayPot() > 1000 && getTrayPot() < 1400 && nextTrayTarget == TRAY_VERTICAL)
 		{
-			setRollers(-70);
+			setRollers(-50);
 		}
     pros::delay(10);
   }
