@@ -22,7 +22,7 @@ void asyncTrayTask(void *ignore)
   printf("asyncTrayTask - created and starting\n");
   int prevTrayTarget = -1;
 
-  auto trayStackingController = IterativeControllerFactory::posPID(0.065, 0.001, 0.0);
+  auto trayStackingController = IterativeControllerFactory::posPID(0.04, 0.001, 0.0);
   auto trayController = IterativeControllerFactory::posPID(0.005, 0.0002, 0.0001);
 
   trayStackingController.setOutputLimits(100, -100);
@@ -65,7 +65,7 @@ void asyncTrayTask(void *ignore)
 
     if (currentTrayTarget == TRAY_VERTICAL)
     {
-      speed = trayStackingController.step(currentTrayPot);
+      speed = trayStackingController.step(currentTrayPot) + ((currentTrayPot < TRAY_VERTICAL) ? 15 : 0);
       setTrayVel(speed);
     }
     else

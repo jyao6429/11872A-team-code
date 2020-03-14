@@ -85,7 +85,7 @@ void autoScoreSmall(AutoColor alliance, bool needsOuttake, bool needsReset)
     // Handle outtake when stacking
 		if (getTrayPot() > 1000 && getTrayPot() < 1400 && nextTrayTarget == TRAY_VERTICAL)
 		{
-			setRollers(-50);
+			setRollers(-55);
 		}
     pros::delay(10);
   }

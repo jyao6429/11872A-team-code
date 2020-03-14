@@ -4,7 +4,7 @@
 #include "main.h"
 
 #define TRAY_ANGLED 330
-#define TRAY_VERTICAL 2500
+#define TRAY_VERTICAL 2400
 #define TRAY_ARM 600
 
 // Variables for handling async tasks

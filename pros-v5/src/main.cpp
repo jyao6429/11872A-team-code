@@ -155,7 +155,7 @@ void opcontrol()
 	bool isTrayVertical = false;
 
 	// Timer for tray over temp
-	uint32_t trayTTimer = pros::millis();
+	uint32_t controllerTextTimer = pros::millis();
 
 	// APS stuff, comment out later
 	//resetPositionFull(&globalPose, 0.0, 0.0, 0.0, true);
@@ -175,10 +175,12 @@ void opcontrol()
 		int rollerPower = 0;
 
 		// Handle outtake when stacking
+
 		if (getTrayPot() > 1000 && getTrayPot() < 1400 && nextTrayTarget == TRAY_VERTICAL)
 		{
-			rollerPower = -50;
+			rollerPower = -55;
 		}
+
 
 		// Handle the arm shift
 		if (armShiftButton.isPressed())
@@ -256,11 +258,18 @@ void opcontrol()
 			setRollers(rollerPower);
 
 		// Print and rumble controller if tray motor is overheated
-		if (isTrayMotorOverTemp() && pros::millis() - trayTTimer > 500)
+		if (pros::millis() - controllerTextTimer > 500)
 		{
-			controller.setText(0, 0, "Tray Over Temp");
-			controller.rumble("-");
-			trayTTimer = pros::millis();
+			if (isTrayMotorOverTemp())
+			{
+				controller.setText(0, 0, "Tray Over Temp");
+				controller.rumble("-       ");
+			}
+			else
+			{
+				controller.clearLine(0);
+			}
+			controllerTextTimer = pros::millis();
 		}
 
 		// Odometry stuff, comment out later
