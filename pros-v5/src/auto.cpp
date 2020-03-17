@@ -18,10 +18,12 @@ uint32_t autoTimer;
 void deploy()
 {
   moveArmsMedAsync();
-  pros::delay(500);
+  pros::delay(200);
   setRollers(-127);
   waitUntilArmMoveComplete(2000);
+  pros::delay(300);
   moveArmsZeroAsync();
+  pros::delay(500);
   setRollers(127);
   waitUntilArmMoveComplete(2000);
 }
@@ -55,7 +57,7 @@ void autoScoreSmall(AutoColor alliance, bool needsOuttake, bool needsReset)
     outtakeOneCubeAsync();
   }
 
-  moveToTargetSimpleAsync(XCoord, 12.0, XCoord1, 26.4, 100, 0, 0.5, 0, 0, 0, STOP_NONE, MTT_CASCADING);
+  moveToTargetSimpleAsync(XCoord, 12.0, XCoord1, 26.4, 110, 0, 0.5, 0, 0, 0, STOP_NONE, MTT_CASCADING);
   waitUntilChassisMoveComplete(2000, 200, true);
 
   // Variables to make sure robot is against wall
@@ -176,9 +178,9 @@ void autoRunOfThree(AutoColor alliance, bool backUpTo4, bool get2Stack)
       turn1 = TURN_CCW;
       turn2 = TURN_CW;
     }
-    turnToTargetNew(XCoord1, 15.0, turn1, 0.7, 30, 10, 180.0, true, true);
+    turnToTargetNew(XCoord1, 10.0, turn1, 0.7, 30, 10, 180.0, true, true);
     waitUntilChassisMoveComplete(2000, 250, false);
-    moveToTargetSimpleAsync(XCoord1, 15.0, XCoord, 44.0, -127, 0, 1.0, 0, 0, 0, STOP_SOFT, MTT_SIMPLE);
+    moveToTargetSimpleAsync(XCoord1, 10.0, XCoord, 44.0, -127, 0, 2.0, 0, 0, 0, STOP_SOFT, MTT_SIMPLE);
     waitUntilChassisMoveComplete(5000, 250, false);
 
     // 5. Turn to face forwards
@@ -190,12 +192,12 @@ void autoRunOfThree(AutoColor alliance, bool backUpTo4, bool get2Stack)
 
 void test5Pt()
 {
-  resetPositionFull(&globalPose, 50.4, BACK_TO_CENTER, 0.0, true);
+  resetPositionFull(&globalPose, FIELD_WIDTH - 50.4, BACK_TO_CENTER, 0.0, true);
 	resetVelocity(&globalVel, globalPose);
   deploy();
-  autoRunOfThree(AUTO_COLOR_BLUE, true, false);
-  autoRunOfFour(AUTO_COLOR_BLUE, true, false);
-  autoScoreSmall(AUTO_COLOR_BLUE, true, false);
+  autoRunOfThree(AUTO_COLOR_RED, true, false);
+  autoRunOfFour(AUTO_COLOR_RED, true, false);
+  autoScoreSmall(AUTO_COLOR_RED, true, false);
 }
 void testStack()
 {
@@ -203,10 +205,18 @@ void testStack()
 	resetVelocity(&globalVel, globalPose);
   autoScoreSmall(AUTO_COLOR_BLUE, true, false);
 }
+void testKill()
+{
+  resetPositionFull(&globalPose, 0.0, 0.0, 0.0, true);
+	resetVelocity(&globalVel, globalPose);
+  moveToTargetSimpleAsync(100, 0, 0.0, 0.0, 30, 0, 2.0, 0, 0, 0, STOP_SOFT, MTT_SIMPLE);
+  //waitUntilChassisMoveComplete(400, 600, true);
+}
 // Testing scripts
 void autoTest()
 {
-  test5Pt();
+  //test5Pt();
+  testKill();
   //testStack();
   //outtakeOneCubeAsync();
   //waitUntilRollerMoveComplete(1000);
@@ -267,7 +277,7 @@ void autoSmall7Pt(AutoColor alliance)
   deploy();
   autoRunOfThree(alliance, true, false);
   autoRunOfFour(alliance, true, false);
-  autoScoreSmall(alliance, true, false);
+  //autoScoreSmall(alliance, true, false);
 }
 void autoSmall6Pt(AutoColor alliance)
 {

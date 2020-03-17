@@ -29,7 +29,7 @@ void disabled()
 {
 	stopAPS();
 	stopAsyncChassisController();
-	stopTesting();
+	//stopTesting();
 }
 
 /**
@@ -63,7 +63,7 @@ void autonomous()
 
 	// Timer for auton
 	autoTimer = pros::millis();
-	char autoT[80];
+	char autoT[150];
 
 	if (isTesting)
 	{
@@ -77,7 +77,7 @@ void autonomous()
 	if (color == AUTO_COLOR_SKILLS)
 	{
 		void autoSkills();
-		sprintf(autoT, "AUTO TIME: %d", autoTimer);
+		sprintf(autoT, "AUTO TIME: %d", pros::millis() - autoTimer);
 		pros::lcd::set_text(6, autoT);
 		return;
 	}
@@ -116,7 +116,7 @@ void autonomous()
 				break;
     }
   }
-	sprintf(autoT, "AUTO TIME: %d", autoTimer);
+	sprintf(autoT, "AUTO TIME: %d", pros::millis() - autoTimer);
 	pros::lcd::set_text(6, autoT);
 }
 
@@ -252,7 +252,7 @@ void opcontrol()
 			resetArm();
 
 		setDrive(leftPower, rightPower);
-		if (rollerPower == 0)
+		if (rollerPower == 0 && nextTrayTarget != TRAY_VERTICAL)
 			setRollersVel(0);
 		else
 			setRollers(rollerPower);
