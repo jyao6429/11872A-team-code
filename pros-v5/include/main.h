@@ -1,3 +1,4 @@
+
 /**
  * \file main.h
  *
@@ -39,8 +40,22 @@
 /**
  * You should add more #includes here
  */
-//#include "okapi/api.hpp"
+#include "okapi/api.hpp"
 //#include "pros/api_legacy.h"
+
+// User includes
+#include "global.hpp"
+#include "mathUtils.hpp"
+#include "aps.hpp"
+#include "motionAlgorithms.hpp"
+#include "chassis.hpp"
+#include "intake.hpp"
+#include "asyncChassisControl.hpp"
+#include "asyncTrayControl.hpp"
+#include "asyncArmControl.hpp"
+#include "lcdSelector.hpp"
+#include "auto.hpp"
+#include "tests.hpp"
 
 /**
  * If you find doing pros::Motor() to be tedious and you'd prefer just to do
@@ -52,7 +67,7 @@
  */
 // using namespace pros;
 // using namespace pros::literals;
-// using namespace okapi;
+using namespace okapi;
 
 /**
  * Prototypes for the competition control tasks are redefined here to ensure
