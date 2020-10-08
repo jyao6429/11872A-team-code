@@ -62,9 +62,45 @@ void opcontrol()
 												.build();
 	std::shared_ptr<XDriveModel> drive = std::dynamic_pointer_cast<XDriveModel>(chassis->getModel());
 
+	Motor indexerMotor(-5);
+	Motor scorerMotor(1);
+
+	ControllerButton intakePositiveButton(ControllerDigital::L1);
+	ControllerButton intakeNegativeButton(ControllerDigital::L2);
+	ControllerButton scorerPositiveButton(ControllerDigital::R1);
+	ControllerButton scorerNegativeButton(ControllerDigital::R2);
+
+
 	while (true)
 	{
 		drive->xArcade(master.getAnalog(ControllerAnalog::leftX), master.getAnalog(ControllerAnalog::leftY), master.getAnalog(ControllerAnalog::rightX), 0);
+
+		int intakeVolt = 0;
+		int indexerVolt = 0;
+		int scorerVolt = 0;
+
+		if (intakePositiveButton.isPressed())
+		{
+			intakeVolt = 12000;
+			indexerVolt = 12000;
+		}
+		else if (intakeNegativeButton.isPressed())
+		{
+			intakeVolt = -12000;
+			indexerVolt = -12000;
+		}
+		if (scorerPositiveButton.isPressed())
+		{
+			scorerVolt = 12000;
+			indexerVolt = 12000;
+		}
+		else if (scorerNegativeButton.isPressed())
+		{
+			scorerVolt = -12000;
+		}
+
+		indexerMotor.moveVoltage(indexerVolt);
+		scorerMotor.moveVoltage(scorerVolt);
 
 		pros::delay(10);
 	}
