@@ -8,7 +8,7 @@
  * This file should not be modified by users, since it gets replaced whenever
  * a kernel upgrade occurs.
  *
- * Copyright (c) 2017-2020, Purdue University ACM SIGBots.
+ * Copyright (c) 2017-2021, Purdue University ACM SIGBots.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -421,7 +421,7 @@ int32_t ext_adi_encoder_get(ext_adi_encoder_t enc);
  *        The smart port number that the ADI Expander is in
  * \param adi_port_top
  *        The "top" wire from the encoder sensor with the removable cover side
- *        up
+ *        up. This should be in port 1, 3, 5, or 7 ('A', 'C', 'E', or 'G').
  * \param adi_port_bottom
  *        The "bottom" wire from the encoder sensor
  * \param reverse
