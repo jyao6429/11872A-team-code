@@ -91,15 +91,16 @@ void opcontrol()
 			intakeVolt = -12000;
 			indexerVolt = -12000;
 		}
-		if (scorerPositiveButton.isPressed())
+		if (scorerNegativeButton.isPressed())
+		{
+			scorerVolt = -12000;
+		}
+		else if (scorerPositiveButton.isPressed())
 		{
 			scorerVolt = 12000;
 			indexerVolt = 12000;
 		}
-		else if (scorerNegativeButton.isPressed())
-		{
-			scorerVolt = -12000;
-		}
+		
 
 		leftIntake.moveVoltage(intakeVolt);
 		rightIntake.moveVoltage(intakeVolt);
