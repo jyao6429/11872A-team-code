@@ -64,6 +64,8 @@ void opcontrol()
 
 	Motor indexerMotor(-5);
 	Motor scorerMotor(1);
+	Motor leftIntake(6);
+	Motor rightIntake(-10);
 
 	ControllerButton intakePositiveButton(ControllerDigital::L1);
 	ControllerButton intakeNegativeButton(ControllerDigital::L2);
@@ -99,6 +101,8 @@ void opcontrol()
 			scorerVolt = -12000;
 		}
 
+		leftIntake.moveVoltage(intakeVolt);
+		rightIntake.moveVoltage(intakeVolt);
 		indexerMotor.moveVoltage(indexerVolt);
 		scorerMotor.moveVoltage(scorerVolt);
 
