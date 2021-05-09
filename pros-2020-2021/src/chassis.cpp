@@ -16,14 +16,14 @@ namespace chassis
     void moveVector(double theta, double omega, double speed)
     {
         // formulas from https://www.desmos.com/calculator/qro9op4rmu
-        double p1 = -std::cos(theta + pi/4);
-        double p2 = std::sin(theta + pi/4);
+        double p1 = -std::cos(theta + okapi::pi/4);
+        double p2 = std::sin(theta + okapi::pi/4);
         double s = std::max(std::abs(p1), std::abs(p2)) / speed;
 
-        int topLeftVoltage = 12000 * ((p2 / s) * (1 - std::abs(omega)) + omega * speed));
-        int topRightVoltage = 12000 * ((p1 / s) * (1 - std::abs(omega)) - omega * speed));
-        int bottomRightVoltage = 12000 * ((p1 / s) * (1 - std::abs(omega)) + omega * speed));
-        int bottomLeftVoltage = 12000 * ((p2 / s) * (1 - std::abs(omega)) - omega * speed));
+        int topLeftVoltage = 12000 * ((p2 / s) * (1 - std::abs(omega)) + omega * speed);
+        int topRightVoltage = 12000 * ((p1 / s) * (1 - std::abs(omega)) - omega * speed);
+        int bottomRightVoltage = 12000 * ((p2 / s) * (1 - std::abs(omega)) - omega * speed);
+        int bottomLeftVoltage = 12000 * ((p1 / s) * (1 - std::abs(omega)) + omega * speed);
 
         topLeft.moveVoltage(topLeftVoltage);
         topRight.moveVoltage(topRightVoltage);
@@ -39,6 +39,8 @@ namespace chassis
         double theta = std::atan2(y, x);
         double omega = a / (double) 127;
         double speed = std::sqrt(std::pow(x / (double) 127, 2) + std::pow(y / (double) 127, 2));
+
+        //printf("theta: %1.3f\tomega: %1.3f\tspeed: %1.3f\n", theta, omega, speed);
         speed = (speed > 1.0) ? 1.0 : speed;
 
         moveVector(theta, omega, speed);
