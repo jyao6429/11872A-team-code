@@ -13,7 +13,7 @@ namespace chassis
         .withDimensions(okapi::AbstractMotor::gearset::green, {{3.25_in, 17_in}, okapi::imev5GreenTPR})
         .build();
 
-    void moveVector(double theta, double omega, double speed)
+    void strafeVector(double theta, double omega, double speed)
     {
         // formulas from https://www.desmos.com/calculator/qro9op4rmu
         double p1 = -std::cos(theta + okapi::pi/4);
@@ -24,6 +24,22 @@ namespace chassis
         int topRightVoltage = 12000 * ((p1 / s) * (1 - std::abs(omega)) - omega * speed);
         int bottomRightVoltage = 12000 * ((p2 / s) * (1 - std::abs(omega)) - omega * speed);
         int bottomLeftVoltage = 12000 * ((p1 / s) * (1 - std::abs(omega)) + omega * speed);
+
+        topLeft.moveVoltage(topLeftVoltage);
+        topRight.moveVoltage(topRightVoltage);
+        bottomRight.moveVoltage(bottomRightVoltage);
+        bottomLeft.moveVoltage(bottomLeftVoltage);
+    }
+    void moveVector(double theta, double omega, double speed)
+    {
+        // formulas from https://theol0403.github.io/7842F-Programming-Journal/2019-11-20/odom-x-controller/
+        double p1 = -std::cos(theta + okapi::pi/4);
+        double p2 = std::sin(theta + okapi::pi/4);
+
+        int topLeftVoltage = 12000 * (p2 * speed + omega);
+        int topRightVoltage = 12000 * (p1 * speed - omega);
+        int bottomRightVoltage = 12000 * (p2 * speed - omega);
+        int bottomLeftVoltage = 12000 * (p1 * speed + omega);
 
         topLeft.moveVoltage(topLeftVoltage);
         topRight.moveVoltage(topRightVoltage);
