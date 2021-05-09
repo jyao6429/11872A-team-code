@@ -58,6 +58,7 @@ using namespace okapi::literals;
 extern Controller master;
 
 #include "chassis.h"
+#include "odom.h"
 
 /**
  * Prototypes for the competition control tasks are redefined here to ensure

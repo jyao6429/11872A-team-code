@@ -10,6 +10,7 @@ Controller master(E_CONTROLLER_MASTER);
  */
 void initialize()
 {
+	odom::start();
 }
 
 /**
