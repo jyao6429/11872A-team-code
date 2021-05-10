@@ -12,7 +12,7 @@ Controller master(E_CONTROLLER_MASTER);
  */
 void initialize()
 {
-	odom::start(false);
+	//odom::start(false);
 }
 
 /**
@@ -71,10 +71,13 @@ void opcontrol()
 	while (true)
 	{
 		chassis::opcontrol();
+		intake::opcontrol();
+		indexer::opcontrol();
+		scorer::opcontrol();
 
-		odom::pose robotPose = odom::getPose();
+		//odom::pose robotPose = odom::getPose();
 
-		printf("X: %3.3f\tY: %3.3f\tT: %3.3f\n", robotPose.x, robotPose.y, robotPose.theta * okapi::radianToDegree);
+		//printf("X: %3.3f\tY: %3.3f\tT: %3.3f\n", robotPose.x, robotPose.y, robotPose.theta * okapi::radianToDegree);
 		delay(100);
 	}
 }

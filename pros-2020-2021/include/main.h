@@ -59,6 +59,9 @@ extern Controller master;
 
 #include "chassis.h"
 #include "odom.h"
+#include "intake.h"
+#include "indexer.h"
+#include "scorer.h"
 
 /**
  * Prototypes for the competition control tasks are redefined here to ensure

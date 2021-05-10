@@ -11,7 +11,13 @@ namespace chassis
     auto chassisController = okapi::ChassisControllerBuilder()
         .withMotors(topLeft, topRight, bottomRight, bottomLeft)
         .withDimensions(okapi::AbstractMotor::gearset::green, {{3.25_in, 17_in}, okapi::imev5GreenTPR})
-        .build();
+        .withSensors(
+            okapi::ADIEncoder{'A', 'B'},
+            okapi::ADIEncoder{'C', 'D'},
+            okapi::ADIEncoder{'E', 'F', true}
+        )
+        .withOdometry({{2.75_in, 15.0_in, 7.5_in, 2.75_in}, okapi::quadEncoderTPR}, okapi::StateMode::CARTESIAN)
+        .buildOdometry();
 
     void strafeVector(double theta, double omega, double speed)
     {
@@ -60,5 +66,9 @@ namespace chassis
         speed = (speed > 1.0) ? 1.0 : speed;
 
         moveVector(theta, omega, speed);
+
+        okapi::OdomState state = chassisController->getState();
+
+        printf("X: %3.3f\tY: %3.3f\tT: %3.3f\n", state.x.convert(okapi::inch), state.y.convert(okapi::inch), state.theta.convert(okapi::degree));
     }
 }
