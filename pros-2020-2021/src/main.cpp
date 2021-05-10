@@ -1,4 +1,6 @@
 #include "main.h"
+#include "odom.h"
+#include "okapi/api/util/mathUtil.hpp"
 
 Controller master(E_CONTROLLER_MASTER);
 
@@ -10,7 +12,7 @@ Controller master(E_CONTROLLER_MASTER);
  */
 void initialize()
 {
-	odom::start();
+	odom::start(false);
 }
 
 /**
@@ -62,10 +64,17 @@ void autonomous()
  */
 void opcontrol()
 {
+	//odom::pose defaultPose;
+	//defaultPose.theta = okapi::pi/2;
+
+	//odom::setPose(defaultPose);
 	while (true)
 	{
 		chassis::opcontrol();
 
-		delay(10);
+		odom::pose robotPose = odom::getPose();
+
+		printf("X: %3.3f\tY: %3.3f\tT: %3.3f\n", robotPose.x, robotPose.y, robotPose.theta * okapi::radianToDegree);
+		delay(100);
 	}
 }

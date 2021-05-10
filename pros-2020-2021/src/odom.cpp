@@ -15,9 +15,9 @@ namespace odom
     static bool initialized = false;
     static bool isLogging = false;
 
-    static constexpr double trackWidth = 15;
-    static constexpr double backLength = 7.5;
-    static constexpr double wheelDiameter = 2.7382;
+    static constexpr double trackWidth = 11.4278;
+    static constexpr double backLength = trackWidth / 2;
+    static constexpr double wheelDiameter = 2.75;
     static constexpr double encoderResolution = 360;
 
     void odomTask(void *ign)
@@ -33,9 +33,9 @@ namespace odom
             int currentRight = rightEncoder->get_value();
             int currentBack = backEncoder->get_value();
             
-            double deltaLeftDistance = (double) (currentLeft - prevLeft) * okapi::pi * wheelDiameter) / (double) encoderResolution;
-            double deltaRightDistance = (double) (currentRight - prevRight) * okapi::pi * wheelDiameter) / (double) encoderResolution;
-            double deltaBackDistance = (double) (currentBack - prevBack) * okapi::pi * wheelDiameter) / (double) encoderResolution;
+            double deltaLeftDistance = (double) (currentLeft - prevLeft) * okapi::pi * wheelDiameter / (double) encoderResolution;
+            double deltaRightDistance = (double) (currentRight - prevRight) * okapi::pi * wheelDiameter / (double) encoderResolution;
+            double deltaBackDistance = (double) (currentBack - prevBack) * okapi::pi * wheelDiameter / (double) encoderResolution;
 
             double deltaAngle = (deltaLeftDistance - deltaRightDistance) / (trackWidth);
 
@@ -49,7 +49,7 @@ namespace odom
             else
             {
                 localX = 2.0 * std::sin(deltaAngle / 2.0) * ((deltaBackDistance / deltaAngle) + backLength);
-                localY = 2.0 * std::sin(deltaAngle / 2.0) * ((deltaRightDistance / deltaAngle) + trackWidth / 2);
+                localY = 2.0 * std::sin(deltaAngle / 2.0) * ((deltaRightDistance / deltaAngle) + trackWidth / 2.0);
             }
 
             double avgAngle = robotPose.theta + (deltaAngle / 2);
@@ -69,7 +69,7 @@ namespace odom
             prevLeft = currentLeft;
             prevRight = currentRight;
             prevBack = currentBack;
-            Task::delay_until(&now, 5);
+            Task::delay_until(&now, 10);
         }
     }
     void start(bool log)
@@ -78,7 +78,7 @@ namespace odom
         {
             leftEncoder = std::make_unique<ADIEncoder>(1, 2, false);
             rightEncoder = std::make_unique<ADIEncoder>(3, 4, false);
-            backEncoder = std::make_unique<ADIEncoder>(5, 6, false);
+            backEncoder = std::make_unique<ADIEncoder>(5, 6, true);
             poseMutex = std::make_unique<Mutex>();
             isLogging = log;
             delay(20);
