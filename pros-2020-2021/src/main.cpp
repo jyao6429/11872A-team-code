@@ -13,6 +13,9 @@ Controller master(E_CONTROLLER_MASTER);
 void initialize()
 {
 	//odom::start(false);
+	//ADIEncoder leftEncoder{'A', 'B'};
+    //ADIEncoder rightEncoder{'C', 'D'};
+    //ADIEncoder backEncoder{'E', 'F', true};
 }
 
 /**
@@ -64,10 +67,10 @@ void autonomous()
  */
 void opcontrol()
 {
-	//odom::pose defaultPose;
-	//defaultPose.theta = okapi::pi/2;
-
-	//odom::setPose(defaultPose);
+	//ADIEncoder leftEncoder{'A', 'B'};
+    //ADIEncoder rightEncoder{'C', 'D'};
+    //ADIEncoder backEncoder{'E', 'F', true};
+	
 	while (true)
 	{
 		chassis::opcontrol();
@@ -76,8 +79,10 @@ void opcontrol()
 		scorer::opcontrol();
 
 		//odom::pose robotPose = odom::getPose();
-
 		//printf("X: %3.3f\tY: %3.3f\tT: %3.3f\n", robotPose.x, robotPose.y, robotPose.theta * okapi::radianToDegree);
+
+		//printf("L: %d\tR: %d\tB: %d\n", leftEncoder.get_value(), rightEncoder.get_value(), backEncoder.get_value());
+
 		delay(100);
 	}
 }

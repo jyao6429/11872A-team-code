@@ -11,10 +11,10 @@ namespace scorer
     {
         int scorerVolt = 0;
 
-        if (scorerPositiveButton.isPressed())
-			scorerVolt = 12000;
-		else if (scorerNegativeButton.isPressed())
+        if (scorerNegativeButton.isPressed())
 			scorerVolt = -12000;
+		else if (scorerPositiveButton.isPressed())
+			scorerVolt = 12000;
 
         scorer.moveVoltage(scorerVolt);
     }

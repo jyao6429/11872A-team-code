@@ -16,8 +16,13 @@ namespace chassis
             okapi::ADIEncoder{'C', 'D'},
             okapi::ADIEncoder{'E', 'F', true}
         )
-        .withOdometry({{2.75_in, 15.0_in, 7.5_in, 2.75_in}, okapi::quadEncoderTPR}, okapi::StateMode::CARTESIAN)
+        .withOdometry({{2.73076_in, 13.227_in, 13.227_in / 2, 2.75_in}, okapi::quadEncoderTPR}, okapi::StateMode::CARTESIAN)
         .buildOdometry();
+
+    // override buttons
+    okapi::ControllerButton strafeHorizontalButton(okapi::ControllerDigital::A);
+	okapi::ControllerButton strafeVerticalButton(okapi::ControllerDigital::B);
+	okapi::ControllerButton resetOdomButton(okapi::ControllerDigital::right);
 
     void strafeVector(double theta, double omega, double speed)
     {
@@ -58,6 +63,11 @@ namespace chassis
         int y = master.get_analog(ANALOG_LEFT_Y);
         int a = master.get_analog(ANALOG_RIGHT_X);
 
+        if (strafeHorizontalButton.isPressed())
+            y = 0;
+        else if (strafeVerticalButton.isPressed())
+            x = 0;
+
         double theta = std::atan2(y, x);
         double omega = a / (double) 127;
         double speed = std::sqrt(std::pow(x / (double) 127, 2) + std::pow(y / (double) 127, 2));
@@ -67,8 +77,14 @@ namespace chassis
 
         moveVector(theta, omega, speed);
 
-        okapi::OdomState state = chassisController->getState();
+        
+        if (resetOdomButton.changedToPressed())
+        {
+            okapi::OdomState zeroState;
+            chassisController->setState(zeroState);
+        }
 
+        okapi::OdomState state = chassisController->getState();
         printf("X: %3.3f\tY: %3.3f\tT: %3.3f\n", state.x.convert(okapi::inch), state.y.convert(okapi::inch), state.theta.convert(okapi::degree));
     }
 }
