@@ -62,6 +62,7 @@ extern Controller master;
 #include "intake.h"
 #include "indexer.h"
 #include "scorer.h"
+#include "test.h"
 
 /**
  * Prototypes for the competition control tasks are redefined here to ensure

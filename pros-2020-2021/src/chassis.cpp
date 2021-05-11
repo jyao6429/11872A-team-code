@@ -16,8 +16,10 @@ namespace chassis
             okapi::ADIEncoder{'C', 'D'},
             okapi::ADIEncoder{'E', 'F', true}
         )
-        .withOdometry({{2.73076_in, 13.227_in, 13.227_in / 2, 2.75_in}, okapi::quadEncoderTPR}, okapi::StateMode::CARTESIAN)
+        .withOdometry({{2.75_in, 15.162_in, 15.162_in / 2, 2.75_in}, okapi::quadEncoderTPR}, okapi::StateMode::CARTESIAN)
         .buildOdometry();
+    
+    std::shared_ptr<okapi::XDriveModel> drive = std::dynamic_pointer_cast<okapi::XDriveModel>(chassisController->getModel());
 
     // override buttons
     okapi::ControllerButton strafeHorizontalButton(okapi::ControllerDigital::A);
@@ -68,15 +70,16 @@ namespace chassis
         else if (strafeVerticalButton.isPressed())
             x = 0;
 
-        double theta = std::atan2(y, x);
-        double omega = a / (double) 127;
-        double speed = std::sqrt(std::pow(x / (double) 127, 2) + std::pow(y / (double) 127, 2));
+        //double theta = std::atan2(y, x);
+        //double omega = a / (double) 127;
+        //double speed = std::sqrt(std::pow(x / (double) 127, 2) + std::pow(y / (double) 127, 2));
 
         //printf("theta: %1.3f\tomega: %1.3f\tspeed: %1.3f\n", theta, omega, speed);
-        speed = (speed > 1.0) ? 1.0 : speed;
+        //speed = (speed > 1.0) ? 1.0 : speed;
 
-        moveVector(theta, omega, speed);
+        //moveVector(theta, omega, speed);
 
+        drive->xArcade(x / (double) 127, y / (double) 127, a / (double) 127);
         
         if (resetOdomButton.changedToPressed())
         {

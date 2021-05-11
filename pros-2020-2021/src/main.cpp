@@ -16,6 +16,10 @@ void initialize()
 	//ADIEncoder leftEncoder{'A', 'B'};
     //ADIEncoder rightEncoder{'C', 'D'};
     //ADIEncoder backEncoder{'E', 'F', true};
+	ADIAnalogIn scorerSensor{'G'};
+	scorerSensor.calibrate();
+
+	intake::init();
 }
 
 /**
@@ -49,7 +53,7 @@ void competition_initialize() {}
  */
 void autonomous()
 {
-
+	test::run();
 }
 
 /**
@@ -70,7 +74,9 @@ void opcontrol()
 	//ADIEncoder leftEncoder{'A', 'B'};
     //ADIEncoder rightEncoder{'C', 'D'};
     //ADIEncoder backEncoder{'E', 'F', true};
-	
+
+	intake::stop();
+
 	while (true)
 	{
 		chassis::opcontrol();
