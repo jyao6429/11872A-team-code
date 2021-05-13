@@ -1,8 +1,12 @@
 #ifndef CHASSIS_H
 #define CHASSIS_H
 
+#include "main.h"
+
 namespace chassis
 {
+    void moveToTarget(okapi::QLength targetX, okapi::QLength targetY, okapi::QAngle targetTheta, double maxSpeed, double maxOmega, bool park);
+
     /** 
      * strafe chassis along target vector and angular velocity
      *

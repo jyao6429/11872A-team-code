@@ -1,6 +1,7 @@
 #include "main.h"
 #include <algorithm>
 #include <cmath>
+#include <memory>
 
 namespace chassis
 {
@@ -21,11 +22,69 @@ namespace chassis
     
     std::shared_ptr<okapi::XDriveModel> drive = std::dynamic_pointer_cast<okapi::XDriveModel>(chassisController->getModel());
 
+    // MTT variables
+    bool isSettled = true;
+
+
     // override buttons
     okapi::ControllerButton strafeHorizontalButton(okapi::ControllerDigital::A);
 	okapi::ControllerButton strafeVerticalButton(okapi::ControllerDigital::B);
 	okapi::ControllerButton resetOdomButton(okapi::ControllerDigital::right);
 
+    void moveToTarget(okapi::QLength targetX, okapi::QLength targetY, okapi::QAngle targetTheta, double maxSpeed, double maxOmega, bool park)
+    {
+        isSettled = false;
+
+        auto distanceController = okapi::IterativeControllerFactory::posPID(0.001, 0.0, 0.0);
+        auto thetaController = okapi::IterativeControllerFactory::posPID(0.001, 0.0, 0.0);
+
+        std::unique_ptr<okapi::SettledUtil> distanceSettled;
+        std::unique_ptr<okapi::SettledUtil> thetaSettled;
+
+        if (park)
+        {
+            distanceSettled = std::make_unique<okapi::SettledUtil>(std::make_unique<okapi::Timer>(), 1.0, 0.1, 250_ms);
+            thetaSettled = std::make_unique<okapi::SettledUtil>(std::make_unique<okapi::Timer>(), 0.05, 0.005, 250_ms);
+        }
+        else
+        {
+            distanceSettled = std::make_unique<okapi::SettledUtil>(std::make_unique<okapi::Timer>(), 2.0, 100, 0_ms);
+            thetaSettled = std::make_unique<okapi::SettledUtil>(std::make_unique<okapi::Timer>(), 0.1, 100, 0_ms);
+        }
+        
+        while (true)
+        {
+            okapi::OdomState currentState = chassisController->getState();
+            double xDiff = targetX.convert(okapi::inch) - currentState.x.convert(okapi::inch);
+            double yDiff = targetY.convert(okapi::inch) - currentState.y.convert(okapi::inch);
+
+            double distanceError = std::sqrt(std::pow(xDiff, 2) + std::pow(yDiff, 2));
+            double thetaError = targetTheta.getValue() - currentState.theta.getValue();
+
+            if (distanceSettled->isSettled(distanceError) && thetaSettled->isSettled(thetaError))
+            {
+                isSettled = true;
+                strafeVector(0, 0, 0);
+                break;
+            }
+
+            double targetHeading = std::atan2(yDiff, xDiff);
+            double targetSpeed = distanceController.step(distanceError) * maxSpeed;
+            double targetOmega = thetaController.step(thetaError) * maxOmega;
+
+
+            if (targetSpeed < 0.7)
+            {
+                moveVector(targetHeading, targetOmega, targetSpeed);
+            }
+            else
+            {
+                strafeVector(targetHeading, targetOmega, targetSpeed);
+            }
+
+            delay(10);
+        }        
+    }
     void strafeVector(double theta, double omega, double speed)
     {
         // formulas from https://www.desmos.com/calculator/qro9op4rmu
