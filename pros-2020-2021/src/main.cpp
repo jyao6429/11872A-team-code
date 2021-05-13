@@ -89,6 +89,6 @@ void opcontrol()
 
 		//printf("L: %d\tR: %d\tB: %d\n", leftEncoder.get_value(), rightEncoder.get_value(), backEncoder.get_value());
 
-		delay(100);
+		delay(10);
 	}
 }

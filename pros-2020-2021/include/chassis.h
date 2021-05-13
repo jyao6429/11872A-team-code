@@ -6,7 +6,9 @@
 namespace chassis
 {
     void moveToTarget(okapi::QLength targetX, okapi::QLength targetY, okapi::QAngle targetTheta, double maxSpeed, double maxOmega, bool park);
-
+    double nearestEquivalentAngle(double angle, double reference);
+    void setOdomState(okapi::QLength newX, okapi::QLength newY, okapi::QAngle newTheta);
+    void resetOdom();
     /** 
      * strafe chassis along target vector and angular velocity
      *
