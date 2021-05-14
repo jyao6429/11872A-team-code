@@ -10,9 +10,10 @@ namespace test
         MTT_STRAIGHT,
         MTT_TURN,
         MTT_COMBINED_0,
-        MTT_COMBINED_1
+        MTT_COMBINED_1,
+        MTT_COMBINED_2
     };
-    static constexpr TestScript currentTest = MTT_TURN;
+    static constexpr TestScript currentTest = MTT_COMBINED_2;
     
     void run()
     {
@@ -50,14 +51,21 @@ namespace test
             case MTT_COMBINED_0:
                 printf("Starting MTT_COMBINED_0\n");
                 chassis::resetOdom();
-                chassis::moveToTarget(0_in, 48_in, 90_deg, 1.0, 0.6, true);
+                chassis::moveToTarget(0_in, 48_in, 90_deg, 1.0, 0.3, true);
                 printf("Done MTT_COMBINED_0\n");
                 break;
             case MTT_COMBINED_1:
                 printf("Starting MTT_COMBINED_1\n");
                 chassis::resetOdom();
-                chassis::moveToTarget(48_in, 48_in, 180_deg, 1.0, 0.6, true);
+                chassis::moveToTarget(48_in, 48_in, 180_deg, 1.0, 0.3, true);
                 printf("Done MTT_COMBINED_1\n");
+                break;
+            case MTT_COMBINED_2:
+                printf("Starting MTT_COMBINED_2\n");
+                chassis::resetOdom();
+                chassis::moveToTarget(0_in, 48_in, -90_deg, 1.0, 0.3, false);
+                chassis::moveToTarget(48_in, 48_in, 180_deg, 1.0, 0.4, true);
+                printf("Done MTT_COMBINED_2\n");
                 break;
         }
         printf("Done Test\n");

@@ -43,7 +43,7 @@ namespace chassis
 
         targetTheta = nearestEquivalentAngle(targetTheta.getValue(), chassisController->getState().theta.getValue()) * 1_rad;
 
-        auto distanceController = okapi::IterativeControllerFactory::posPID(0.5, 0.0, 0.025);
+        auto distanceController = okapi::IterativeControllerFactory::posPID(0.7, 0.0, 0.04);
         auto thetaController = okapi::IterativeControllerFactory::posPID(4.0, 0.0, 0.1);
 
         distanceController.setTarget(0);
@@ -52,18 +52,17 @@ namespace chassis
         std::unique_ptr<okapi::SettledUtil> distanceSettled;
         std::unique_ptr<okapi::SettledUtil> thetaSettled;
 
-        printf("~~~~~~~~~~~~~~~MTT~~~~~~~~~~~~~~~\n
-                tX: %3.3f\ttY: %3.3f\ttT: %3.3f\tmaxS: %3.3f\tmaxO: %3.3f\n",
+        printf("~~~~~~~~~~~~~~~MTT~~~~~~~~~~~~~~~\ntX: %3.3f\ttY: %3.3f\ttT: %3.3f\tmaxS: %3.3f\tmaxO: %3.3f\n",
                 targetX.convert(okapi::inch), targetY.convert(okapi::inch), targetTheta.convert(okapi::degree), maxSpeed, maxOmega);
 
         if (park)
         {
             distanceSettled = std::make_unique<okapi::SettledUtil>(std::make_unique<okapi::Timer>(), 1.0, 0.1, 250_ms);
-            thetaSettled = std::make_unique<okapi::SettledUtil>(std::make_unique<okapi::Timer>(), 0.1, 0.005, 250_ms);
+            thetaSettled = std::make_unique<okapi::SettledUtil>(std::make_unique<okapi::Timer>(), 0.05, 0.005, 250_ms);
         }
         else
         {
-            distanceSettled = std::make_unique<okapi::SettledUtil>(std::make_unique<okapi::Timer>(), 2.0, 100, 0_ms);
+            distanceSettled = std::make_unique<okapi::SettledUtil>(std::make_unique<okapi::Timer>(), 3.0, 100, 0_ms);
             thetaSettled = std::make_unique<okapi::SettledUtil>(std::make_unique<okapi::Timer>(), 0.2, 100, 0_ms);
         }
 
