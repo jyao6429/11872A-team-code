@@ -30,6 +30,11 @@ namespace chassis
 
     // MTT variables
     bool isSettled = true;
+    bool initialized = false;
+    ChassisState state = OFF;
+    MTTContainer mttContainer;
+    std::unique_ptr<Mutex> chassisMutex;
+    std::unique_ptr<Task> chassisTaskhandler;
 
 
     // override buttons
@@ -37,6 +42,201 @@ namespace chassis
 	okapi::ControllerButton strafeVerticalButton(okapi::ControllerDigital::B);
 	okapi::ControllerButton resetOdomButton(okapi::ControllerDigital::right);
 
+
+    void chassisTask(void *ign)
+    {
+        ChassisState currentState = SKIP;
+        MTTContainer currentContainer;
+
+        printf("Starting chassisTask loop\n");
+        while (true)
+        {
+            chassisMutex->take(10);
+            currentState = state;
+            currentContainer = mttContainer;
+            chassisMutex->give();
+
+            //printf("chassisTask: got necessary variables\n");
+
+            switch (currentState)
+            {
+                case OFF:
+                    strafeVector(0.0, 0.0, 0.0);
+                    break;
+                case SKIP:
+                    break;
+                case MTT:
+                    printf("chassisTask: in case MTT\n");
+                    currentContainer.theta = nearestEquivalentAngle(currentContainer.theta.getValue(), chassisController->getState().theta.getValue()) * 1_rad;
+
+                    auto distanceController = okapi::IterativeControllerFactory::posPID(0.7, 0.0, 0.04);
+                    auto thetaController = okapi::IterativeControllerFactory::posPID(4.0, 0.0, 0.1);
+
+                    distanceController.setTarget(0);
+                    thetaController.setTarget(currentContainer.theta.getValue());
+
+                    std::unique_ptr<okapi::SettledUtil> distanceSettled;
+                    std::unique_ptr<okapi::SettledUtil> thetaSettled;
+
+                    //printf("~~~~~~~~~~~~~~~MTT~~~~~~~~~~~~~~~\ntX: %3.3f\ttY: %3.3f\ttT: %3.3f\tmaxS: %3.3f\tmaxO: %3.3f\n",
+                            //targetX.convert(okapi::inch), targetY.convert(okapi::inch), targetTheta.convert(okapi::degree), maxSpeed, maxOmega);
+
+                    if (currentContainer.park)
+                    {
+                        distanceSettled = std::make_unique<okapi::SettledUtil>(std::make_unique<okapi::Timer>(), 1.0, 0.05, 250_ms);
+                        thetaSettled = std::make_unique<okapi::SettledUtil>(std::make_unique<okapi::Timer>(), 0.05, 0.005, 250_ms);
+                    }
+                    else
+                    {
+                        distanceSettled = std::make_unique<okapi::SettledUtil>(std::make_unique<okapi::Timer>(), 3.0, 100, 0_ms);
+                        thetaSettled = std::make_unique<okapi::SettledUtil>(std::make_unique<okapi::Timer>(), 0.2, 100, 0_ms);
+                    }
+
+                    //printf("Starting MTT loop\n");
+
+                    int timer = millis();
+                    
+                    while (true)
+                    {
+                        if (getState() != MTT)
+                            break;
+                        
+                        okapi::OdomState currentState = chassisController->getState();
+                        double xDiff = currentContainer.x.convert(okapi::inch) - currentState.x.convert(okapi::inch);
+                        double yDiff = currentContainer.y.convert(okapi::inch) - currentState.y.convert(okapi::inch);
+
+                        double distanceError = std::sqrt(std::pow(xDiff, 2) + std::pow(yDiff, 2));
+                        double thetaError = currentContainer.theta.getValue() - currentState.theta.getValue();
+
+                        if (distanceSettled->isSettled(distanceError) && thetaSettled->isSettled(thetaError))
+                        {
+                            setState(OFF);
+                            break;
+                        }
+
+                        double targetHeading = std::atan2(yDiff, xDiff) + currentState.theta.getValue();
+                        double targetSpeed = -distanceController.step(distanceError) * currentContainer.maxSpeed;
+                        double targetOmega = thetaController.step(currentState.theta.getValue()) * currentContainer.maxOmega;
+
+
+                        if (targetSpeed < 0.7)
+                            moveVector(targetHeading, targetOmega, targetSpeed);
+                        else
+                            strafeVector(targetHeading, targetOmega, targetSpeed);
+
+                        if (millis() - timer > 100)
+                        {
+                            timer = millis();
+                            //printf("xDiff: %3.3f\tyDiff: %3.3f\tdE: %3.3f\ttE: %3.3f\theading: %3.3f\tspeed: %3.3f\tomega: %3.3f\n", xDiff, yDiff, distanceError, thetaError, targetHeading * okapi::radianToDegree, targetSpeed, targetOmega);
+                        }
+
+                        delay(10);
+                    }
+                    break;
+            }
+            delay(10);
+        }
+    }
+    void init()
+    {
+        if (!initialized)
+        {
+            printf("Initializing chassisTask\n");
+            chassisMutex = std::make_unique<Mutex>();
+            delay(20);
+            
+            chassisTaskhandler = std::make_unique<Task>(chassisTask, nullptr, TASK_PRIORITY_DEFAULT);
+            initialized = true;
+            printf("Done initializing chassisTask\n");
+        }
+        else
+        {
+            chassisTaskhandler->resume();
+        }
+    }
+    void stop()
+    {
+        if (chassisTaskhandler)
+            chassisTaskhandler->suspend();
+    }
+    void setState(ChassisState newState)
+    {
+        chassisMutex->take(10);
+        state = newState;
+        chassisMutex->give();
+    }
+    ChassisState getState()
+    {
+        return state;
+    }
+    int waitUntilSettled(int timeout)
+    {
+        int timer = millis();
+        while (getState() == MTT && millis() - timer < timeout)
+        {
+            delay(50);
+        }
+        if (millis() - timer > timeout)
+        {
+            setState(OFF);
+            return -1;
+        }
+        return 0;
+    }
+    int waitUntilSettled()
+    {
+        return waitUntilSettled(60000);
+    }
+    int waitUntilStuck(int timeout)
+    {
+        okapi::SettledUtil distanceStuckUtil(std::make_unique<okapi::Timer>(), 2.0, 2.0, 750_ms);
+        okapi::SettledUtil thetaStuckUtil(std::make_unique<okapi::Timer>(), 0.2, 0.2, 750_ms);
+        int timer = millis();
+
+        while (true)
+        {
+            if (getState() != MTT)
+                return 0;
+            if (millis() - timer > timeout)
+            {
+                setState(OFF);
+                return -1;
+            }
+            okapi::OdomState currentV = getVelocity();
+            double robotV = std::sqrt(std::pow(currentV.x.convert(okapi::inch), 2) + std::pow(currentV.y.convert(okapi::inch), 2));
+            printf("robotV: %3.3f\trobotOmega: %3.3f\n", robotV, currentV.theta.getValue());
+            if (distanceStuckUtil.isSettled(robotV) && thetaStuckUtil.isSettled(currentV.theta.getValue()))
+            {
+                setState(OFF);
+                return -2;
+            }
+        }
+    }
+    okapi::OdomState getVelocity()
+    {
+        okapi::OdomState prevState = chassisController->getState();
+        delay(50);
+        okapi::OdomState currentState = chassisController->getState();
+        currentState.x = (currentState.x - prevState.x) / (50.0 / 1000.0);
+        currentState.y = (currentState.y - prevState.y) / (50.0 / 1000.0);
+        currentState.theta = (currentState.theta - prevState.theta) / (50.0 / 1000.0);
+        //printf("getV: X: %3.3f\tY: %3.3f\tT: %3.3f\n", currentState.x.convert(okapi::inch),currentState.y.convert(okapi::inch), currentState.theta.getValue());
+        return currentState;
+    }
+    void moveToTargetAsync(okapi::QLength targetX, okapi::QLength targetY, okapi::QAngle targetTheta, double maxSpeed, double maxOmega, bool park)
+    {
+        setState(OFF);
+        delay(50);
+        chassisMutex->take(10);
+        mttContainer.x = targetX;
+        mttContainer.y = targetY;
+        mttContainer.theta = targetTheta;
+        mttContainer.maxSpeed = maxSpeed;
+        mttContainer.maxOmega = maxOmega;
+        mttContainer.park = park;
+        state = MTT;
+        chassisMutex->give();
+    }
     void moveToTarget(okapi::QLength targetX, okapi::QLength targetY, okapi::QAngle targetTheta, double maxSpeed, double maxOmega, bool park)
     {
         isSettled = false;

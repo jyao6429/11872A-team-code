@@ -20,6 +20,7 @@ void initialize()
 	scorerSensor.calibrate();
 
 	intake::init();
+	chassis::init();
 }
 
 /**
@@ -76,6 +77,8 @@ void opcontrol()
     //ADIEncoder backEncoder{'E', 'F', true};
 
 	intake::stop();
+	chassis::setState(chassis::SKIP);
+	chassis::stop();
 
 	while (true)
 	{

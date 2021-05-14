@@ -5,6 +5,30 @@
 
 namespace chassis
 {
+    typedef enum ChassisState
+    {
+        OFF,
+        SKIP,
+        MTT
+    } ChassisState;
+    typedef struct MTTContainer
+    {
+        okapi::QLength x, y;
+        okapi::QAngle theta;
+        double maxSpeed, maxOmega;
+        bool park;
+
+    } MTTContainer;
+    
+    void init();
+    void stop();
+    okapi::OdomState getVelocity();
+    void setState(ChassisState newState);
+    ChassisState getState();
+    int waitUntilSettled(int timeout);
+    int waitUntilSettled();
+    int waitUntilStuck(int timeout);
+    void moveToTargetAsync(okapi::QLength targetX, okapi::QLength targetY, okapi::QAngle targetTheta, double maxSpeed, double maxOmega, bool park);
     void moveToTarget(okapi::QLength targetX, okapi::QLength targetY, okapi::QAngle targetTheta, double maxSpeed, double maxOmega, bool park);
     double nearestEquivalentAngle(double angle, double reference);
     void setOdomState(okapi::QLength newX, okapi::QLength newY, okapi::QAngle newTheta);

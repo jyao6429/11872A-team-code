@@ -3,14 +3,14 @@
 
 namespace intake
 {
-    enum IntakeState
+    typedef enum IntakeState
     {
         OFF,
         INTAKE,
         OUTTAKE,
         NUMBER_IN,
         NUMBER_OUT
-    };
+    } IntakeState;
     void init();
     void stop();
     void waitUntilStopped();
