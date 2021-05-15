@@ -23,7 +23,7 @@ namespace chassis
             okapi::ADIEncoder{'C', 'D'},
             okapi::ADIEncoder{'E', 'F', true}
         )
-        .withOdometry({{2.75_in, 15.162_in, 15.162_in / 2, 2.75_in}, okapi::quadEncoderTPR}, okapi::StateMode::CARTESIAN)
+        .withOdometry({{2.742_in, 15.126_in, 15.126_in / 2, 2.742_in}, okapi::quadEncoderTPR}, okapi::StateMode::CARTESIAN)
         .buildOdometry();
     
     std::shared_ptr<okapi::XDriveModel> drive = std::dynamic_pointer_cast<okapi::XDriveModel>(chassisController->getModel());
@@ -69,8 +69,8 @@ namespace chassis
                     printf("chassisTask: in case MTT\n");
                     currentContainer.theta = nearestEquivalentAngle(currentContainer.theta.getValue(), chassisController->getState().theta.getValue()) * 1_rad;
 
-                    auto distanceController = okapi::IterativeControllerFactory::posPID(0.7, 0.0, 0.04);
-                    auto thetaController = okapi::IterativeControllerFactory::posPID(4.0, 0.0, 0.1);
+                    auto distanceController = okapi::IterativeControllerFactory::posPID(0.35, 0.0015, 0.015);
+                    auto thetaController = okapi::IterativeControllerFactory::posPID(3.0, 4.0, 0.07);
 
                     distanceController.setTarget(0);
                     thetaController.setTarget(currentContainer.theta.getValue());
@@ -127,7 +127,7 @@ namespace chassis
                         if (millis() - timer > 100)
                         {
                             timer = millis();
-                            //printf("xDiff: %3.3f\tyDiff: %3.3f\tdE: %3.3f\ttE: %3.3f\theading: %3.3f\tspeed: %3.3f\tomega: %3.3f\n", xDiff, yDiff, distanceError, thetaError, targetHeading * okapi::radianToDegree, targetSpeed, targetOmega);
+                            printf("ASYNC xDiff: %3.3f\tyDiff: %3.3f\tdE: %3.3f\ttE: %3.3f\theading: %3.3f\tspeed: %3.3f\tomega: %3.3f\n", xDiff, yDiff, distanceError, thetaError, targetHeading * okapi::radianToDegree, targetSpeed, targetOmega);
                         }
 
                         delay(10);

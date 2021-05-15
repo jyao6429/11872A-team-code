@@ -1,6 +1,9 @@
 #include "main.h"
+#include "chassis.h"
+#include "intake.h"
 #include "odom.h"
 #include "okapi/api/util/mathUtil.hpp"
+#include "pros/rtos.h"
 
 Controller master(E_CONTROLLER_MASTER);
 
@@ -28,7 +31,11 @@ void initialize()
  * the VEX Competition Switch, following either autonomous or opcontrol. When
  * the robot is enabled, this task will exit.
  */
-void disabled() {}
+void disabled()
+{
+	chassis::setState(chassis::OFF);
+	intake::setState(intake::OFF);
+}
 
 /**
  * Runs after initialize(), and before autonomous when connected to the Field
@@ -72,13 +79,16 @@ void autonomous()
  */
 void opcontrol()
 {
-	//ADIEncoder leftEncoder{'A', 'B'};
-    //ADIEncoder rightEncoder{'C', 'D'};
-    //ADIEncoder backEncoder{'E', 'F', true};
+	ADIEncoder leftEncoder{'A', 'B'};
+    ADIEncoder rightEncoder{'C', 'D'};
+    ADIEncoder backEncoder{'E', 'F', true};
 
 	intake::stop();
 	chassis::setState(chassis::SKIP);
 	chassis::stop();
+
+	int timer = millis();
+	bool isLogging = false;
 
 	while (true)
 	{
@@ -87,10 +97,13 @@ void opcontrol()
 		indexer::opcontrol();
 		scorer::opcontrol();
 
-		//odom::pose robotPose = odom::getPose();
-		//printf("X: %3.3f\tY: %3.3f\tT: %3.3f\n", robotPose.x, robotPose.y, robotPose.theta * okapi::radianToDegree);
-
-		//printf("L: %d\tR: %d\tB: %d\n", leftEncoder.get_value(), rightEncoder.get_value(), backEncoder.get_value());
+		if (millis() - timer > 100 && isLogging)
+		{
+			//odom::pose robotPose = odom::getPose();
+			//printf("X: %3.3f\tY: %3.3f\tT: %3.3f\n", robotPose.x, robotPose.y, robotPose.theta * okapi::radianToDegree);
+			printf("L: %d\tR: %d\tB: %d\n", leftEncoder.get_value(), rightEncoder.get_value(), backEncoder.get_value());
+			timer = millis();
+		}
 
 		delay(10);
 	}

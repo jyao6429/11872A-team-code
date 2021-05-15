@@ -1,6 +1,8 @@
 #include "chassis.h"
 #include "intake.h"
 #include "main.h"
+#include "okapi/api/util/mathUtil.hpp"
+#include "pros/rtos.hpp"
 
 namespace test
 {
@@ -16,9 +18,10 @@ namespace test
         MTT_ASYNC_0,
         MTT_ASYNC_1,
         MTT_ASYNC_2,
-        MTT_ASYNC_3
+        MTT_ASYNC_3,
+        ODOM_DIAMETER_TUNE
     };
-    static constexpr TestScript currentTest = MTT_ASYNC_3;
+    static constexpr TestScript currentTest = INTAKE_1;
     
     void run()
     {
@@ -76,7 +79,9 @@ namespace test
                 printf("Starting MTT_ASYNC_0\n");
                 chassis::resetOdom();
                 chassis::init();
-                chassis::moveToTargetAsync(0_in, 48_in, 90_deg, 1.0, 0.3, true);
+                chassis::moveToTargetAsync(48_in, 48_in, 180_deg, 1.0, 0.3, true);
+                chassis::waitUntilSettled();
+                chassis::moveToTargetAsync(0_in, 0_in, 0_deg, 1.0, 0.3, true);
                 chassis::waitUntilSettled();
                 break;
             case MTT_ASYNC_1:
@@ -103,6 +108,21 @@ namespace test
                 chassis::init();
                 chassis::moveToTargetAsync(0_in, 48_in, 90_deg, 1.0, 0.3, true);
                 printf("Finished MTT_ASYNC_3 code: %d\n", chassis::waitUntilStuck(4000));
+                break;
+            case ODOM_DIAMETER_TUNE:
+                printf("Starting ODOM_DIAMETER_TUNE\n");
+                chassis::moveVector(-okapi::pi / 2, 0, 0.3);
+                delay(500);
+                chassis::resetOdom();
+                chassis::init();
+                chassis::moveToTargetAsync(0_in, 120_in, 0_deg, 1.0, 0.5, true);
+                chassis::waitUntilSettled();
+                while (true)
+                {
+                    chassis::opcontrol();
+                    delay(50);
+                }
+                break;
         }
         printf("Done Test\n");
     }
