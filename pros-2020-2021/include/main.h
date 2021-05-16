@@ -57,6 +57,8 @@ using namespace okapi::literals;
 
 extern Controller master;
 
+#include "ARMS/selector.h"
+
 #include "chassis.h"
 #include "odom.h"
 #include "intake.h"

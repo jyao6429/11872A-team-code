@@ -10,6 +10,12 @@ namespace test
     {
         INTAKE_1,
         INTAKE_2,
+        SCORER_1,
+        SCORER_2,
+        IN_SCORE_COMBINED_1_1,
+        IN_SCORE_COMBINED_2_1,
+        IN_SCORE_COMBINED_1_2,
+        IN_SCORE_COMBINED_2_2,
         MTT_STRAIGHT,
         MTT_TURN,
         MTT_COMBINED_0,
@@ -21,13 +27,21 @@ namespace test
         MTT_ASYNC_3,
         ODOM_DIAMETER_TUNE
     };
-    static constexpr TestScript currentTest = INTAKE_1;
+    static constexpr TestScript currentTest = SCORER_1;
     
     void run()
     {
         printf("Starting Test\n");
         switch (currentTest)
         {
+            case INTAKE_1:
+                intake::init();
+                printf("Starting INTAKE_1\n");
+                intake::setState(intake::NUMBER_IN, 1);
+                printf("Waiting INTAKE_1\n");
+                intake::waitUntilStopped();
+                printf("Done INTAKE_1\n");
+                break;
             case INTAKE_2:
                 intake::init();
                 printf("Starting INTAKE_2\n");
@@ -36,13 +50,65 @@ namespace test
                 intake::waitUntilStopped();
                 printf("Done INTAKE_2\n");
                 break;
-            case INTAKE_1:
+            case SCORER_1:
+                scorer::init();
+                printf("Starting SCORER_1\n");
+                scorer::setState(scorer::NUMBER_SCORE, 1);
+                printf("Waiting SCORER_1\n");
+                scorer::waitUntilStopped();
+                printf("Done SCORER_1\n");
+                break;
+            case SCORER_2:
+                scorer::init();
+                printf("Starting SCORER_2\n");
+                scorer::setState(scorer::NUMBER_SCORE, 2);
+                printf("Waiting SCORER_2\n");
+                scorer::waitUntilStopped();
+                printf("Done SCORER_2\n");
+                break;
+            case IN_SCORE_COMBINED_1_1:
                 intake::init();
-                printf("Starting INTAKE_1\n");
+                scorer::init();
+                printf("Starting IN_SCORE_COMBINED_1_1\n");
                 intake::setState(intake::NUMBER_IN, 1);
-                printf("Waiting INTAKE_1\n");
+                scorer::setState(scorer::NUMBER_SCORE, 1);
+                printf("Waiting IN_SCORE_COMBINED_1_1\n");
                 intake::waitUntilStopped();
-                printf("Done INTAKE_1\n");
+                scorer::waitUntilStopped();
+                printf("Done IN_SCORE_COMBINED_1_1\n");
+                break;
+            case IN_SCORE_COMBINED_2_1:
+                intake::init();
+                scorer::init();
+                printf("Starting IN_SCORE_COMBINED_2_1\n");
+                intake::setState(intake::NUMBER_IN, 2);
+                scorer::setState(scorer::NUMBER_SCORE, 1);
+                printf("Waiting IN_SCORE_COMBINED_2_1\n");
+                intake::waitUntilStopped();
+                scorer::waitUntilStopped();
+                printf("Done IN_SCORE_COMBINED_2_1\n");
+                break;
+            case IN_SCORE_COMBINED_1_2:
+                intake::init();
+                scorer::init();
+                printf("Starting IN_SCORE_COMBINED_1_2\n");
+                intake::setState(intake::NUMBER_IN, 1);
+                scorer::setState(scorer::NUMBER_SCORE, 2);
+                printf("Waiting IN_SCORE_COMBINED_1_2\n");
+                intake::waitUntilStopped();
+                scorer::waitUntilStopped();
+                printf("Done IN_SCORE_COMBINED_1_2\n");
+                break;
+            case IN_SCORE_COMBINED_2_2:
+                intake::init();
+                scorer::init();
+                printf("Starting IN_SCORE_COMBINED_2_2\n");
+                intake::setState(intake::NUMBER_IN, 2);
+                scorer::setState(scorer::NUMBER_SCORE, 2);
+                printf("Waiting IN_SCORE_COMBINED_2_2\n");
+                intake::waitUntilStopped();
+                scorer::waitUntilStopped();
+                printf("Done IN_SCORE_COMBINED_2_2\n");
                 break;
             case MTT_STRAIGHT:
                 printf("Starting MTT_STRAIGHT\n");

@@ -16,14 +16,11 @@ Controller master(E_CONTROLLER_MASTER);
 void initialize()
 {
 	//odom::start(false);
-	//ADIEncoder leftEncoder{'A', 'B'};
-    //ADIEncoder rightEncoder{'C', 'D'};
-    //ADIEncoder backEncoder{'E', 'F', true};
-	ADIAnalogIn scorerSensor{'G'};
-	scorerSensor.calibrate();
-
-	intake::init();
 	chassis::init();
+	intake::init();
+	scorer::init();
+
+	selector::init();
 }
 
 /**
@@ -35,6 +32,7 @@ void disabled()
 {
 	chassis::setState(chassis::OFF);
 	intake::setState(intake::OFF);
+	scorer::setState(scorer::OFF);
 }
 
 /**
@@ -62,6 +60,12 @@ void competition_initialize() {}
 void autonomous()
 {
 	test::run();
+	/*
+	switch (selector::auton)
+	{
+		case 
+	}
+	*/
 }
 
 /**
@@ -79,13 +83,16 @@ void autonomous()
  */
 void opcontrol()
 {
-	ADIEncoder leftEncoder{'A', 'B'};
-    ADIEncoder rightEncoder{'C', 'D'};
-    ADIEncoder backEncoder{'E', 'F', true};
+	//ADIEncoder leftEncoder{'A', 'B'};
+    //ADIEncoder rightEncoder{'C', 'D'};
+    //ADIEncoder backEncoder{'E', 'F', true};
 
-	intake::stop();
 	chassis::setState(chassis::SKIP);
 	chassis::stop();
+	intake::setState(intake::OFF);
+	intake::stop();
+	scorer::setState(scorer::OFF);
+	scorer::stop();
 
 	int timer = millis();
 	bool isLogging = false;
@@ -104,7 +111,6 @@ void opcontrol()
 			printf("L: %d\tR: %d\tB: %d\n", leftEncoder.get_value(), rightEncoder.get_value(), backEncoder.get_value());
 			timer = millis();
 		}
-
 		delay(10);
 	}
 }

@@ -55,7 +55,7 @@ namespace intake
                         }
                         
                         moveVoltage(12000);
-                        indexer::moveVoltage(12000);
+                        indexer::moveVoltageSafe(12000);
                         if (readFilterSensor() < detectionThreshold)
                         {
                             currentTarget--;
@@ -69,7 +69,7 @@ namespace intake
                         delay(20);
                     }
                     moveVoltage(0);
-                    indexer::moveVoltage(0);
+                    indexer::moveVoltageSafe(0);
                     intakeMutex->take(10);
                     state = OFF;
                     targetNumber = 0;
@@ -138,12 +138,20 @@ namespace intake
         if (intakeTaskHandler)
             intakeTaskHandler->suspend();
     }
-    void waitUntilStopped()
+    int waitUntilStopped()
     {
+        return waitUntilStopped(60000);
+    }
+    int waitUntilStopped(int timeout)
+    {
+        int timer = millis();
         while (getState() != OFF)
         {
+            if (millis() - timer > timeout)
+                return -1;
             delay(50);
         }
+        return 0;
     }
     IntakeState getState()
     {

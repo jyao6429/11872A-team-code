@@ -13,7 +13,8 @@ namespace intake
     } IntakeState;
     void init();
     void stop();
-    void waitUntilStopped();
+    int waitUntilStopped();
+    int waitUntilStopped(int timeout);
     IntakeState getState();
     void setState(IntakeState newState, int newTarget);
     void setState(IntakeState newState);
