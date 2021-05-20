@@ -30,9 +30,12 @@ void initialize()
  */
 void disabled()
 {
-	chassis::setState(chassis::OFF);
+	chassis::setState(chassis::SKIP);
+	chassis::stop();
 	intake::setState(intake::OFF);
+	intake::stop();
 	scorer::setState(scorer::OFF);
+	scorer::stop();
 }
 
 /**
@@ -59,6 +62,10 @@ void competition_initialize() {}
  */
 void autonomous()
 {
+	chassis::init();
+	intake::init();
+	scorer::init();
+
 	test::run();
 	/*
 	switch (selector::auton)
@@ -108,7 +115,7 @@ void opcontrol()
 		{
 			//odom::pose robotPose = odom::getPose();
 			//printf("X: %3.3f\tY: %3.3f\tT: %3.3f\n", robotPose.x, robotPose.y, robotPose.theta * okapi::radianToDegree);
-			printf("L: %d\tR: %d\tB: %d\n", leftEncoder.get_value(), rightEncoder.get_value(), backEncoder.get_value());
+			//printf("L: %d\tR: %d\tB: %d\n", leftEncoder.get_value(), rightEncoder.get_value(), backEncoder.get_value());
 			timer = millis();
 		}
 		delay(10);

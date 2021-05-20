@@ -41,6 +41,9 @@ namespace chassis
     okapi::ControllerButton strafeHorizontalButton(okapi::ControllerDigital::A);
 	okapi::ControllerButton strafeVerticalButton(okapi::ControllerDigital::B);
 	okapi::ControllerButton resetOdomButton(okapi::ControllerDigital::right);
+    okapi::ControllerButton toggleFieldCentricControlButton(okapi::ControllerDigital::left);
+
+    bool isFieldCentric = false;
 
 
     void chassisTask(void *ign)
@@ -376,17 +379,21 @@ namespace chassis
             y = 0;
         else if (strafeVerticalButton.isPressed())
             x = 0;
+        if (toggleFieldCentricControlButton.changedToPressed())
+            isFieldCentric = !isFieldCentric;
+        
+        double offset = (isFieldCentric) ? chassisController->getState().theta.getValue() : 0;
 
-        //double theta = std::atan2(y, x);
-        //double omega = a / (double) 127;
-        //double speed = std::sqrt(std::pow(x / (double) 127, 2) + std::pow(y / (double) 127, 2));
+        double theta = std::atan2(y, x) + offset;
+        double omega = a / (double) 127;
+        double speed = std::sqrt(std::pow(x / (double) 127, 2) + std::pow(y / (double) 127, 2));
 
         //printf("theta: %1.3f\tomega: %1.3f\tspeed: %1.3f\n", theta, omega, speed);
         //speed = (speed > 1.0) ? 1.0 : speed;
 
         //moveVector(theta, omega, speed);
 
-        drive->xArcade(x / (double) 127, y / (double) 127, a / (double) 127);
+        drive->xArcade(speed * std::cos(theta), speed * std::sin(theta), omega);
         
         if (resetOdomButton.changedToPressed())
             resetOdom();
@@ -394,7 +401,8 @@ namespace chassis
         if (millis() - timer > 100 && isLogging)
         {
             okapi::OdomState state = chassisController->getState();
-            printf("X: %3.3f\tY: %3.3f\tT: %3.3f\n", state.x.convert(okapi::inch), state.y.convert(okapi::inch), state.theta.convert(okapi::degree));
+            //printf("X: %3.3f\tY: %3.3f\tT: %3.3f\n", state.x.convert(okapi::inch), state.y.convert(okapi::inch), state.theta.convert(okapi::degree));
+            printf("isFieldCentric: %d\n", isFieldCentric);
             timer = millis();
         }
     }

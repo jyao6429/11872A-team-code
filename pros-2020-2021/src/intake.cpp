@@ -6,8 +6,8 @@ namespace intake
 {
     okapi::Motor left(6), right(-10);
 
-    okapi::ControllerButton intakePositiveButton(okapi::ControllerDigital::L1);
-	okapi::ControllerButton intakeNegativeButton(okapi::ControllerDigital::L2);
+    okapi::ControllerButton intakePositiveButton(okapi::ControllerDigital::L2);
+	okapi::ControllerButton intakeNegativeButton(okapi::ControllerDigital::L1);
 
     std::unique_ptr<ADIAnalogIn> intakeSensor;
     std::unique_ptr<okapi::MedianFilter<10>> filter;

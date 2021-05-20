@@ -27,7 +27,7 @@ namespace test
         MTT_ASYNC_3,
         ODOM_DIAMETER_TUNE
     };
-    static constexpr TestScript currentTest = SCORER_1;
+    static constexpr TestScript currentTest = ODOM_DIAMETER_TUNE;
     
     void run()
     {
