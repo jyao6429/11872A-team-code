@@ -4,6 +4,7 @@
 #include "odom.h"
 #include "okapi/api/util/mathUtil.hpp"
 #include "pros/rtos.h"
+#include "pros/rtos.hpp"
 
 Controller master(E_CONTROLLER_MASTER);
 
@@ -36,6 +37,7 @@ void disabled()
 	intake::stop();
 	scorer::setState(scorer::OFF);
 	scorer::stop();
+	delay(500);
 }
 
 /**

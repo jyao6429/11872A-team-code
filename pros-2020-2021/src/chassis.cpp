@@ -23,7 +23,7 @@ namespace chassis
             okapi::ADIEncoder{'C', 'D'},
             okapi::ADIEncoder{'E', 'F', true}
         )
-        .withOdometry({{2.742_in, 15.126_in, 15.126_in / 2, 2.742_in}, okapi::quadEncoderTPR}, okapi::StateMode::CARTESIAN)
+        .withOdometry({{2.742_in, 15.0328_in, 15.0328_in / 2, 2.742_in}, okapi::quadEncoderTPR}, okapi::StateMode::CARTESIAN)
         .buildOdometry();
     
     std::shared_ptr<okapi::XDriveModel> drive = std::dynamic_pointer_cast<okapi::XDriveModel>(chassisController->getModel());
@@ -170,19 +170,26 @@ namespace chassis
     }
     ChassisState getState()
     {
-        return state;
+        ChassisState currentState = OFF;
+        chassisMutex->take(50);
+        currentState = state;
+        chassisMutex->give();
+        return currentState;
     }
     int waitUntilSettled(int timeout)
     {
         int timer = millis();
-        while (getState() == MTT && millis() - timer < timeout)
+        while (true)
         {
+            if (getState() != MTT)
+                break;
+
+            if (millis() - timer > timeout)
+            {
+                setState(OFF);
+                return -1;
+            }
             delay(50);
-        }
-        if (millis() - timer > timeout)
-        {
-            setState(OFF);
-            return -1;
         }
         return 0;
     }
@@ -401,8 +408,8 @@ namespace chassis
         if (millis() - timer > 100 && isLogging)
         {
             okapi::OdomState state = chassisController->getState();
-            //printf("X: %3.3f\tY: %3.3f\tT: %3.3f\n", state.x.convert(okapi::inch), state.y.convert(okapi::inch), state.theta.convert(okapi::degree));
-            printf("isFieldCentric: %d\n", isFieldCentric);
+            printf("X: %3.3f\tY: %3.3f\tT: %3.3f\n", state.x.convert(okapi::inch), state.y.convert(okapi::inch), state.theta.convert(okapi::degree));
+            //printf("isFieldCentric: %d\n", isFieldCentric);
             timer = millis();
         }
     }

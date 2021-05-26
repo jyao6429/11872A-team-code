@@ -177,15 +177,15 @@ namespace test
                 break;
             case ODOM_DIAMETER_TUNE:
                 printf("Starting ODOM_DIAMETER_TUNE\n");
-                chassis::moveVector(-okapi::pi / 2, 0, 0.3);
+                chassis::moveVector(0, 0, 0.3);
                 delay(500);
                 chassis::resetOdom();
                 chassis::init();
-                chassis::moveToTargetAsync(0_in, 120_in, 0_deg, 1.0, 0.5, true);
+                chassis::moveToTargetAsync(-120_in, 0_in, 0_deg, 1.0, 0.5, true);
                 chassis::waitUntilSettled();
                 while (true)
                 {
-                    chassis::opcontrol();
+                    //chassis::opcontrol();
                     delay(50);
                 }
                 break;
