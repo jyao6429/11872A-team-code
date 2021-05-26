@@ -5,6 +5,7 @@
 #include "okapi/api/util/mathUtil.hpp"
 #include "pros/rtos.h"
 #include "pros/rtos.hpp"
+#include "autoSelect/selection.h"
 
 Controller master(E_CONTROLLER_MASTER);
 

@@ -97,7 +97,7 @@ namespace chassis
 
                     //printf("Starting MTT loop\n");
 
-                    int timer = millis();
+                    int mttTimer = millis();
                     
                     while (true)
                     {
@@ -127,9 +127,9 @@ namespace chassis
                         else
                             strafeVector(targetHeading, targetOmega, targetSpeed);
 
-                        if (millis() - timer > 100)
+                        if (millis() - mttTimer > 100)
                         {
-                            timer = millis();
+                            mttTimer = millis();
                             printf("ASYNC xDiff: %3.3f\tyDiff: %3.3f\tdE: %3.3f\ttE: %3.3f\theading: %3.3f\tspeed: %3.3f\tomega: %3.3f\n", xDiff, yDiff, distanceError, thetaError, targetHeading * okapi::radianToDegree, targetSpeed, targetOmega);
                         }
 
@@ -178,13 +178,13 @@ namespace chassis
     }
     int waitUntilSettled(int timeout)
     {
-        int timer = millis();
+        int timeoutTimer = millis();
         while (true)
         {
             if (getState() != MTT)
                 break;
 
-            if (millis() - timer > timeout)
+            if (millis() - timeoutTimer > timeout)
             {
                 setState(OFF);
                 return -1;
@@ -201,13 +201,13 @@ namespace chassis
     {
         okapi::SettledUtil distanceStuckUtil(std::make_unique<okapi::Timer>(), 2.0, 2.0, 750_ms);
         okapi::SettledUtil thetaStuckUtil(std::make_unique<okapi::Timer>(), 0.2, 0.2, 750_ms);
-        int timer = millis();
+        int timeoutTimer = millis();
 
         while (true)
         {
             if (getState() != MTT)
                 return 0;
-            if (millis() - timer > timeout)
+            if (millis() - timeoutTimer > timeout)
             {
                 setState(OFF);
                 return -1;
@@ -278,7 +278,7 @@ namespace chassis
 
         printf("Starting MTT loop\n");
 
-        int timer = millis();
+        int mttTimer = millis();
         
         while (true)
         {
@@ -313,9 +313,9 @@ namespace chassis
                 strafeVector(targetHeading, targetOmega, targetSpeed);
             }
 
-            if (millis() - timer > 100)
+            if (millis() - mttTimer > 100)
             {
-                timer = millis();
+                mttTimer = millis();
                 printf("xDiff: %3.3f\tyDiff: %3.3f\tdE: %3.3f\ttE: %3.3f\theading: %3.3f\tspeed: %3.3f\tomega: %3.3f\n", xDiff, yDiff, distanceError, thetaError, targetHeading * okapi::radianToDegree, targetSpeed, targetOmega);
                 //printf("distanceDerivative: %3.3f\tthetaDerivative: %3.3f\n");
             }
@@ -373,7 +373,7 @@ namespace chassis
         bottomLeft.moveVoltage(bottomLeftVoltage);
     }
 
-    int timer = millis();
+    int logTimer = millis();
     bool isLogging = true;
 
     void opcontrol()
@@ -405,12 +405,12 @@ namespace chassis
         if (resetOdomButton.changedToPressed())
             resetOdom();
 
-        if (millis() - timer > 100 && isLogging)
+        if (millis() - logTimer > 100 && isLogging)
         {
             okapi::OdomState state = chassisController->getState();
             printf("X: %3.3f\tY: %3.3f\tT: %3.3f\n", state.x.convert(okapi::inch), state.y.convert(okapi::inch), state.theta.convert(okapi::degree));
             //printf("isFieldCentric: %d\n", isFieldCentric);
-            timer = millis();
+            logTimer = millis();
         }
     }
 }

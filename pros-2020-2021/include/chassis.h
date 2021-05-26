@@ -1,7 +1,7 @@
 #ifndef CHASSIS_H
 #define CHASSIS_H
 
-#include "main.h"
+#include "okapi/api.hpp"
 
 namespace chassis
 {
@@ -25,8 +25,8 @@ namespace chassis
     okapi::OdomState getVelocity();
     void setState(ChassisState newState);
     ChassisState getState();
-    int waitUntilSettled(int timeout);
     int waitUntilSettled();
+    int waitUntilSettled(int timeout);
     int waitUntilStuck(int timeout);
     void moveToTargetAsync(okapi::QLength targetX, okapi::QLength targetY, okapi::QAngle targetTheta, double maxSpeed, double maxOmega, bool park);
     void moveToTarget(okapi::QLength targetX, okapi::QLength targetY, okapi::QAngle targetTheta, double maxSpeed, double maxOmega, bool park);

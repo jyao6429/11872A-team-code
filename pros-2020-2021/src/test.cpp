@@ -181,8 +181,10 @@ namespace test
                 delay(500);
                 chassis::resetOdom();
                 chassis::init();
-                chassis::moveToTargetAsync(-120_in, 0_in, 0_deg, 1.0, 0.5, true);
-                chassis::waitUntilSettled();
+                chassis::moveToTargetAsync(-120_in, 0_in, 0_deg, 0.3, 0.5, true);
+                printf("Waiting ODOM_DIAMETER_TUNE\n");
+                chassis::waitUntilSettled(200);
+                printf("Done waiting ODOM_DIAMETER_TUNE\n");
                 while (true)
                 {
                     //chassis::opcontrol();
