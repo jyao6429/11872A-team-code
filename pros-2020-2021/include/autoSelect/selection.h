@@ -3,9 +3,9 @@
 #include <string>
 
 //selector configuration
-#define HUE 360
-#define DEFAULT 1
-#define AUTONS "Front", "Back", "Do Nothing"
+#define HUE 180
+#define DEFAULT 0
+#define AUTONS "Front-HR", "Front-Half", "Back-Half", "None"
 
 namespace selector{
 

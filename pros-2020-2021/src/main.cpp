@@ -6,8 +6,29 @@
 #include "pros/rtos.h"
 #include "pros/rtos.hpp"
 #include "autoSelect/selection.h"
+#include <memory>
 
 Controller master(E_CONTROLLER_MASTER);
+
+int prevAuto = 1;
+std::unique_ptr<Task> textUpdateHandler;
+
+void textUpdate(void *ign)
+{
+	while (true)
+	{
+		int currentAuto = selector::auton;
+		if (currentAuto != prevAuto)
+		{
+			char autoSelection[20];
+			sprintf(autoSelection, "Auto: %d    ", currentAuto);
+			master.set_text(0, 0, autoSelection);
+			prevAuto = currentAuto;
+		}
+		delay(200);
+	}
+}
+
 
 /**
  * Runs initialization code. This occurs as soon as the program is started.
@@ -23,6 +44,8 @@ void initialize()
 	scorer::init();
 
 	selector::init();
+
+	textUpdateHandler = std::make_unique<Task>(textUpdate, nullptr, TASK_PRIORITY_DEFAULT - 1);
 }
 
 /**
@@ -38,7 +61,6 @@ void disabled()
 	intake::stop();
 	scorer::setState(scorer::OFF);
 	scorer::stop();
-	delay(500);
 }
 
 /**
