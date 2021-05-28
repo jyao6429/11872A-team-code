@@ -49,6 +49,7 @@ namespace chassis
      * @param speed - [0 - 1] target translational speed
      */
     void moveVector(double theta, double omega, double speed);
+    void moveVelocity(double theta, double omega, double speed);
     void opcontrol();
 }
 

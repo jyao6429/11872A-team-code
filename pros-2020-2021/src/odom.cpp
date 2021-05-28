@@ -15,9 +15,9 @@ namespace odom
     static bool initialized = false;
     static bool isLogging = false;
 
-    static constexpr double trackWidth = 11.4278;
+    static constexpr double trackWidth = 15.0328;
     static constexpr double backLength = trackWidth / 2;
-    static constexpr double wheelDiameter = 2.75;
+    static constexpr double wheelDiameter = 2.742;
     static constexpr double encoderResolution = 360;
 
     void odomTask(void *ign)

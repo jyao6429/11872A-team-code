@@ -23,7 +23,7 @@ namespace chassis
             okapi::ADIEncoder{'C', 'D'},
             okapi::ADIEncoder{'E', 'F', true}
         )
-        .withOdometry({{2.742_in, 15.0328_in, 15.0328_in / 2, 2.742_in}, okapi::quadEncoderTPR}, okapi::StateMode::CARTESIAN)
+        .withOdometry({{2.73228_in, 14.924_in, 14.924_in / 2, 2.73228_in}, okapi::quadEncoderTPR}, okapi::StateMode::CARTESIAN)
         .buildOdometry();
     
     std::shared_ptr<okapi::XDriveModel> drive = std::dynamic_pointer_cast<okapi::XDriveModel>(chassisController->getModel());
@@ -86,8 +86,8 @@ namespace chassis
 
                     if (currentContainer.park)
                     {
-                        distanceSettled = std::make_unique<okapi::SettledUtil>(std::make_unique<okapi::Timer>(), 1.0, 0.05, 250_ms);
-                        thetaSettled = std::make_unique<okapi::SettledUtil>(std::make_unique<okapi::Timer>(), 0.05, 0.005, 250_ms);
+                        distanceSettled = std::make_unique<okapi::SettledUtil>(std::make_unique<okapi::Timer>(), 1.0, 0.05, 200_ms);
+                        thetaSettled = std::make_unique<okapi::SettledUtil>(std::make_unique<okapi::Timer>(), 0.05, 0.005, 200_ms);
                     }
                     else
                     {
@@ -214,7 +214,7 @@ namespace chassis
             }
             okapi::OdomState currentV = getVelocity();
             double robotV = std::sqrt(std::pow(currentV.x.convert(okapi::inch), 2) + std::pow(currentV.y.convert(okapi::inch), 2));
-            printf("robotV: %3.3f\trobotOmega: %3.3f\n", robotV, currentV.theta.getValue());
+            //printf("robotV: %3.3f\trobotOmega: %3.3f\n", robotV, currentV.theta.getValue());
             if (distanceStuckUtil.isSettled(robotV) && thetaStuckUtil.isSettled(currentV.theta.getValue()))
             {
                 setState(OFF);
@@ -372,9 +372,29 @@ namespace chassis
         bottomRight.moveVoltage(bottomRightVoltage);
         bottomLeft.moveVoltage(bottomLeftVoltage);
     }
+    void moveVelocity(double theta, double omega, double speed)
+    {
+        // formulas from https://theol0403.github.io/7842F-Programming-Journal/2019-11-20/odom-x-controller/
+        double p1 = -std::cos(theta + okapi::pi/4);
+        double p2 = std::sin(theta + okapi::pi/4);
+
+        int topLeftVelocity = 200 * (p2 * speed + omega);
+        int topRightVelocity = 200 * (p1 * speed - omega);
+        int bottomRightVelocity = 200 * (p2 * speed - omega);
+        int bottomLeftVelocity = 200 * (p1 * speed + omega);
+
+        topLeft.moveVelocity(topLeftVelocity);
+        topRight.moveVelocity(topRightVelocity);
+        bottomRight.moveVelocity(bottomRightVelocity);
+        bottomLeft.moveVelocity(bottomLeftVelocity);
+    }
 
     int logTimer = millis();
     bool isLogging = true;
+
+    ADIEncoder leftEncoder{'A', 'B'};
+    ADIEncoder rightEncoder{'C', 'D'};
+    ADIEncoder backEncoder{'E', 'F', true};
 
     void opcontrol()
     {
@@ -405,12 +425,14 @@ namespace chassis
         if (resetOdomButton.changedToPressed())
             resetOdom();
 
-        if (millis() - logTimer > 100 && isLogging)
+        if (millis() - logTimer > 150 && isLogging)
         {
             okapi::OdomState state = chassisController->getState();
-            printf("X: %3.3f\tY: %3.3f\tT: %3.3f\n", state.x.convert(okapi::inch), state.y.convert(okapi::inch), state.theta.convert(okapi::degree));
-            //printf("isFieldCentric: %d\n", isFieldCentric);
-            logTimer = millis();
+            printf("X: %3.3f\tY: %3.3f\tT: %3.3f\t", state.x.convert(okapi::inch), state.y.convert(okapi::inch), state.theta.convert(okapi::degree));
+            //odom::pose robotPose = odom::getPose();
+			//printf("X*: %3.3f\tY*: %3.3f\tT*: %3.3f\t", robotPose.x, robotPose.y, robotPose.theta * okapi::radianToDegree);
+			printf("L: %d\tR: %d\tB: %d\n", leftEncoder.get_value(), rightEncoder.get_value(), backEncoder.get_value());
+			logTimer = millis();
         }
     }
 }

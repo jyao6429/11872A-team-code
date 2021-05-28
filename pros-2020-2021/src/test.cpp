@@ -27,7 +27,7 @@ namespace test
         MTT_ASYNC_3,
         ODOM_DIAMETER_TUNE
     };
-    static constexpr TestScript currentTest = ODOM_DIAMETER_TUNE;
+    static constexpr TestScript currentTest = MTT_ASYNC_0;
     
     void run()
     {
@@ -145,9 +145,9 @@ namespace test
                 printf("Starting MTT_ASYNC_0\n");
                 chassis::resetOdom();
                 chassis::init();
-                chassis::moveToTargetAsync(48_in, 48_in, 180_deg, 1.0, 0.3, true);
+                chassis::moveToTargetAsync(24_in, 48_in, 180_deg, 1.0, 0.4, true);
                 chassis::waitUntilSettled();
-                chassis::moveToTargetAsync(0_in, 0_in, 0_deg, 1.0, 0.3, true);
+                chassis::moveToTargetAsync(0_in, 0_in, 0_deg, 1.0, 0.4, true);
                 chassis::waitUntilSettled();
                 break;
             case MTT_ASYNC_1:
@@ -172,22 +172,22 @@ namespace test
                 printf("Starting MTT_ASYNC_3\n");
                 chassis::resetOdom();
                 chassis::init();
-                chassis::moveToTargetAsync(0_in, 48_in, 90_deg, 1.0, 0.3, true);
-                printf("Finished MTT_ASYNC_3 code: %d\n", chassis::waitUntilStuck(4000));
+                chassis::moveToTargetAsync(0_in, 48_in, 0_deg, 1.0, 0.3, true);
+                printf("Finished MTT_ASYNC_3 code: %d\n", chassis::waitUntilStuck(100000));
                 break;
             case ODOM_DIAMETER_TUNE:
                 printf("Starting ODOM_DIAMETER_TUNE\n");
-                chassis::moveVector(0, 0, 0.3);
+                //chassis::moveVector(-okapi::pi / 2, 0, 0.3);
                 delay(500);
                 chassis::resetOdom();
                 chassis::init();
-                chassis::moveToTargetAsync(-120_in, 0_in, 0_deg, 0.3, 0.5, true);
+                chassis::moveToTargetAsync(0_in, 120_in, 0_deg, 0.7, 0.5, true);
                 printf("Waiting ODOM_DIAMETER_TUNE\n");
-                chassis::waitUntilSettled(200);
+                chassis::waitUntilSettled();
                 printf("Done waiting ODOM_DIAMETER_TUNE\n");
                 while (true)
                 {
-                    //chassis::opcontrol();
+                    chassis::opcontrol();
                     delay(50);
                 }
                 break;
