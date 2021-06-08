@@ -52,11 +52,15 @@ namespace scorer
                             break;
                         }
                         
+                        // Scores until sensor is below threshold
                         scorer.moveVoltage(12000);
                         indexer::moveVoltageSafe(12000);
                         if (readFilterSensor() < detectionThreshold)
                         {
+                            // Decreases currentTarget each time sensor is below threshold
                             currentTarget--;
+                            
+                            // Loop until ball is past the sensor so a ball isn't double counted
                             while (readFilterSensor() < detectionThreshold)
                             {
                                 delay(20);

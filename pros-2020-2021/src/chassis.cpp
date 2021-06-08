@@ -37,15 +37,14 @@ namespace chassis
     std::unique_ptr<Task> chassisTaskhandler;
 
 
-    // override buttons
+    // Override buttons and variables during opcontrol
     okapi::ControllerButton strafeHorizontalButton(okapi::ControllerDigital::A);
 	okapi::ControllerButton strafeVerticalButton(okapi::ControllerDigital::B);
 	okapi::ControllerButton resetOdomButton(okapi::ControllerDigital::right);
     okapi::ControllerButton toggleFieldCentricControlButton(okapi::ControllerDigital::left);
-
     bool isFieldCentric = false;
 
-
+    // Task to handle state machine during auton
     void chassisTask(void *ign)
     {
         ChassisState currentState = SKIP;
@@ -70,20 +69,21 @@ namespace chassis
                     break;
                 case MTT:
                     printf("chassisTask: in case MTT\n");
+                    // Convert to nearest equivalent angle
                     currentContainer.theta = nearestEquivalentAngle(currentContainer.theta.getValue(), chassisController->getState().theta.getValue()) * 1_rad;
 
+                    // Initialize PID controllers
                     auto distanceController = okapi::IterativeControllerFactory::posPID(0.35, 0.0015, 0.015);
                     auto thetaController = okapi::IterativeControllerFactory::posPID(3.0, 4.0, 0.07);
-
                     distanceController.setTarget(0);
                     thetaController.setTarget(currentContainer.theta.getValue());
-
-                    std::unique_ptr<okapi::SettledUtil> distanceSettled;
-                    std::unique_ptr<okapi::SettledUtil> thetaSettled;
 
                     //printf("~~~~~~~~~~~~~~~MTT~~~~~~~~~~~~~~~\ntX: %3.3f\ttY: %3.3f\ttT: %3.3f\tmaxS: %3.3f\tmaxO: %3.3f\n",
                             //targetX.convert(okapi::inch), targetY.convert(okapi::inch), targetTheta.convert(okapi::degree), maxSpeed, maxOmega);
 
+                    // Initialize SettledUtils depending on park
+                    std::unique_ptr<okapi::SettledUtil> distanceSettled;
+                    std::unique_ptr<okapi::SettledUtil> thetaSettled;
                     if (currentContainer.park)
                     {
                         distanceSettled = std::make_unique<okapi::SettledUtil>(std::make_unique<okapi::Timer>(), 1.0, 0.05, 200_ms);
@@ -104,29 +104,34 @@ namespace chassis
                         if (getState() != MTT)
                             break;
                         
+                        // Calculate current states
                         okapi::OdomState currentState = chassisController->getState();
                         double xDiff = currentContainer.x.convert(okapi::inch) - currentState.x.convert(okapi::inch);
                         double yDiff = currentContainer.y.convert(okapi::inch) - currentState.y.convert(okapi::inch);
 
+                        // Calculate errors
                         double distanceError = std::sqrt(std::pow(xDiff, 2) + std::pow(yDiff, 2));
                         double thetaError = currentContainer.theta.getValue() - currentState.theta.getValue();
 
+                        // Check if settled
                         if (distanceSettled->isSettled(distanceError) && thetaSettled->isSettled(thetaError))
                         {
                             setState(OFF);
                             break;
                         }
 
+                        // Calculate targets based on PID and heading
                         double targetHeading = std::atan2(yDiff, xDiff) + currentState.theta.getValue();
                         double targetSpeed = -distanceController.step(distanceError) * currentContainer.maxSpeed;
                         double targetOmega = thetaController.step(currentState.theta.getValue()) * currentContainer.maxOmega;
 
-
+                        // Power motors based on targets
                         if (targetSpeed < 0.7)
                             moveVector(targetHeading, targetOmega, targetSpeed);
                         else
                             strafeVector(targetHeading, targetOmega, targetSpeed);
 
+                        // Logging
                         if (millis() - mttTimer > 100)
                         {
                             mttTimer = millis();
@@ -237,6 +242,7 @@ namespace chassis
     {
         setState(OFF);
         delay(50);
+        // Set variables in container and update chassis state
         chassisMutex->take(10);
         mttContainer.x = targetX;
         mttContainer.y = targetY;
@@ -249,79 +255,8 @@ namespace chassis
     }
     void moveToTarget(okapi::QLength targetX, okapi::QLength targetY, okapi::QAngle targetTheta, double maxSpeed, double maxOmega, bool park)
     {
-        isSettled = false;
-
-        targetTheta = nearestEquivalentAngle(targetTheta.getValue(), chassisController->getState().theta.getValue()) * 1_rad;
-
-        auto distanceController = okapi::IterativeControllerFactory::posPID(0.7, 0.0, 0.04);
-        auto thetaController = okapi::IterativeControllerFactory::posPID(4.0, 0.0, 0.1);
-
-        distanceController.setTarget(0);
-        thetaController.setTarget(targetTheta.getValue());
-
-        std::unique_ptr<okapi::SettledUtil> distanceSettled;
-        std::unique_ptr<okapi::SettledUtil> thetaSettled;
-
-        printf("~~~~~~~~~~~~~~~MTT~~~~~~~~~~~~~~~\ntX: %3.3f\ttY: %3.3f\ttT: %3.3f\tmaxS: %3.3f\tmaxO: %3.3f\n",
-                targetX.convert(okapi::inch), targetY.convert(okapi::inch), targetTheta.convert(okapi::degree), maxSpeed, maxOmega);
-
-        if (park)
-        {
-            distanceSettled = std::make_unique<okapi::SettledUtil>(std::make_unique<okapi::Timer>(), 1.0, 0.1, 250_ms);
-            thetaSettled = std::make_unique<okapi::SettledUtil>(std::make_unique<okapi::Timer>(), 0.05, 0.005, 250_ms);
-        }
-        else
-        {
-            distanceSettled = std::make_unique<okapi::SettledUtil>(std::make_unique<okapi::Timer>(), 3.0, 100, 0_ms);
-            thetaSettled = std::make_unique<okapi::SettledUtil>(std::make_unique<okapi::Timer>(), 0.2, 100, 0_ms);
-        }
-
-        printf("Starting MTT loop\n");
-
-        int mttTimer = millis();
-        
-        while (true)
-        {
-            okapi::OdomState currentState = chassisController->getState();
-            double xDiff = targetX.convert(okapi::inch) - currentState.x.convert(okapi::inch);
-            double yDiff = targetY.convert(okapi::inch) - currentState.y.convert(okapi::inch);
-
-            double distanceError = std::sqrt(std::pow(xDiff, 2) + std::pow(yDiff, 2));
-            double thetaError = targetTheta.getValue() - currentState.theta.getValue();
-
-            if (distanceSettled->isSettled(distanceError) && thetaSettled->isSettled(thetaError))
-            {
-                isSettled = true;
-                strafeVector(0, 0, 0);
-                break;
-            }
-
-            double targetHeading = std::atan2(yDiff, xDiff) + currentState.theta.getValue();
-            double targetSpeed = -distanceController.step(distanceError) * maxSpeed;
-            double targetOmega = thetaController.step(currentState.theta.getValue()) * maxOmega;
-
-
-            if (targetSpeed < 0.7)
-            {
-                //double targetX = targetSpeed * std::cos(targetHeading);
-                //double targetY = targetSpeed * std::sin(targetHeading);
-                //drive->xArcade(targetX, targetY, targetOmega);
-                moveVector(targetHeading, targetOmega, targetSpeed);
-            }
-            else
-            {
-                strafeVector(targetHeading, targetOmega, targetSpeed);
-            }
-
-            if (millis() - mttTimer > 100)
-            {
-                mttTimer = millis();
-                printf("xDiff: %3.3f\tyDiff: %3.3f\tdE: %3.3f\ttE: %3.3f\theading: %3.3f\tspeed: %3.3f\tomega: %3.3f\n", xDiff, yDiff, distanceError, thetaError, targetHeading * okapi::radianToDegree, targetSpeed, targetOmega);
-                //printf("distanceDerivative: %3.3f\tthetaDerivative: %3.3f\n");
-            }
-
-            delay(10);
-        }
+        moveToTargetAsync(targetX, targetY, targetTheta, maxSpeed, maxOmega, park);
+        waitUntilSettled();
     }
     double nearestEquivalentAngle(double angle, double reference)
     {
@@ -372,23 +307,8 @@ namespace chassis
         bottomRight.moveVoltage(bottomRightVoltage);
         bottomLeft.moveVoltage(bottomLeftVoltage);
     }
-    void moveVelocity(double theta, double omega, double speed)
-    {
-        // formulas from https://theol0403.github.io/7842F-Programming-Journal/2019-11-20/odom-x-controller/
-        double p1 = -std::cos(theta + okapi::pi/4);
-        double p2 = std::sin(theta + okapi::pi/4);
 
-        int topLeftVelocity = 200 * (p2 * speed + omega);
-        int topRightVelocity = 200 * (p1 * speed - omega);
-        int bottomRightVelocity = 200 * (p2 * speed - omega);
-        int bottomLeftVelocity = 200 * (p1 * speed + omega);
-
-        topLeft.moveVelocity(topLeftVelocity);
-        topRight.moveVelocity(topRightVelocity);
-        bottomRight.moveVelocity(bottomRightVelocity);
-        bottomLeft.moveVelocity(bottomLeftVelocity);
-    }
-
+    // variables for debugging
     int logTimer = millis();
     bool isLogging = true;
 
@@ -398,10 +318,12 @@ namespace chassis
 
     void opcontrol()
     {
+        // Get values from controller
         int x = master.get_analog(ANALOG_LEFT_X);
         int y = master.get_analog(ANALOG_LEFT_Y);
         int a = master.get_analog(ANALOG_RIGHT_X);
 
+        // Handle overrides
         if (strafeHorizontalButton.isPressed())
             y = 0;
         else if (strafeVerticalButton.isPressed())
@@ -409,6 +331,7 @@ namespace chassis
         if (toggleFieldCentricControlButton.changedToPressed())
             isFieldCentric = !isFieldCentric;
         
+        // Calculate if driving is field centric or not
         double offset = (isFieldCentric) ? chassisController->getState().theta.getValue() : 0;
 
         double theta = std::atan2(y, x) + offset;
@@ -425,6 +348,7 @@ namespace chassis
         if (resetOdomButton.changedToPressed())
             resetOdom();
 
+        // Logging
         if (millis() - logTimer > 150 && isLogging)
         {
             okapi::OdomState state = chassisController->getState();

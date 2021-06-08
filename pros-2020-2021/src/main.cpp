@@ -10,9 +10,11 @@
 
 Controller master(E_CONTROLLER_MASTER);
 
+// Variables for textUpdate
 int prevAuto = 1;
 std::unique_ptr<Task> textUpdateHandler;
 
+// Task for updating controller text for auton state
 void textUpdate(void *ign)
 {
 	while (true)
@@ -87,17 +89,31 @@ void competition_initialize() {}
  */
 void autonomous()
 {
+	// Ensure all necessary subsystems are running
 	chassis::init();
 	intake::init();
 	scorer::init();
 
-	test::run();
-	/*
-	switch (selector::auton)
+	// Switch based on desired autonomous
+	int selection = selector::auton;
+	switch (std::abs(selection))
 	{
-		case 
+		case 0:
+			auton::skillsSafe();
+			//auton::skills();
+			//test::run();
+			break;
+		case 1:
+			auton::frontHalf(selection);
+			break;
+		case 2:
+			auton::frontHalf(selection);
+			break;
+		case 3:
+			auton::backHalf(selection);
+			break;
 	}
-	*/
+	
 }
 
 /**
@@ -115,10 +131,6 @@ void autonomous()
  */
 void opcontrol()
 {
-	//ADIEncoder leftEncoder{'A', 'B'};
-    //ADIEncoder rightEncoder{'C', 'D'};
-    //ADIEncoder backEncoder{'E', 'F', true};
-
 	chassis::setState(chassis::SKIP);
 	chassis::stop();
 	intake::setState(intake::OFF);
@@ -131,6 +143,7 @@ void opcontrol()
 
 	while (true)
 	{
+		// Run each of the subsystem's opcontrol
 		chassis::opcontrol();
 		intake::opcontrol();
 		indexer::opcontrol();

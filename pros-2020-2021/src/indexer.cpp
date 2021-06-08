@@ -2,8 +2,10 @@
 
 namespace indexer
 {
+    // Indexer motor
     okapi::Motor indexer(-5);
 
+    // Buttons during opcontrol
     okapi::ControllerButton intakePositiveButton(okapi::ControllerDigital::L2);
 	okapi::ControllerButton intakeNegativeButton(okapi::ControllerDigital::L1);
 	okapi::ControllerButton scorerPositiveButton(okapi::ControllerDigital::R2);

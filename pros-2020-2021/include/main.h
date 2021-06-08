@@ -63,6 +63,7 @@ extern Controller master;
 #include "indexer.h"
 #include "scorer.h"
 #include "test.h"
+#include "auton.h"
 
 /**
  * Prototypes for the competition control tasks are redefined here to ensure

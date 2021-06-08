@@ -6,6 +6,7 @@
 
 namespace test
 {
+    // Enum for each test case
     enum TestScript
     {
         INTAKE_1,
@@ -27,6 +28,7 @@ namespace test
         MTT_ASYNC_3,
         ODOM_DIAMETER_TUNE
     };
+    // Current test case to run
     static constexpr TestScript currentTest = MTT_ASYNC_0;
     
     void run()

@@ -4,11 +4,14 @@
 
 namespace intake
 {
+    // intake motors
     okapi::Motor left(6), right(-10);
 
+    // buttons for opcontrol
     okapi::ControllerButton intakePositiveButton(okapi::ControllerDigital::L2);
 	okapi::ControllerButton intakeNegativeButton(okapi::ControllerDigital::L1);
 
+    // Variables for auton
     std::unique_ptr<ADIAnalogIn> intakeSensor;
     std::unique_ptr<okapi::MedianFilter<10>> filter;
     std::unique_ptr<Task> intakeTaskHandler;
@@ -16,7 +19,6 @@ namespace intake
     static IntakeState state = OFF;
     static int targetNumber = 0;
     static bool initialized = false;
-
     static constexpr int detectionThreshold = -500;
 
     void intakeTask(void *ign)
@@ -54,13 +56,19 @@ namespace intake
                             break;
                         }
                         
+                        // Intakes until sensor is below threshold
                         moveVoltage(12000);
                         indexer::moveVoltageSafe(12000);
                         if (readFilterSensor() < detectionThreshold)
                         {
+                            // Decreases currentTarget each time sensor is below threshold
                             currentTarget--;
+
+                            // Break early if it is the last ball to be intaked
                             if (currentTarget == 0)
                                 break;
+                            
+                            // Loop until ball is past the sensor so a ball isn't double counted
                             while (readFilterSensor() < detectionThreshold)
                             {
                                 delay(20);
@@ -87,13 +95,15 @@ namespace intake
                             break;
                         }
                         
+                        // Intakes until sensor is below threshold
                         moveVoltage(-12000);
-                        indexer::moveVoltage(-12000);
+                        indexer::moveVoltageSafe(-12000);
                         if (readFilterSensor() < detectionThreshold)
                         {
+                            // Decreases currentTarget each time sensor is below threshold
                             currentTarget--;
-                            if (currentTarget == 0)
-                                break;
+                            
+                            // Loop until ball is past the sensor so a ball isn't double counted
                             while (readFilterSensor() < detectionThreshold)
                             {
                                 delay(20);
@@ -102,7 +112,7 @@ namespace intake
                         delay(20);
                     }
                     moveVoltage(0);
-                    indexer::moveVoltage(0);
+                    indexer::moveVoltageSafe(0);
                     intakeMutex->take(10);
                     state = OFF;
                     targetNumber = 0;

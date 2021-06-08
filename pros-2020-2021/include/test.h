@@ -3,6 +3,9 @@
 
 namespace test
 {
+    /**
+     * Runs the selected test case in test.cpp
+     */
     void run();
 }
 

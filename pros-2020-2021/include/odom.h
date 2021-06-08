@@ -3,6 +3,7 @@
 
 namespace odom
 {
+    // Class for the coordinates and orientation of the robot in inches and radians
     class pose
     {
         public:
@@ -16,9 +17,25 @@ namespace odom
         }
     };
 
+    /** 
+     * Initialize odomTask during startup or resume task after suspension
+     */
     void start(bool log = false);
+    /** 
+     * Suspends odomTask
+     */
     void stop();
+    /** 
+     * Returns the current pose of the robot
+     *
+     * @return the current pose
+     */
     pose getPose();
+    /** 
+     * Sets the current pose of the robot
+     *
+     * @param newPose - the desired pose of the robot
+     */
     void setPose(pose newPose);
 }
 
