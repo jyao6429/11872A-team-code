@@ -46,7 +46,6 @@ def main():
     with wrapper_dest.open(mode='w') as f:
         # Recursively search the entire project for any header files
         f.write("%%---------------------\n")
-        f.write("\\section*{Header Files}\n\n")
         for header in root.cwd().glob('**/*.h*'):
             # break header into components starting from the root
             components = header.parts[ROOT_START:]
@@ -77,13 +76,13 @@ def main():
 
             # Generate LaTeX code for any valid header
             # Write it to the 'Code' LaTeX file
+            f.write("\\thispagestyle{empty}")
             f.write("\\subsection*{" + rel_header_path + "}\n")
             f.write("\\inputminted[linenos,tabsize=2,breaklines, breakanywhere]{c}{" + name + "}\n")
             f.write("\\pagebreak\n\n")
 
         # Recursively search the entire project for any relevant source files
         f.write("%%---------------------\n")
-        f.write("\\section*{Source Files}\n\n")
         for source in root.cwd().glob('**/*.c*'):
             # break source into components starting from the root
             components = source.parts[ROOT_START:]
@@ -105,6 +104,7 @@ def main():
             copy(source, zip_source)
 
             # Generate LaTeX code for any valid source file
+            f.write("\\thispagestyle{empty}")
             f.write("\\subsection*{" + rel_src_path + "}\n")
             f.write("\\inputminted[linenos,tabsize=2,breaklines, breakanywhere]{c}{" + name + "}\n")
             f.write("\\pagebreak\n\n")
@@ -117,6 +117,7 @@ def main():
                  + "\\usepackage[utf8]{inputenc}\n"
                  + "\\usepackage[margin=1in]{geometry}\n"
                  + "\\title{" + PROJECT_NAME + "}\n"
+                 + "\\pagestyle{empty}\n"
                  + "\\author{LAST_FIRST}\n"
                  + "\\date{MONTH_YEAR}\n"
                  + "\\usepackage{minted}\n"
