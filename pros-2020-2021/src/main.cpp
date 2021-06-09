@@ -6,6 +6,7 @@
 #include "pros/rtos.h"
 #include "pros/rtos.hpp"
 #include "autoSelect/selection.h"
+#include <cmath>
 #include <memory>
 
 Controller master(E_CONTROLLER_MASTER);
@@ -95,8 +96,8 @@ void autonomous()
 	scorer::init();
 
 	// Switch based on desired autonomous
-	int selection = selector::auton;
-	switch (std::abs(selection))
+	int selection = std::abs(selector::auton);
+	switch (selection)
 	{
 		case 0:
 			auton::skillsSafe();
@@ -104,13 +105,16 @@ void autonomous()
 			//test::run();
 			break;
 		case 1:
-			auton::frontHalf(selection);
+			auton::leftHomeRow();
 			break;
 		case 2:
-			auton::frontHalf(selection);
+			auton::leftHalf();
 			break;
 		case 3:
-			auton::backHalf(selection);
+			auton::rightHalf();
+			break;
+		case 4:
+			disabled();
 			break;
 	}
 	

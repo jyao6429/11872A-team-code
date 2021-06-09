@@ -5,9 +5,9 @@ namespace auton
 {
     void skills();
     void skillsSafe();
-    void frontHomeRow(int selection);
-    void frontHalf(int selection);
-    void backHalf(int selection);
+    void leftHomeRow();
+    void leftHalf();
+    void rightHalf();
 }
 
 #endif

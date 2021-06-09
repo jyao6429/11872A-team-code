@@ -5,7 +5,7 @@
 //selector configuration
 #define HUE 180
 #define DEFAULT 0
-#define AUTONS "Front-HR", "Front-Half", "Back-Half", "None"
+#define AUTONS "Left-HR", "Left-Half", "Right-Half", "None"
 
 namespace selector{
 
