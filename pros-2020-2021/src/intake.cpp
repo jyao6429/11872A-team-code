@@ -8,8 +8,8 @@ namespace intake
     okapi::Motor left(6), right(-10);
 
     // buttons for opcontrol
-    okapi::ControllerButton intakePositiveButton(okapi::ControllerDigital::L2);
-	okapi::ControllerButton intakeNegativeButton(okapi::ControllerDigital::L1);
+    okapi::ControllerButton intakePositiveButton(okapi::ControllerDigital::L1);
+	okapi::ControllerButton intakeNegativeButton(okapi::ControllerDigital::L2);
 
     // Variables for auton
     std::unique_ptr<ADIAnalogIn> intakeSensor;

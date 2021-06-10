@@ -4,8 +4,8 @@ namespace scorer
 {
     okapi::Motor scorer(1);
 
-    okapi::ControllerButton scorerPositiveButton(okapi::ControllerDigital::R2);
-	okapi::ControllerButton scorerNegativeButton(okapi::ControllerDigital::R1);
+    okapi::ControllerButton scorerPositiveButton(okapi::ControllerDigital::R1);
+	okapi::ControllerButton scorerNegativeButton(okapi::ControllerDigital::R2);
 
     std::unique_ptr<ADIAnalogIn> scorerSensor;
     std::unique_ptr<okapi::MedianFilter<10>> filter;
