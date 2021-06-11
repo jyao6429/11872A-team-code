@@ -81,7 +81,7 @@ namespace auton
         // Line up with left middle goal and score
         chassis::moveToTargetAsync(-55.5_in, 0_in, -90_deg, 1.0, 0.8, false);
         chassis::waitUntilStuck(4000);
-        scorer::setState(scorer::NUMBER_SCORE, 2)
+        scorer::setState(scorer::NUMBER_SCORE, 2);
         delay(1000);
         intake::setState(intake::NUMBER_IN, 1);
         scorer::waitUntilStopped(5000);
@@ -89,7 +89,7 @@ namespace auton
 
         // Back away while outtaking
         chassis::moveToTargetAsync(-47_in, 0_in, -90_deg, 1.0, 0.8, false);
-        indexer.moveVoltageSafe(10000);
+        indexer::moveVoltageSafe(10000);
         intake::setState(intake::OUTTAKE);
         chassis::waitUntilStuck(2000);
 
@@ -124,7 +124,7 @@ namespace auton
         corner2(1);
 
         // Intake ball from center
-        chassis::moveToTargetAsync(-35.4_in, -15_in, 0_deg, 1.0, 0.4, false);
+        chassis::moveToTargetAsync(-35.4_in, -20_in, 0_deg, 1.0, 0.4, false);
         chassis::waitUntilStuck(3000);
         intake::setState(intake::NUMBER_IN, 1);
         chassis::moveToTargetAsync(-35.4_in, -10_in, 0_deg, 1.0, 0.4, true);
@@ -142,7 +142,7 @@ namespace auton
         matchStart(-1);
 
         // Intake 2 and score 2 in back corner goal
-        corner2(1);
+        corner2(-1);
 
         // Possibly push out balls in middle goal?
         //intake::setState(intake::OUTTAKE);
