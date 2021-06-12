@@ -39,6 +39,8 @@ namespace chassis
 
 
     // Override buttons and variables during opcontrol
+    okapi::ControllerButton intakePositiveButton(okapi::ControllerDigital::L1);
+	okapi::ControllerButton intakeNegativeButton(okapi::ControllerDigital::L2);
     okapi::ControllerButton strafeHorizontalButton(okapi::ControllerDigital::A);
 	okapi::ControllerButton strafeVerticalButton(okapi::ControllerDigital::B);
 	okapi::ControllerButton resetOdomButton(okapi::ControllerDigital::right);
@@ -81,8 +83,10 @@ namespace chassis
                     // Initialize PID controllers
                     auto distanceController = okapi::IterativeControllerFactory::posPID(0.35, 0.0015, 0.015);
                     auto thetaController = okapi::IterativeControllerFactory::posPID(3.0, 4.0, 0.07);
+                    auto lineUpController = okapi::IterativeControllerFactory::posPID(0.5, 0.0, 0.0);
                     distanceController.setTarget(0);
                     thetaController.setTarget(currentContainer.theta.getValue());
+                    lineUpController.setTarget(0);
 
                     //printf("~~~~~~~~~~~~~~~MTT~~~~~~~~~~~~~~~\ntX: %3.3f\ttY: %3.3f\ttT: %3.3f\tmaxS: %3.3f\tmaxO: %3.3f\n",
                             //targetX.convert(okapi::inch), targetY.convert(okapi::inch), targetTheta.convert(okapi::degree), maxSpeed, maxOmega);
@@ -130,6 +134,16 @@ namespace chassis
                         double targetHeading = std::atan2(yDiff, xDiff) + currentState.theta.getValue();
                         double targetSpeed = -distanceController.step(distanceError) * currentContainer.maxSpeed;
                         double targetOmega = thetaController.step(currentState.theta.getValue()) * currentContainer.maxOmega;
+
+                        if (currentContainer.lineUp)
+                        {
+                            double headingDelta = lineUpController.step(targetHeading - currentState.theta.getValue()) * okapi::pi / 2;
+                            targetHeading += headingDelta;
+                            if (targetHeading - currentState.theta.getValue() > okapi::pi / 2)
+                                targetHeading = currentState.theta.getValue() + okapi::pi / 2;
+                            if (targetHeading - currentState.theta.getValue() < -okapi::pi / 2)
+                                targetHeading = currentState.theta.getValue() - okapi::pi / 2;
+                        }
 
                         // Power motors based on targets
                         if (targetSpeed < 0.7)
@@ -246,6 +260,10 @@ namespace chassis
     }
     void moveToTargetAsync(okapi::QLength targetX, okapi::QLength targetY, okapi::QAngle targetTheta, double maxSpeed, double maxOmega, bool park)
     {
+        moveToTargetAsync(targetX, targetY, targetTheta, maxSpeed, maxOmega, park, false);
+    }
+    void moveToTargetAsync(okapi::QLength targetX, okapi::QLength targetY, okapi::QAngle targetTheta, double maxSpeed, double maxOmega, bool park, bool lineUp)
+    {
         setState(OFF);
         delay(50);
         // Set variables in container and update chassis state
@@ -256,6 +274,7 @@ namespace chassis
         mttContainer.maxSpeed = maxSpeed;
         mttContainer.maxOmega = maxOmega;
         mttContainer.park = park;
+        mttContainer.lineUp = lineUp;
         state = MTT;
         chassisMutex->give();
     }
@@ -322,6 +341,10 @@ namespace chassis
     int logTimer = millis();
     bool isLogging = true;
 
+    // variables for rocking
+    int rockTimer = millis();
+    bool rockForward = true;
+
     ADIEncoder leftEncoder{'A', 'B'};
     ADIEncoder rightEncoder{'C', 'D'};
     ADIEncoder backEncoder{'E', 'F', true};
@@ -352,6 +375,24 @@ namespace chassis
         //speed = (speed > 1.0) ? 1.0 : speed;
 
         //moveVector(theta, omega, speed);
+
+        if (intakePositiveButton.isPressed() && intakeNegativeButton.isPressed() && millis() - rockTimer > 500)
+        {
+            if (rockForward)
+            {
+                theta = okapi::pi / 2;
+                omega = 0;
+                speed = 1.0;
+            }
+            else
+            {
+                theta = -okapi::pi / 2;
+                omega = 0;
+                speed = 1.0;
+            }
+            rockForward != rockForward;
+            rockTimer = millis();
+        }
 
         drive->xArcade(speed * std::cos(theta), speed * std::sin(theta), omega);
         

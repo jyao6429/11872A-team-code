@@ -20,7 +20,7 @@ namespace chassis
         okapi::QLength x, y;
         okapi::QAngle theta;
         double maxSpeed, maxOmega;
-        bool park;
+        bool park, lineUp;
 
     } MTTContainer;
     
@@ -81,6 +81,18 @@ namespace chassis
      * @param park - true if the robot should settle at target before exiting   
      */
     void moveToTargetAsync(okapi::QLength targetX, okapi::QLength targetY, okapi::QAngle targetTheta, double maxSpeed, double maxOmega, bool park);
+    /** 
+     * Moves robot to desired position and orientation on field without blocking
+     *
+     * @param targetX - target X coordinate on the field
+     * @param targetY - target Y coordinate on the field
+     * @param targetTheta - target orientation of the robot
+     * @param maxSpeed - [0 - 1] maximum linear speed of the movement
+     * @param maxOmega - [0 - 1] maximum angular velocity of the movement     
+     * @param park - true if the robot should settle at target before exiting
+     * @param lineUp - true if robot should line up before reaching target
+     */
+    void moveToTargetAsync(okapi::QLength targetX, okapi::QLength targetY, okapi::QAngle targetTheta, double maxSpeed, double maxOmega, bool park, bool lineUp);
     /** 
      * Moves robot to desired position and orientation on field while blocking
      *

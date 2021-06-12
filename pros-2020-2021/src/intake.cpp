@@ -10,6 +10,7 @@ namespace intake
     // buttons for opcontrol
     okapi::ControllerButton intakePositiveButton(okapi::ControllerDigital::L1);
 	okapi::ControllerButton intakeNegativeButton(okapi::ControllerDigital::L2);
+    okapi::ControllerButton strafeVerticalButton(okapi::ControllerDigital::B);
 
     // Variables for auton
     std::unique_ptr<ADIAnalogIn> intakeSensor;
@@ -204,6 +205,11 @@ namespace intake
 			intakeVolt = 12000;
         else if (intakeNegativeButton.isPressed())
 			intakeVolt = -12000;
+
+        if (strafeVerticalButton.isPressed())
+            intakeVolt = 12000 * (master.get_analog(ANALOG_LEFT_Y) / 127 (double));
+
+        
 
         moveVoltage(intakeVolt);
 
