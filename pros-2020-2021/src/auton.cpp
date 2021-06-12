@@ -263,6 +263,7 @@ namespace auton
         // Intake 2 and score 2 in back corner goal
         corner2(1);
 
+        /*
         // Intake ball from center
         chassis::moveToTargetAsync(-36.0_in, -30_in, 0_deg, 1.0, 0.5, false);
         chassis::waitUntilStuck(3000);
@@ -274,7 +275,7 @@ namespace auton
         chassis::moveToTargetAsync(-11_in, -12_in, 45_deg, 1.0, 0.6, false);
         chassis::waitUntilStuck(3000);
 
-
+        */
     }
     void rightHalf()
     {

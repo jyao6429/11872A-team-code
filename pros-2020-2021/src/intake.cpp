@@ -1,3 +1,4 @@
+#include "intake.h"
 #include "main.h"
 #include <cmath>
 #include <memory>
@@ -159,7 +160,10 @@ namespace intake
         while (getState() != OFF)
         {
             if (millis() - timer > timeout)
+            {
+                setState(OFF);
                 return -1;
+            }
             delay(50);
         }
         return 0;

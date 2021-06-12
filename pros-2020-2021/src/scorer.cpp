@@ -1,4 +1,5 @@
 #include "main.h"
+#include "scorer.h"
 
 namespace scorer
 {
@@ -115,7 +116,10 @@ namespace scorer
         while (getState() != OFF)
         {
             if (millis() - timer > timeout)
+            {
+                setState(OFF);
                 return -1;
+            }
             delay(50);
         }
         return 0;
