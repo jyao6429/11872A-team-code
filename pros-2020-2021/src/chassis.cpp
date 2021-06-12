@@ -4,6 +4,7 @@
 #include "okapi/api/units/QLength.hpp"
 #include "okapi/api/util/mathUtil.hpp"
 #include "pros/rtos.h"
+#include "pros/rtos.hpp"
 #include <algorithm>
 #include <cmath>
 #include <cstdlib>
@@ -23,7 +24,7 @@ namespace chassis
             okapi::ADIEncoder{'C', 'D'},
             okapi::ADIEncoder{'E', 'F', true}
         )
-        .withOdometry({{2.73228_in, 14.924_in, 14.924_in / 2, 2.73228_in}, okapi::quadEncoderTPR}, okapi::StateMode::CARTESIAN)
+        .withOdometry({{2.73228_in, 14.866_in, 14.866_in / 2, 2.73228_in}, okapi::quadEncoderTPR}, okapi::StateMode::CARTESIAN)
         .buildOdometry();
     
     std::shared_ptr<okapi::XDriveModel> drive = std::dynamic_pointer_cast<okapi::XDriveModel>(chassisController->getModel());
@@ -67,6 +68,11 @@ namespace chassis
                     break;
                 case SKIP:
                     break;
+                case ROCK:
+                    strafeVector(okapi::pi / 2, 0.0, 1.0);
+                    delay(500);
+                    strafeVector(-okapi::pi / 2, 0.0, 1.0);
+                    delay(500);
                 case MTT:
                     printf("chassisTask: in case MTT\n");
                     // Convert to nearest equivalent angle
@@ -269,6 +275,10 @@ namespace chassis
         newState.y = newY;
         newState.theta = newTheta;
         chassisController->setState(newState);
+    }
+    okapi::OdomState getOdomState()
+    {
+        return chassisController->getState();
     }
     void resetOdom()
     {

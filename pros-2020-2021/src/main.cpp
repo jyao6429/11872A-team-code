@@ -56,6 +56,9 @@ void initialize()
  * the VEX Competition Switch, following either autonomous or opcontrol. When
  * the robot is enabled, this task will exit.
  */
+okapi::ControllerButton autoSelectUP(okapi::ControllerDigital::up);
+okapi::ControllerButton autoSelectDown(okapi::ControllerDigital::down);
+
 void disabled()
 {
 	chassis::setState(chassis::SKIP);
@@ -64,6 +67,18 @@ void disabled()
 	intake::stop();
 	scorer::setState(scorer::OFF);
 	scorer::stop();
+
+	/*
+	while (true)
+	{
+		if (autoSelectUP.changedToPressed() && selector::auton < 4)
+			selector::auton++;
+		if (autoSelectDown.changedToPressed() && selector::auton > -4)
+			selector::auton--;
+
+		delay(50);
+	}
+	*/
 }
 
 /**

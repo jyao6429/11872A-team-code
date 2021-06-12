@@ -10,6 +10,7 @@ namespace chassis
     {
         OFF,
         SKIP,
+        ROCK,
         MTT
     } ChassisState;
         
@@ -108,6 +109,7 @@ namespace chassis
     * @param newTheta - the desired orientation of the new state
     */
     void setOdomState(okapi::QLength newX, okapi::QLength newY, okapi::QAngle newTheta);
+    okapi::OdomState getOdomState();
     /**
     * Resets the robot pose to (0, 0, 0)
     */

@@ -29,7 +29,7 @@ namespace test
         ODOM_DIAMETER_TUNE
     };
     // Current test case to run
-    static constexpr TestScript currentTest = MTT_ASYNC_0;
+    static constexpr TestScript currentTest = ODOM_DIAMETER_TUNE;
     
     void run()
     {
@@ -183,7 +183,7 @@ namespace test
                 delay(500);
                 chassis::resetOdom();
                 chassis::init();
-                chassis::moveToTargetAsync(0_in, 120_in, 0_deg, 0.7, 0.5, true);
+                chassis::moveToTargetAsync(120_in, 0_in, 0_deg, 0.7, 0.5, true);
                 printf("Waiting ODOM_DIAMETER_TUNE\n");
                 chassis::waitUntilSettled();
                 printf("Done waiting ODOM_DIAMETER_TUNE\n");
