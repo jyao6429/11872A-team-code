@@ -29,7 +29,7 @@ namespace test
         ODOM_DIAMETER_TUNE
     };
     // Current test case to run
-    static constexpr TestScript currentTest = ODOM_DIAMETER_TUNE;
+    static constexpr TestScript currentTest = MTT_ASYNC_0;
     
     void run()
     {
@@ -147,10 +147,10 @@ namespace test
                 printf("Starting MTT_ASYNC_0\n");
                 chassis::resetOdom();
                 chassis::init();
-                chassis::moveToTargetAsync(24_in, 48_in, 180_deg, 1.0, 0.4, true);
+                chassis::moveToTargetAsync(-48_in, 24_in, 0_deg, 1.0, 0.4, true, true);
                 chassis::waitUntilSettled();
-                chassis::moveToTargetAsync(0_in, 0_in, 0_deg, 1.0, 0.4, true);
-                chassis::waitUntilSettled();
+                //chassis::moveToTargetAsync(0_in, 0_in, 0_deg, 1.0, 0.4, true);
+                //chassis::waitUntilSettled();
                 break;
             case MTT_ASYNC_1:
                 printf("Starting MTT_ASYNC_1\n");

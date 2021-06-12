@@ -83,10 +83,11 @@ namespace chassis
                     // Initialize PID controllers
                     auto distanceController = okapi::IterativeControllerFactory::posPID(0.35, 0.0015, 0.015);
                     auto thetaController = okapi::IterativeControllerFactory::posPID(3.0, 4.0, 0.07);
-                    auto lineUpController = okapi::IterativeControllerFactory::posPID(0.5, 0.0, 0.0);
+                    auto lineUpController = okapi::IterativeControllerFactory::posPID(0.1, 0.0, 0.0);
                     distanceController.setTarget(0);
                     thetaController.setTarget(currentContainer.theta.getValue());
-                    lineUpController.setTarget(0);
+                    double convertedTargetTheta = okapi::pi / 2 - currentContainer.theta.getValue();
+                    lineUpController.setTarget(currentContainer.theta.getValue());
 
                     //printf("~~~~~~~~~~~~~~~MTT~~~~~~~~~~~~~~~\ntX: %3.3f\ttY: %3.3f\ttT: %3.3f\tmaxS: %3.3f\tmaxO: %3.3f\n",
                             //targetX.convert(okapi::inch), targetY.convert(okapi::inch), targetTheta.convert(okapi::degree), maxSpeed, maxOmega);
@@ -135,14 +136,17 @@ namespace chassis
                         double targetSpeed = -distanceController.step(distanceError) * currentContainer.maxSpeed;
                         double targetOmega = thetaController.step(currentState.theta.getValue()) * currentContainer.maxOmega;
 
-                        if (currentContainer.lineUp)
+                        double headingDelta = 0;
+                        double originalHeading = targetHeading;
+                        if (currentContainer.lineUp && distanceError > 6)
                         {
-                            double headingDelta = lineUpController.step(targetHeading - currentState.theta.getValue()) * okapi::pi / 2;
+                            targetHeading = nearestEquivalentAngle(targetHeading, convertedTargetTheta);
+                            headingDelta = -lineUpController.step(targetHeading) * okapi::pi / 2;
                             targetHeading += headingDelta;
-                            if (targetHeading - currentState.theta.getValue() > okapi::pi / 2)
-                                targetHeading = currentState.theta.getValue() + okapi::pi / 2;
-                            if (targetHeading - currentState.theta.getValue() < -okapi::pi / 2)
-                                targetHeading = currentState.theta.getValue() - okapi::pi / 2;
+                            if (targetHeading - convertedTargetTheta > okapi::pi / 2)
+                                targetHeading = convertedTargetTheta + okapi::pi / 2;
+                            if (targetHeading - convertedTargetTheta < -okapi::pi / 2)
+                                targetHeading = convertedTargetTheta - okapi::pi / 2;
                         }
 
                         // Power motors based on targets
@@ -155,7 +159,8 @@ namespace chassis
                         if (millis() - mttTimer > 100)
                         {
                             mttTimer = millis();
-                            printf("ASYNC xDiff: %3.3f\tyDiff: %3.3f\tdE: %3.3f\ttE: %3.3f\theading: %3.3f\tspeed: %3.3f\tomega: %3.3f\n", xDiff, yDiff, distanceError, thetaError, targetHeading * okapi::radianToDegree, targetSpeed, targetOmega);
+                            //printf("ASYNC xDiff: %3.3f\tyDiff: %3.3f\tdE: %3.3f\ttE: %3.3f\theading: %3.3f\tspeed: %3.3f\tomega: %3.3f\n", xDiff, yDiff, distanceError, thetaError, targetHeading * okapi::radianToDegree, targetSpeed, targetOmega);
+                            printf("ASYNC xDiff: %3.3f\tyDiff: %3.3f\toriginalHeading: %3.3f\theadingDelta: %3.3f\theading: %3.3f\n", xDiff, yDiff, originalHeading * okapi::radianToDegree, headingDelta * okapi::radianToDegree, targetHeading * okapi::radianToDegree);
                         }
 
                         delay(10);
@@ -376,7 +381,7 @@ namespace chassis
 
         //moveVector(theta, omega, speed);
 
-        if (intakePositiveButton.isPressed() && intakeNegativeButton.isPressed() && millis() - rockTimer > 500)
+        if (intakePositiveButton.isPressed() && intakeNegativeButton.isPressed() && millis())
         {
             if (rockForward)
             {
@@ -390,8 +395,11 @@ namespace chassis
                 omega = 0;
                 speed = 1.0;
             }
-            rockForward != rockForward;
-            rockTimer = millis();
+            if (millis() - rockTimer > 200)
+            {
+                rockForward = !rockForward;
+                rockTimer = millis();
+            }
         }
 
         drive->xArcade(speed * std::cos(theta), speed * std::sin(theta), omega);

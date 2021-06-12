@@ -207,7 +207,7 @@ namespace intake
 			intakeVolt = -12000;
 
         if (strafeVerticalButton.isPressed())
-            intakeVolt = 12000 * (master.get_analog(ANALOG_LEFT_Y) / 127 (double));
+            intakeVolt = 12000 * ((double) master.get_analog(ANALOG_LEFT_Y) / 127);
 
         
 
