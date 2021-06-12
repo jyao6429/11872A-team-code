@@ -24,7 +24,6 @@ namespace auton
 
         // Back away while outtaking 
         chassis::moveToTargetAsync(side * -45_in, -45_in, side * -135_deg, 1.0, 0.4, false);
-        delay(400);
         intake::setState(intake::OUTTAKE);
         chassis::waitUntilStuck(2000);
         intake::setState(intake::OFF);
