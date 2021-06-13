@@ -72,9 +72,9 @@ namespace chassis
                     break;
                 case ROCK:
                     strafeVector(okapi::pi / 2, 0.0, 1.0);
-                    delay(500);
+                    delay(200);
                     strafeVector(-okapi::pi / 2, 0.0, 1.0);
-                    delay(500);
+                    delay(200);
                 case MTT:
                     printf("chassisTask: in case MTT\n");
                     // Convert to nearest equivalent angle
@@ -229,8 +229,8 @@ namespace chassis
     }
     int waitUntilStuck(int timeout)
     {
-        okapi::SettledUtil distanceStuckUtil(std::make_unique<okapi::Timer>(), 2.0, 2.0, 750_ms);
-        okapi::SettledUtil thetaStuckUtil(std::make_unique<okapi::Timer>(), 0.2, 0.2, 750_ms);
+        okapi::SettledUtil distanceStuckUtil(std::make_unique<okapi::Timer>(), 2.0, 2.0, 400_ms);
+        okapi::SettledUtil thetaStuckUtil(std::make_unique<okapi::Timer>(), 0.2, 0.2, 400_ms);
         int timeoutTimer = millis();
 
         while (true)

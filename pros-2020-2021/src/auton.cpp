@@ -15,7 +15,7 @@ namespace auton
         chassis::moveToTargetAsync(side * -45_in, -45_in, side * -135_deg, 1.0, 0.4, false);
         chassis::waitUntilStuck(3000);
         intake::setState(intake::NUMBER_IN, 1);
-        chassis::moveToTargetAsync(side * -58_in, -58_in, side * -135_deg, 1.0, 0.4, false);
+        chassis::moveToTargetAsync(side * -58_in, -58_in, side * -135_deg, 1.0, 0.4, false, true);
         chassis::waitUntilStuck(2000);
 
         // Score the two intaked balls
@@ -102,74 +102,76 @@ namespace auton
 
 
     }
-    void halfSafeSkills()
+    void halfSafeSkills(int side)
     {
+        okapi::QAngle angleDiff = (side == 1) ? 0_deg : 180_deg;
+
         // Line up with corner goal and score
-        chassis::moveToTargetAsync(-53_in, -53_in, -135_deg, 1.0, 0.6, false);
+        chassis::moveToTargetAsync(side * -53_in, side * -53_in, -135_deg - angleDiff, 1.0, 0.6, false);
         chassis::waitUntilStuck(2000);
-        chassis::moveToTargetAsync(-58_in, -58_in, -135_deg, 1.0, 0.4, false);
+        chassis::moveToTargetAsync(side * -58_in, side * -58_in, -135_deg - angleDiff, 1.0, 0.4, false, true);
         chassis::waitUntilStuck(2000);
         scorer::setState(scorer::NUMBER_SCORE, 1);
         scorer::waitUntilStopped(5000);
 
         // Back away while intaking
-        chassis::moveToTargetAsync(-50_in, -50_in, -135_deg, 1.0, 0.4, false);
+        chassis::moveToTargetAsync(side * -50_in, side * -50_in, -135_deg - angleDiff, 1.0, 0.4, false);
         intake::setState(intake::INTAKE);
         chassis::waitUntilStuck(2000);
         intake::setState(intake::OFF);
 
         // Line up with center left ball and eject 2 blue balls
-        chassis::moveToTargetAsync(-37_in, -40_in, 15_deg, 1.0, 0.6, false);
+        chassis::moveToTargetAsync(side * -37_in, side * -40_in, 15_deg - angleDiff, 1.0, 0.6, false);
         chassis::waitUntilStuck(3000);
         intake::setState(intake::INTAKE);
         indexer::moveVoltageSafe(12000);
         scorer::setState(scorer::EJECT);
 
         // Intake center left ball
-        chassis::moveToTargetAsync(-24_in, 0_in, 20_deg, 1.0, 0.4, false);
+        chassis::moveToTargetAsync(side * -24_in, side * 0_in, 20_deg - angleDiff, 1.0, 0.4, false, true);
         delay(1500);
         intake::setState(intake::NUMBER_IN, 2);
         scorer::setState(scorer::OFF);
         chassis::waitUntilStuck(4000);
 
         // Line up with left middle goal and score
-        chassis::moveToTargetAsync(-55.5_in, 0_in, -90_deg, 1.0, 0.8, true);
+        chassis::moveToTargetAsync(side * -55.5_in, side * 0_in, -90_deg - angleDiff, 1.0, 0.8, true, true);
         chassis::waitUntilStuck(4000);
         scorer::setState(scorer::NUMBER_SCORE, 2);
         delay(1000);
         scorer::waitUntilStopped(5000);
 
-        // Back away while intaking
-        chassis::moveToTargetAsync(-47_in, 0_in, -90_deg, 1.0, 0.8, false);
-        //intake::setState(intake::INTAKE);
+        // Back away while outtaking
+        chassis::moveToTargetAsync(side * -47_in, side * 0_in, -90_deg - angleDiff, 1.0, 0.8, false);
+        intake::setState(intake::OUTTAKE);
         chassis::waitUntilStuck(2000);
         intake::setState(intake::OFF);
 
         // Intake one ball and line up with corner goal
         intake::setState(intake::NUMBER_IN, 1);
-        chassis::moveToTargetAsync(-36_in, 48_in, 15_deg, 1.0, 0.8, false);
+        chassis::moveToTargetAsync(side * -36_in, side * 48_in, 15_deg - angleDiff, 1.0, 0.8, false, true);
         chassis::waitUntilStuck(3000);
-        chassis::moveToTargetAsync(-53_in, 53_in, -45_deg, 1.0, 0.6, false);
+        chassis::moveToTargetAsync(side * -53_in, side * 53_in, -45_deg - angleDiff, 1.0, 0.6, false);
         chassis::waitUntilStuck(2000);
-        chassis::moveToTargetAsync(-58_in, 58_in, -45_deg, 1.0, 0.4, false);
+        chassis::moveToTargetAsync(side * -58_in, side * 58_in, -45_deg - angleDiff, 1.0, 0.4, false, true);
         chassis::waitUntilStuck(2000);
         scorer::setState(scorer::NUMBER_SCORE, 1);
         scorer::waitUntilStopped(5000);
 
         // Back away while intaking
-        chassis::moveToTargetAsync(-50_in, 50_in, -45_deg, 1.0, 0.4, false);
+        chassis::moveToTargetAsync(side * -50_in, side * 50_in, -45_deg - angleDiff, 1.0, 0.4, false);
         intake::setState(intake::INTAKE);
         chassis::waitUntilStuck(2000);
 
         // Line up with center top ball and eject 1 blue ball
-        chassis::moveToTargetAsync(-40_in, 37_in, 110_deg, 1.0, 0.6, false);
+        chassis::moveToTargetAsync(-side * 40_in, side * 37_in, 110_deg - angleDiff, 1.0, 0.6, false);
         chassis::waitUntilStuck(3000);
         intake::setState(intake::INTAKE);
         indexer::moveVoltageSafe(12000);
         scorer::setState(scorer::EJECT);
 
         // Intake center top ball
-        chassis::moveToTargetAsync(0_in, 24_in, 110_deg, 1.0, 0.4, false);
+        chassis::moveToTargetAsync(side * 0_in, side * 24_in, 110_deg - angleDiff, 1.0, 0.4, false, true);
         delay(1500);
         intake::setState(intake::NUMBER_IN, 1);
         scorer::setState(scorer::OFF);
@@ -182,50 +184,44 @@ namespace auton
         intake::setState(intake::NUMBER_IN, 1);
 
         // Move to first ball
-        chassis::moveToTargetAsync(-35.4_in, -48_in, -70_deg, 1.0, 0.8, false);
+        chassis::moveToTargetAsync(-35.4_in, -48_in, -70_deg, 1.0, 0.8, false, true);
         chassis::waitUntilStuck(1000);
 
         // Half of skills
-        halfSafeSkills();
-
+        halfSafeSkills(1);
         
         // Line up with top middle goal and score
-        chassis::moveToTargetAsync(0_in, 55.5_in, 0_deg, 1.0, 0.8, false);
+        chassis::moveToTargetAsync(0_in, 55.5_in, 0_deg, 1.0, 0.8, false, true);
         chassis::waitUntilStuck(4000);
         scorer::setState(scorer::NUMBER_SCORE, 1);
         scorer::waitUntilStopped(5000);
 
         // Back away while intaking
         chassis::moveToTargetAsync(0_in, 40_in, 0_deg, 1.0, 0.8, false);
-        intake::setState(intake::INTAKE);
+        intake::setState(intake::OUTTAKE);
         chassis::waitUntilStuck(2000);
         intake::setState(intake::OFF);
 
         // Turn to right corner ball and eject blue ball
         chassis::moveToTargetAsync(0_in, 40_in, 75_deg, 1.0, 1.0, false);
         chassis::waitUntilStuck(2000);
-        intake::setState(intake::INTAKE);
-        indexer::moveVoltageSafe(12000);
-        scorer::setState(scorer::EJECT);
+        //intake::setState(intake::INTAKE);
+        //indexer::moveVoltageSafe(12000);
+        //scorer::setState(scorer::EJECT);
 
         // Intake right corner ball
-        chassis::moveToTargetAsync(36_in, 48_in, 75_deg, 1.0, 0.4, true);
+        chassis::moveToTargetAsync(36_in, 48_in, 75_deg, 1.0, 0.4, false, true);
         delay(1500);
         intake::setState(intake::NUMBER_IN, 1);
         scorer::setState(scorer::OFF);
         chassis::waitUntilStuck(2000);
-
-        delay(500);
-        okapi::OdomState currentState = chassis::getOdomState();
-        chassis::setOdomState(-currentState.x, -currentState.y, currentState.theta - 180_deg);
         
-        halfSafeSkills();
+        halfSafeSkills(-1);
 
-        /*
         // Line up with center goal and score
-        chassis::moveToTargetAsync(0_in, 8_in, -180_deg, 1.0, 0.8, false);
-        intake::setState(intake::INTAKE);
-        indexer::moveVoltageSafe(9000);
+        chassis::moveToTargetAsync(0_in, -8_in, 0_deg, 1.0, 0.8, false, true);
+        intake::setState(intake::NUMBER_IN, 3);
+        //indexer::moveVoltageSafe(9000);
         chassis::waitUntilStuck(4000);
         chassis::setState(chassis::ROCK);
         delay(500);
@@ -237,7 +233,6 @@ namespace auton
         chassis::moveToTargetAsync(0_in, 20_in, -180_deg, 1.0, 0.8, false);
         chassis::waitUntilStuck(4000);
         intake::setState(intake::OFF);
-        */
     }
     void leftHomeRow()
     {
