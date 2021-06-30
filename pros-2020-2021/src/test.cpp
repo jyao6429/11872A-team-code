@@ -29,7 +29,7 @@ namespace test
         ODOM_DIAMETER_TUNE
     };
     // Current test case to run
-    static constexpr TestScript currentTest = MTT_ASYNC_0;
+    static constexpr TestScript currentTest = ODOM_DIAMETER_TUNE;
     
     void run()
     {

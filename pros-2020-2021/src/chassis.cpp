@@ -83,7 +83,7 @@ namespace chassis
                     // Initialize PID controllers
                     auto distanceController = okapi::IterativeControllerFactory::posPID(0.35, 0.0015, 0.015);
                     auto thetaController = okapi::IterativeControllerFactory::posPID(3.0, 4.0, 0.07);
-                    auto lineUpController = okapi::IterativeControllerFactory::posPID(0.1, 0.0, 0.0);
+                    auto lineUpController = okapi::IterativeControllerFactory::posPID(0.05, 0.0, 0.0);
                     distanceController.setTarget(0);
                     thetaController.setTarget(currentContainer.theta.getValue());
                     double convertedTargetTheta = okapi::pi / 2 - currentContainer.theta.getValue();
@@ -279,7 +279,7 @@ namespace chassis
         mttContainer.maxSpeed = maxSpeed;
         mttContainer.maxOmega = maxOmega;
         mttContainer.park = park;
-        mttContainer.lineUp = lineUp;
+        mttContainer.lineUp = false;
         state = MTT;
         chassisMutex->give();
     }

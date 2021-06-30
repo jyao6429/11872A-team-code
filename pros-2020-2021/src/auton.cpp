@@ -15,7 +15,7 @@ namespace auton
         chassis::moveToTargetAsync(side * -45_in, -45_in, side * -135_deg, 1.0, 0.4, false);
         chassis::waitUntilStuck(3000);
         intake::setState(intake::NUMBER_IN, 1);
-        chassis::moveToTargetAsync(side * -58_in, -58_in, side * -135_deg, 1.0, 0.4, false, true);
+        chassis::moveToTargetAsync(side * -58_in, -58_in, side * -135_deg, 1.0, 0.4, false);
         chassis::waitUntilStuck(2000);
 
         // Score the two intaked balls
