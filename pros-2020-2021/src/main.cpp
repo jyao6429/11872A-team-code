@@ -1,20 +1,37 @@
 #include "main.h"
+#include "chassis.h"
+#include "intake.h"
+#include "odom.h"
+#include "okapi/api/util/mathUtil.hpp"
+#include "pros/rtos.h"
+#include "pros/rtos.hpp"
+#include "autoSelect/selection.h"
+#include <cmath>
+#include <memory>
 
-/**
- * A callback function for LLEMU's center button.
- *
- * When this callback is fired, it will toggle line 2 of the LCD text between
- * "I was pressed!" and nothing.
- */
-void on_center_button() {
-	static bool pressed = false;
-	pressed = !pressed;
-	if (pressed) {
-		pros::lcd::set_text(2, "I was pressed!");
-	} else {
-		pros::lcd::clear_line(2);
+Controller master(E_CONTROLLER_MASTER);
+
+// Variables for textUpdate
+int prevAuto = 1;
+std::unique_ptr<Task> textUpdateHandler;
+
+// Task for updating controller text for auton state
+void textUpdate(void *ign)
+{
+	while (true)
+	{
+		int currentAuto = selector::auton;
+		if (currentAuto != prevAuto)
+		{
+			char autoSelection[20];
+			sprintf(autoSelection, "Auto: %d    ", currentAuto);
+			master.set_text(0, 0, autoSelection);
+			prevAuto = currentAuto;
+		}
+		delay(200);
 	}
 }
+
 
 /**
  * Runs initialization code. This occurs as soon as the program is started.
@@ -22,11 +39,16 @@ void on_center_button() {
  * All other competition modes are blocked by initialize; it is recommended
  * to keep execution time for this mode under a few seconds.
  */
-void initialize() {
-	pros::lcd::initialize();
-	pros::lcd::set_text(1, "Hello PROS User!");
+void initialize()
+{
+	//odom::start(false);
+	chassis::init();
+	intake::init();
+	scorer::init();
 
-	pros::lcd::register_btn1_cb(on_center_button);
+	selector::init();
+
+	textUpdateHandler = std::make_unique<Task>(textUpdate, nullptr, TASK_PRIORITY_DEFAULT - 1);
 }
 
 /**
@@ -34,7 +56,30 @@ void initialize() {
  * the VEX Competition Switch, following either autonomous or opcontrol. When
  * the robot is enabled, this task will exit.
  */
-void disabled() {}
+okapi::ControllerButton autoSelectUP(okapi::ControllerDigital::up);
+okapi::ControllerButton autoSelectDown(okapi::ControllerDigital::down);
+
+void disabled()
+{
+	chassis::setState(chassis::SKIP);
+	chassis::stop();
+	intake::setState(intake::OFF);
+	intake::stop();
+	scorer::setState(scorer::OFF);
+	scorer::stop();
+
+	/*
+	while (true)
+	{
+		if (autoSelectUP.changedToPressed() && selector::auton < 4)
+			selector::auton++;
+		if (autoSelectDown.changedToPressed() && selector::auton > -4)
+			selector::auton--;
+
+		delay(50);
+	}
+	*/
+}
 
 /**
  * Runs after initialize(), and before autonomous when connected to the Field
@@ -58,7 +103,37 @@ void competition_initialize() {}
  * will be stopped. Re-enabling the robot will restart the task, not re-start it
  * from where it left off.
  */
-void autonomous() {}
+void autonomous()
+{
+	// Ensure all necessary subsystems are running
+	chassis::init();
+	intake::init();
+	scorer::init();
+
+	// Switch based on desired autonomous
+	int selection = std::abs(selector::auton);
+	switch (selection)
+	{
+		case 0:
+			auton::skillsSafe();
+			//auton::skills();
+			//test::run();
+			break;
+		case 1:
+			auton::leftHomeRow();
+			break;
+		case 2:
+			auton::leftHalf();
+			break;
+		case 3:
+			auton::rightHalf();
+			break;
+		case 4:
+			disabled();
+			break;
+	}
+	
+}
 
 /**
  * Runs the operator control code. This function will be started in its own task
@@ -73,20 +148,33 @@ void autonomous() {}
  * operator control task will be stopped. Re-enabling the robot will restart the
  * task, not resume it from where it left off.
  */
-void opcontrol() {
-	pros::Controller master(pros::E_CONTROLLER_MASTER);
-	pros::Motor left_mtr(1);
-	pros::Motor right_mtr(2);
+void opcontrol()
+{
+	chassis::setState(chassis::SKIP);
+	chassis::stop();
+	intake::setState(intake::OFF);
+	intake::stop();
+	scorer::setState(scorer::OFF);
+	scorer::stop();
 
-	while (true) {
-		pros::lcd::print(0, "%d %d %d", (pros::lcd::read_buttons() & LCD_BTN_LEFT) >> 2,
-		                 (pros::lcd::read_buttons() & LCD_BTN_CENTER) >> 1,
-		                 (pros::lcd::read_buttons() & LCD_BTN_RIGHT) >> 0);
-		int left = master.get_analog(ANALOG_LEFT_Y);
-		int right = master.get_analog(ANALOG_RIGHT_Y);
+	int timer = millis();
+	bool isLogging = false;
 
-		left_mtr = left;
-		right_mtr = right;
-		pros::delay(20);
+	while (true)
+	{
+		// Run each of the subsystem's opcontrol
+		chassis::opcontrol();
+		intake::opcontrol();
+		indexer::opcontrol();
+		scorer::opcontrol();
+
+		if (millis() - timer > 100 && isLogging)
+		{
+			//odom::pose robotPose = odom::getPose();
+			//printf("X: %3.3f\tY: %3.3f\tT: %3.3f\n", robotPose.x, robotPose.y, robotPose.theta * okapi::radianToDegree);
+			//printf("L: %d\tR: %d\tB: %d\n", leftEncoder.get_value(), rightEncoder.get_value(), backEncoder.get_value());
+			timer = millis();
+		}
+		delay(10);
 	}
 }
